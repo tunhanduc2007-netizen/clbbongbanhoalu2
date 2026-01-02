@@ -60,6 +60,45 @@ Dự án sử dụng Supabase cho:
 
 Thông tin Supabase đã được cấu hình sẵn trong `.env.example`
 
+## 🌐 Netlify Deployment (Auto-Deploy)
+
+### Cách Netlify Hoạt Động:
+
+1. **Kết nối một lần** (đã setup):
+   - Netlify được kết nối với GitHub repo này
+   - Mỗi khi có code mới push lên `main` branch → Netlify tự động build & deploy
+
+2. **Workflow tự động**:
+   ```
+   Máy 1: git push origin main
+   ↓
+   GitHub nhận code mới
+   ↓
+   Netlify tự động detect thay đổi
+   ↓
+   Netlify build: npm run build
+   ↓
+   Website tự động cập nhật!
+   ```
+
+3. **Không cần làm gì thêm**:
+   - ✅ Không cần login Netlify trên máy mới
+   - ✅ Không cần build thủ công
+   - ✅ Website tự động cập nhật sau 2-3 phút
+
+### Kiểm Tra Deployment:
+
+- **Netlify Dashboard**: https://app.netlify.com
+- Xem build logs để debug nếu có lỗi
+- Mỗi commit = 1 deployment mới
+
+### Environment Variables trên Netlify:
+
+Nếu cần thêm biến môi trường:
+1. Vào Netlify Dashboard → Site settings
+2. Build & deploy → Environment variables
+3. Add: `VITE_SUPABASE_URL` và `VITE_SUPABASE_ANON_KEY`
+
 ## 📦 Tech Stack
 
 - **Frontend**: React + Vite + TypeScript

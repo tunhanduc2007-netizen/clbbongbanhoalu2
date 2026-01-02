@@ -1,0 +1,31 @@
+# Netlify Configuration File
+# Docs: https://docs.netlify.com/configure-builds/file-based-configuration/
+
+[build]
+  # Build command
+  command = "npm run build"
+  
+  # Directory to deploy (Vite builds to dist/)
+  publish = "dist"
+  
+  # Node version
+  environment = { NODE_VERSION = "18" }
+
+# Redirects for SPA (Single Page Application)
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# Headers for better performance
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-XSS-Protection = "1; mode=block"
+    X-Content-Type-Options = "nosniff"
+
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
