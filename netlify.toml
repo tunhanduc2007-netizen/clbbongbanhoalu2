@@ -2,10 +2,13 @@
 # Docs: https://docs.netlify.com/configure-builds/file-based-configuration/
 
 [build]
+  # Base directory where package.json is located
+  base = "clbbongbanhoalu-master"
+  
   # Build command
   command = "npm run build"
   
-  # Directory to deploy (Vite builds to dist/)
+  # Directory to deploy (Relative to base)
   publish = "dist"
   
   # Node version
