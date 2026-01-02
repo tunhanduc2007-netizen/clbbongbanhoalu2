@@ -636,11 +636,11 @@ export default function Admin() {
                 </div>
             </header>
 
-            <main className="max-w-[1600px] mx-auto px-8 py-10">
+            <main className="max-w-[1600px] mx-auto px-4 md:px-8 py-10">
                 {/* Top Row: Title & Filter */}
-                <div className="flex flex-col md:flex-row justify-between items-end mb-10 gap-6">
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-10 gap-6">
                     <div>
-                        <h1 className="text-4xl font-black text-[#1e293b] tracking-tight">
+                        <h1 className="text-2xl md:text-4xl font-black text-[#1e293b] tracking-tight">
                             {activeTab === 'finance' ? 'Tổng Quan Tài Chính' : (activeTab === 'tables' ? 'Quản Lý Bàn' : 'Quản Lý Lịch Tập')}
                         </h1>
                         <div className="flex gap-4 mt-4 overflow-x-auto pb-2">
@@ -680,7 +680,7 @@ export default function Admin() {
                                 </select>
                                 <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400" size={18} />
                             </div>
-                            <button onClick={exportExcel} className="flex items-center gap-2 bg-white px-5 py-3.5 rounded-2xl shadow-sm text-sm font-bold text-slate-600 border border-slate-100 hover:bg-slate-50 transition-all">
+                            <button onClick={exportExcel} className="hidden md:flex items-center gap-2 bg-white px-5 py-3.5 rounded-2xl shadow-sm text-sm font-bold text-slate-600 border border-slate-100 hover:bg-slate-50 transition-all">
                                 <FileSpreadsheet size={18} className="text-green-600" /> XUẤT EXCEL
                             </button>
                         </div>
@@ -759,18 +759,26 @@ export default function Admin() {
                         </div>
 
                         {/* Right: Sidebar Actions */}
-                        <div className="lg:col-span-4">
-                            <div className="bg-white p-6 rounded-[2rem] shadow-2xl border border-slate-100 min-h-[700px] sticky top-28 flex flex-col">
+                        <div className={`lg:col-span-4 transition-all duration-300 ${selectedTable ? 'fixed inset-0 z-[200] p-4 bg-slate-50/95 backdrop-blur-sm lg:static lg:p-0 lg:bg-transparent' : 'hidden lg:block'}`}>
+                            <div className="bg-white p-6 rounded-[2rem] shadow-2xl border border-slate-100 lg:min-h-[700px] lg:sticky lg:top-28 flex flex-col h-full lg:h-auto overflow-y-auto">
                                 {selectedTable ? (
                                     <>
                                         {/* Top: HeaderInfo */}
-                                        <div className="flex justify-between items-center mb-6 pb-6 border-b border-slate-100">
+                                        <div className="flex justify-between items-center mb-6 pb-6 border-b border-slate-100 relative">
                                             <div>
-                                                <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Bàn đang chọn</div>
+                                                <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                                                    <button onClick={() => setSelectedTable(null)} className="lg:hidden p-1 -ml-2 text-slate-400 hover:text-slate-800"><ChevronDown size={20} className="rotate-90" /></button>
+                                                    Bàn đang chọn
+                                                </div>
                                                 <div className="text-4xl font-black text-[#1e293b]">Bàn {selectedTable.table_number}</div>
                                             </div>
-                                            <div className={`w-12 h-12 rounded-2xl flex items-center justify-center text-white shadow-lg ${selectedTable.status === 'occupied' ? 'bg-blue-600 shadow-blue-500/30' : 'bg-slate-200'}`}>
-                                                <LayoutDashboard size={24} />
+                                            <div className="flex items-center gap-3">
+                                                <button onClick={() => setSelectedTable(null)} className="lg:hidden w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-500">
+                                                    <CloseIcon size={20} />
+                                                </button>
+                                                <div className={`w-12 h-12 rounded-2xl flex items-center justify-center text-white shadow-lg ${selectedTable.status === 'occupied' ? 'bg-blue-600 shadow-blue-500/30' : 'bg-slate-200'}`}>
+                                                    <LayoutDashboard size={24} />
+                                                </div>
                                             </div>
                                         </div>
 
