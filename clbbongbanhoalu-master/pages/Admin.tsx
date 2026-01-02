@@ -60,7 +60,11 @@ export default function Admin() {
     const [catId, setCatId] = useState('');
     const [desc, setDesc] = useState('');
     const [equipment, setEquipment] = useState('');
-    const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
+    const [date, setDate] = useState(() => {
+        const d = new Date();
+        const offset = d.getTimezoneOffset() * 60000;
+        return new Date(d.getTime() - offset).toISOString().split('T')[0];
+    });
 
     // Chart Ref
     const chartRef = useRef<any>(null);
@@ -983,11 +987,17 @@ export default function Admin() {
                                         </div>
                                         <div>
                                             <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Ngày thực hiện</label>
-                                            <input
-                                                type="date"
-                                                className="w-full p-4 bg-slate-50 border-none rounded-2xl mt-2 font-bold text-slate-600 outline-none"
-                                                value={date} onChange={(e) => setDate(e.target.value)} required
-                                            />
+                                            <div className="relative w-full mt-2 group">
+                                                <input
+                                                    type="date"
+                                                    className="absolute inset-0 w-full h-full opacity-0 z-10 cursor-pointer"
+                                                    value={date} onChange={(e) => setDate(e.target.value)} required
+                                                />
+                                                <div className="w-full p-4 bg-slate-50 rounded-2xl font-bold text-slate-600 flex justify-between items-center group-focus-within:ring-2 ring-green-500/10 transition-all">
+                                                    <span>{date ? date.split('-').reverse().join('/') : 'dd/mm/yyyy'}</span>
+                                                    <Calendar size={20} className="text-slate-400" />
+                                                </div>
+                                            </div>
                                         </div>
                                         <div>
                                             <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Họ và tên người nộp</label>
@@ -1036,12 +1046,12 @@ export default function Admin() {
                                         <table className="w-full text-left border-collapse">
                                             <thead>
                                                 <tr className="bg-slate-50/50 text-slate-400 text-[10px] font-black uppercase tracking-[0.15em]">
-                                                    <th className="px-10 py-6">Ngày</th>
-                                                    <th className="px-10 py-6">Hạng mục</th>
-                                                    <th className="px-10 py-6">Dụng cụ</th>
-                                                    <th className="px-10 py-6">Họ và tên</th>
-                                                    <th className="px-10 py-6 text-right">Số tiền</th>
-                                                    <th className="px-10 py-6 text-center">Thao tác</th>
+                                                    <th className="px-4 md:px-10 py-6 hidden md:table-cell">Ngày</th>
+                                                    <th className="px-4 md:px-10 py-6">Hạng mục</th>
+                                                    <th className="px-4 md:px-10 py-6">Dụng cụ</th>
+                                                    <th className="px-4 md:px-10 py-6">Họ và tên</th>
+                                                    <th className="px-4 md:px-10 py-6 text-right">Số tiền</th>
+                                                    <th className="px-4 md:px-10 py-6 text-center">Thao tác</th>
                                                 </tr>
                                             </thead>
                                             <tbody className="divide-y divide-slate-50">
@@ -1051,22 +1061,34 @@ export default function Admin() {
                                                     (r.equipment_name && r.equipment_name.toLowerCase().includes(searchTerm.toLowerCase()))
                                                 ).map((r: any) => (
                                                     <tr key={r.id} className="hover:bg-slate-50/80 transition-all group">
-                                                        <td className="px-10 py-7 text-sm font-bold text-slate-400">
+                                                        <td className="px-4 md:px-10 py-7 text-sm font-bold text-slate-400 hidden md:table-cell">
                                                             {new Date(r.transaction_date).toLocaleDateString()}
                                                         </td>
-                                                        <td className="px-10 py-7">
+                                                        <td className="px-4 md:px-10 py-7">
                                                             <span className="font-black text-slate-700 block text-base">{r.category_name}</span>
                                                             <span className="bg-green-50 text-green-600 px-2.5 py-1 rounded-md text-[9px] font-black uppercase tracking-wider mt-1 inline-block">Đã duyệt</span>
                                                         </td>
-                                                        <td className="px-10 py-7 text-sm font-medium text-slate-400 italic line-clamp-1">{r.equipment_name || '-'}</td>
-                                                        <td className="px-10 py-7 text-sm font-medium text-slate-400 italic line-clamp-1">{r.description || '-'}</td>
-                                                        <td className="px-10 py-7 text-right font-black text-[#7AC943] text-xl">
+                                                        <td className="px-4 md:px-10 py-7 text-sm font-medium text-slate-400 italic line-clamp-1">{r.equipment_name || '-'}</td>
+                                                        <td className="px-4 md:px-10 py-7">
+                                                            <div id={`desc-${r.id}`} className="text-sm font-medium text-slate-400 italic line-clamp-1 transition-all">
+                                                                {r.description || '-'}
+                                                            </div>
+                                                            {r.description && r.description.length > 5 && (
+                                                                <button
+                                                                    onClick={() => document.getElementById(`desc-${r.id}`)?.classList.toggle('line-clamp-1')}
+                                                                    className="text-[10px] font-bold text-blue-500 hover:text-blue-600 mt-1 flex items-center gap-1"
+                                                                >
+                                                                    Xem thêm <ChevronDown size={10} />
+                                                                </button>
+                                                            )}
+                                                        </td>
+                                                        <td className="px-4 md:px-10 py-7 text-right font-black text-[#7AC943] text-xl">
                                                             +{parseFloat(r.amount).toLocaleString()} đ
                                                         </td>
-                                                        <td className="px-10 py-7 text-center">
+                                                        <td className="px-4 md:px-10 py-7 text-center">
                                                             <button
                                                                 onClick={() => { setDeleteTargetId(r.id); setShowDeleteModal(true) }}
-                                                                className="p-2 text-slate-200 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all"
+                                                                className="p-3 text-red-500 bg-red-50 hover:bg-red-100 rounded-xl transition-all shadow-sm"
                                                             >
                                                                 <Trash2 size={20} />
                                                             </button>
@@ -1230,7 +1252,7 @@ export default function Admin() {
                                                     </td>
                                                     <td className="px-8 py-5 text-xs font-bold text-slate-600">{s.location}</td>
                                                     <td className="px-8 py-5 text-right">
-                                                        <button onClick={() => deleteTableItem('training_sessions', s.id)} className="text-slate-200 hover:text-red-500 p-2"><Trash2 size={18} /></button>
+                                                        <button onClick={() => deleteTableItem('training_sessions', s.id)} className="p-3 text-red-500 bg-red-50 hover:bg-red-100 rounded-xl transition-all shadow-sm"><Trash2 size={18} /></button>
                                                     </td>
                                                 </tr>
                                             ))}
