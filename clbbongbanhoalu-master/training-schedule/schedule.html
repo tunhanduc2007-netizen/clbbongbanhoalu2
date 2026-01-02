@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý lịch tập - CLB Bóng bàn Lê Quý Đôn</title>
+    <link rel="stylesheet" href="schedule.css">
+</head>
+
+<body>
+
+    <header>
+        <h1>CLB BÓNG BÀN LÊ QUÝ ĐÔN</h1>
+        <p class="subtitle">Hệ thống Quản lý & Điều phối lịch tập luyện chuyên nghiệp</p>
+    </header>
+
+    <main class="container">
+        <!-- Tab Navigation -->
+        <div class="tabs">
+            <button class="tab-btn active" data-tab="calendar">LỊCH TẬP TUẦN</button>
+            <button class="tab-btn" data-tab="admin">QUẢN TRỊ VIÊN</button>
+        </div>
+
+        <!-- Calendar Section -->
+        <section id="calendar-view" class="calendar-view">
+            <div class="calendar-grid" id="calendar-grid">
+                <!-- Day columns will be injected here -->
+            </div>
+        </section>
+
+        <!-- Admin Section -->
+        <section id="admin-view" class="admin-section">
+            <div class="admin-grid">
+                <!-- Column 1: Coach Management -->
+                <div class="admin-card">
+                    <h2>Quản lý Huấn luyện viên</h2>
+                    <form id="coach-form">
+                        <div class="form-group">
+                            <label>Họ và tên</label>
+                            <input type="text" id="coach-name" placeholder="VD: Nguyễn Văn A" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Trình độ</label>
+                            <select id="coach-level" required>
+                                <option value="HLV Cơ bản">Cơ bản</option>
+                                <option value="HLV Nâng cao">Nâng cao</option>
+                                <option value="HLV Chuyên nghiệp">Chuyên nghiệp</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Điện thoại</label>
+                            <input type="tel" id="coach-phone" placeholder="09xx.xxx.xxx">
+                        </div>
+                        <button type="submit" class="btn btn-primary w-full">THÊM HLV MỚI</button>
+                    </form>
+                    <ul id="coach-list" class="coach-list"></ul>
+                </div>
+
+                <!-- Column 2: Session Management -->
+                <div class="admin-card">
+                    <h2>Xếp lịch tập luyện</h2>
+                    <form id="session-form">
+                        <div class="form-group">
+                            <label>Chọn Huấn luyện viên</label>
+                            <select id="session-coach" required></select>
+                        </div>
+                        <div class="form-group">
+                            <label>Chọn Nhóm tập</label>
+                            <select id="session-group" required></select>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="form-group">
+                                <label>Thứ</label>
+                                <select id="session-day" required>
+                                    <option value="Monday">Thứ 2</option>
+                                    <option value="Tuesday">Thứ 3</option>
+                                    <option value="Wednesday">Thứ 4</option>
+                                    <option value="Thursday">Thứ 5</option>
+                                    <option value="Friday">Thứ 6</option>
+                                    <option value="Saturday">Thứ 7</option>
+                                    <option value="Sunday">Chủ nhật</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Bàn số / Vị trí</label>
+                                <input type="text" id="session-loc" placeholder="Bàn 1-2" required>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="form-group">
+                                <label>Giờ bắt đầu</label>
+                                <input type="time" id="session-start" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Giờ kết thúc</label>
+                                <input type="time" id="session-end" required>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-full">LƯU THỜI KHÓA BIỂU</button>
+                    </form>
+                    <ul id="session-list" class="session-list"></ul>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <div id="toast"></div>
+
+    <script src="schedule.js"></script>
+</body>
+
+</html>

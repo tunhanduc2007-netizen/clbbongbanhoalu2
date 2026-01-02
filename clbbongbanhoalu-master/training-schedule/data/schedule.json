@@ -1,0 +1,136 @@
+{
+    "coaches": [
+        {
+            "id": "c1",
+            "name": "Nguyễn Văn Hùng",
+            "level": "HLV Cao cấp",
+            "phone": "0913909012",
+            "color": "#4E9F3D"
+        },
+        {
+            "id": "c2",
+            "name": "Trần Thị Lan",
+            "level": "HLV Cơ bản",
+            "phone": "0912.345.678",
+            "color": "#7AC943"
+        },
+        {
+            "id": "c3",
+            "name": "Lê Minh Đức",
+            "level": "HLV Nâng cao",
+            "phone": "0911.222.333",
+            "color": "#FFD800"
+        },
+        {
+            "id": "c4",
+            "name": "Phạm Hải Nam",
+            "level": "HLV Chuyên nghiệp",
+            "phone": "0988.777.666",
+            "color": "#2D5A27"
+        },
+        {
+            "id": "c5",
+            "name": "Vũ Tuyết Mai",
+            "level": "HLV Trẻ em",
+            "phone": "0944.555.666",
+            "color": "#A3D977"
+        }
+    ],
+    "groups": [
+        {
+            "id": "g1",
+            "name": "Năng khiếu U10",
+            "skill_level": "Cơ bản"
+        },
+        {
+            "id": "g2",
+            "name": "Năng khiếu U15",
+            "skill_level": "Nâng cao"
+        },
+        {
+            "id": "g3",
+            "name": "Người lớn - Cơ bản",
+            "skill_level": "Cơ bản"
+        },
+        {
+            "id": "g4",
+            "name": "Người lớn - Nâng cao",
+            "skill_level": "Nâng cao"
+        },
+        {
+            "id": "g5",
+            "name": "Đội tuyển CLB",
+            "skill_level": "Chuyên nghiệp"
+        },
+        {
+            "id": "g6",
+            "name": "Hội viên tự do",
+            "skill_level": "Giao lưu"
+        }
+    ],
+    "sessions": [
+        {
+            "id": "s1",
+            "coach_id": "c1",
+            "group_id": "g5",
+            "day": "Monday",
+            "start_time": "17:30",
+            "end_time": "19:30",
+            "location": "Bàn 1-4"
+        },
+        {
+            "id": "s2",
+            "coach_id": "c2",
+            "group_id": "g1",
+            "day": "Monday",
+            "start_time": "16:00",
+            "end_time": "17:30",
+            "location": "Bàn 5-6"
+        },
+        {
+            "id": "s3",
+            "coach_id": "c3",
+            "group_id": "g4",
+            "day": "Tuesday",
+            "start_time": "18:00",
+            "end_time": "20:00",
+            "location": "Bàn 2-3"
+        },
+        {
+            "id": "s4",
+            "coach_id": "c4",
+            "group_id": "g2",
+            "day": "Wednesday",
+            "start_time": "17:00",
+            "end_time": "19:00",
+            "location": "Bàn 1-2"
+        },
+        {
+            "id": "s5",
+            "coach_id": "c5",
+            "group_id": "g3",
+            "day": "Thursday",
+            "start_time": "18:00",
+            "end_time": "19:30",
+            "location": "Bàn 5-8"
+        },
+        {
+            "id": "s6",
+            "coach_id": "c1",
+            "group_id": "g5",
+            "day": "Friday",
+            "start_time": "17:30",
+            "end_time": "19:30",
+            "location": "Bàn 1-4"
+        },
+        {
+            "id": "s7",
+            "coach_id": "c6",
+            "group_id": "g6",
+            "day": "Saturday",
+            "start_time": "08:00",
+            "end_time": "11:00",
+            "location": "Toàn bộ CLB"
+        }
+    ]
+}

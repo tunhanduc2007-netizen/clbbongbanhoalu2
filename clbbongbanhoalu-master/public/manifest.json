@@ -1,0 +1,21 @@
+{
+    "name": "CLB Bóng Bàn Hoa Lư",
+    "short_name": "Hoa Lư TT",
+    "description": "Trung tâm đào tạo và giao lưu bóng bàn chuyên nghiệp hàng đầu.",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#ffffff",
+    "theme_color": "#7AC943",
+    "icons": [
+        {
+            "src": "/logo.png",
+            "sizes": "192x192",
+            "type": "image/png"
+        },
+        {
+            "src": "/logo.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        }
+    ]
+}

@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản Lý Tài Chính - CLB Bóng Bàn Hoa Lư</title>
+
+    <!-- Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- Charts & External Libs -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div class="dashboard-wrapper">
+        <!-- Header / Navbar -->
+        <header class="main-header sticky-nav">
+            <div class="container header-flex">
+                <div class="logo-section">
+                    <img src="logo.png" alt="Logo">
+                    <span class="brand-text">HOA LƯ ADMIN</span>
+                </div>
+                <div class="user-nav">
+                    <div class="user-profile" id="profileTrigger" onclick="toggleProfileModal()">
+                        <span id="userNameDisplay" class="user-name">...</span>
+                        <div class="avatar-circle" id="avatarInitial">A</div>
+                    </div>
+                    <button onclick="handleLogout()" class="logout-btn" title="Đăng xuất">
+                        <i data-lucide="log-out"></i>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <main class="container main-content">
+            <!-- Subheader: Filters & Exports -->
+            <div class="subheader">
+                <div class="title-actions">
+                    <h1>Tổng Quan Tài Chính</h1>
+                    <p class="subtitle" id="currentRangeText">Tháng Này</p>
+                </div>
+                <div class="filters-group">
+                    <div class="select-wrapper">
+                        <select id="timeRange" onchange="handleTimeFilterChange()">
+                            <option value="today">Hôm Nay</option>
+                            <option value="week">Tuần Này</option>
+                            <option value="month" selected>Tháng Này</option>
+                            <option value="lastMonth">Tháng Trước</option>
+                            <option value="year">Năm Nay</option>
+                        </select>
+                        <i data-lucide="chevron-down" class="select-icon"></i>
+                    </div>
+                    <div class="export-actions">
+                        <button class="export-btn excel" onclick="exportToExcel()">
+                            <i data-lucide="file-spreadsheet"></i> EXCEL
+                        </button>
+                        <button class="export-btn pdf" onclick="exportToPDF()">
+                            <i data-lucide="file-text"></i> PDF
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stats Grid -->
+            <section class="stats-grid single-card">
+                <div class="stat-card premium-card">
+                    <div class="stat-header">
+                        <span class="stat-label">Tổng Thu Nhập Thực Tế</span>
+                        <div class="stat-icon-wrapper">
+                            <i data-lucide="wallet"></i>
+                        </div>
+                    </div>
+                    <div class="stat-content">
+                        <h2 id="totalIncome">0 đ</h2>
+                        <div class="stat-footer trend-up">
+                            <i data-lucide="trending-up" size="14"></i>
+                            <span id="trendText">Dữ liệu ổn định</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Chart Section -->
+            <section class="charts-row">
+                <div class="chart-container">
+                    <div class="chart-header">
+                        <h3>Dòng Tiền Thu Nhập (Theo Tháng)</h3>
+                        <div class="chart-legend">
+                            <span class="dot green"></span> Doanh thu
+                        </div>
+                    </div>
+                    <div class="canvas-holder">
+                        <canvas id="lineChart"></canvas>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Main Data Grid -->
+            <section class="data-grid">
+                <!-- Transaction Form -->
+                <div class="panel form-panel">
+                    <div class="panel-header">
+                        <i data-lucide="plus-circle"></i>
+                        <h3>Ghi Chép Giao Dịch</h3>
+                    </div>
+                    <form id="transForm" class="styled-form">
+                        <div class="form-group">
+                            <label>Loại & Hạng Mục</label>
+                            <select id="catSelect" required></select>
+                        </div>
+                        <div class="form-group">
+                            <label>Số tiền (VNĐ)</label>
+                            <input type="text" id="amountInput" placeholder="Ví dụ: 60.000" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Ngày thực hiện</label>
+                            <input type="date" id="transDate" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Mô tả chi tiết</label>
+                            <textarea id="description" placeholder="Ghi chú thêm nội dung (Nếu có)..."
+                                rows="2"></textarea>
+                        </div>
+                        <button type="submit" class="submit-btn" id="submitBtn">
+                            <span class="btn-text">LƯU GIAO DỊCH</span>
+                            <div class="spinner" id="btnSpinner"></div>
+                        </button>
+                    </form>
+                </div>
+
+                <!-- History Table -->
+                <div class="panel table-panel">
+                    <div class="panel-header table-actions">
+                        <div class="search-bar">
+                            <i data-lucide="search"></i>
+                            <input type="text" id="searchInput" placeholder="Tìm kiếm theo mô tả, người tạo...">
+                        </div>
+                    </div>
+
+                    <div class="table-container">
+                        <table class="premium-table">
+                            <thead>
+                                <tr>
+                                    <th>Ngày</th>
+                                    <th>Danh mục</th>
+                                    <th>Mô tả</th>
+                                    <th>Người tạo</th>
+                                    <th class="text-right">Số tiền</th>
+                                    <th class="text-center">Trạng thái</th>
+                                    <th class="text-center">Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody id="transTableBody">
+                                <!-- JS items -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="pagination-footer" id="pagination">
+                        <!-- JS buttons -->
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div id="confirmModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-icon warning">
+                <i data-lucide="alert-triangle"></i>
+            </div>
+            <h3>Xác Nhận Xóa?</h3>
+            <p>Bạn có chắc chắn muốn xóa giao dịch này không? Hành động này không thể hoàn tác trong báo cáo.</p>
+            <div class="modal-btns">
+                <button class="btn-cancel" onclick="closeModal('confirmModal')">HỦY BỎ</button>
+                <button class="btn-confirm" id="confirmDeleteBtn">ĐỒNG Ý XÓA</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Profile Modal / Change Password -->
+    <div id="profileModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Thông Tin Tài Khoản</h3>
+                <button class="close-modal" onclick="closeModal('profileModal')">&times;</button>
+            </div>
+            <div class="profile-info">
+                <div class="info-row"><strong>Họ Tên:</strong> <span id="profFullName">...</span></div>
+                <div class="info-row"><strong>Tên Đăng Nhập:</strong> <span id="profUser">...</span></div>
+                <div class="info-row"><strong>Vai Trò:</strong> <span id="profRole">Quản Trị Viên</span></div>
+            </div>
+            <hr>
+            <form id="changePassForm" class="styled-form">
+                <h4>Đổi Mật Khẩu</h4>
+                <div class="form-group">
+                    <input type="password" id="newPass" placeholder="Mật khẩu mới" required>
+                </div>
+                <button type="submit" class="submit-btn secondary">CẬP NHẬT MẬT KHẨU</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Toast Notification Container -->
+    <div id="toastContainer" class="toast-container"></div>
+
+    <script src="main.js"></script>
+    <script>
+        // Start Lucide
+        lucide.createIcons();
+
+        // Auth Protec
+        const user = JSON.parse(localStorage.getItem('adminUser'));
+        if (!user) window.location.href = 'login.html';
+
+        // Initial setup
+        document.getElementById('userNameDisplay').textContent = user.full_name || user.username;
+        document.getElementById('profFullName').textContent = user.full_name || 'Admin';
+        document.getElementById('profUser').textContent = user.username;
+        document.getElementById('avatarInitial').textContent = (user.full_name || user.username)[0].toUpperCase();
+        document.getElementById('transDate').valueAsDate = new Date();
+
+        initApp();
+    </script>
+</body>
+
+</html>
