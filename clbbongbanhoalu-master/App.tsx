@@ -188,11 +188,11 @@ const AppContent: React.FC = () => {
       {!isAdminPath && <Footer />}
 
       {!isAdminPath && (
-        <div className="fixed bottom-6 right-6 z-40 flex flex-col gap-3">
+        <div className="fixed bottom-6 right-0 z-40 flex flex-col gap-3 items-end">
           <a href="tel:0913909012" className="ripple flex items-center justify-center w-14 h-14 bg-[#7AC943] text-white rounded-full shadow-2xl transition-transform active:scale-90 animate-bounce">
             <Phone size={28} />
           </a>
-          <Link to="/register" className="ripple flex items-center gap-2 bg-gradient-to-r from-[#4E9F3D] to-[#7AC943] text-white px-6 py-3 rounded-full shadow-2xl font-bold transition-transform active:scale-90">
+          <Link to="/register" className="ripple flex items-center gap-2 bg-gradient-to-r from-[#4E9F3D] to-[#7AC943] text-white px-6 py-3 rounded-full shadow-2xl font-bold transition-transform active:scale-90 whitespace-nowrap">
             <MessageSquare size={20} />
             <span>TƯ VẤN NGAY</span>
           </Link>

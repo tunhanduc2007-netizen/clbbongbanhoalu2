@@ -120,10 +120,10 @@ const Home: React.FC = () => {
               <Users className="text-[#4E9F3D]" size={32} /> Về CLB Bóng Bàn Hoa Lư
             </h2>
             <p className="text-gray-600 leading-relaxed text-lg mb-4">
-              <strong>CLB Bóng bàn Hoa Lư</strong> tự hào là trung tâm đào tạo và giao lưu bóng bàn uy tín hàng đầu. Chúng tôi cung cấp môi trường tập luyện lý tưởng với hệ thống bàn thi đấu đạt tiêu chuẩn ITTF, thảm Enlio chuyên nghiệp và đội ngũ huấn luyện viên giàu kinh nghiệm từ đội tuyển quốc gia.
+              <strong>CLB Bóng bàn Hoa Lư</strong> tự hào là điểm đến mới dành cho những người yêu thích bóng bàn tại khu vực. Với trang thiết bị hiện đại, hệ thống bàn thi đấu đạt tiêu chuẩn ITTF, thảm Enlio chuyên nghiệp và đội ngũ huấn luyện viên tâm huyết, chúng tôi cam kết mang đến trải nghiệm tập luyện chất lượng nhất.
             </p>
             <p className="text-gray-500 text-sm italic">
-              Dù bạn là người mới bắt đầu hay vận động viên chuyên nghiệp, Hoa Lư luôn có không gian phù hợp để bạn thỏa đam mê và nâng cao trình độ.
+              Dù bạn là người mới bắt đầu hay vận động viên có kinh nghiệm, Hoa Lư luôn có không gian phù hợp để bạn khám phá đam mê và phát triển kỹ năng.
             </p>
           </article>
 
@@ -147,7 +147,7 @@ const Home: React.FC = () => {
       </section>
 
       {/* Pricing Section - Premium Card Style */}
-      <section className="px-6 py-16 bg-[#f8fafc] rounded-[40px] my-12" id="pricing">
+      <section className="px-6 py-8 bg-[#f8fafc] rounded-[40px] my-4" id="pricing">
         <header className="text-center mb-16">
           <div className="flex items-center justify-center gap-3 mb-4">
             <span className="w-12 h-[2px] bg-[#7AC943]/30"></span>
@@ -304,7 +304,7 @@ const Home: React.FC = () => {
 
         <div className="space-y-4">
           {[
-            { title: "Huấn luyện viên đội tuyển quốc gia", icon: "🥇", desc: "Học phương pháp chuẩn nhất" },
+            { title: "Huấn luyện viên nhiều năm kinh nghiệm", icon: "🥇", desc: "Học phương pháp chuẩn nhất" },
             { title: "Thảm Enlio chuyên nghiệp đạt chuẩn", icon: "🏃", desc: "Bảo vệ đôi chân và khớp" },
             { title: "Cộng đồng văn minh, đoàn kết", icon: "🤝", desc: "Nơi giao lưu kết nối cùng đam mê" }
           ].map((item, idx) => (

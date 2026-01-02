@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Calendar, Clock, User, Users, ChevronRight, MapPin, Loader2, Info, Check, Phone, ArrowLeft, ArrowRight } from 'lucide-react';
+import { Calendar, Clock, User, Users, ChevronRight, MapPin, Loader2, Info, Check, Phone, ArrowLeft, ArrowRight, X, Star, Award } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { supabase } from '../supabaseClient';
 
@@ -11,6 +11,7 @@ const Schedule: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [selectedDay, setSelectedDay] = useState('Monday');
   const [coachFilter, setCoachFilter] = useState('all');
+  const [selectedCoach, setSelectedCoach] = useState<any | null>(null);
 
   const daysOfWeek = [
     { key: 'Monday', label: 'T2', full: 'Thứ 2' },
@@ -30,7 +31,7 @@ const Schedule: React.FC = () => {
     setLoading(true);
     try {
       const [sRes, cRes] = await Promise.all([
-        supabase.from('training_sessions').select('*, coaches(*), training_groups(*)').order('start_time'),
+        supabase.from('training_sessions').select('*, coaches(*)').order('start_time'),
         supabase.from('coaches').select('*')
       ]);
 
@@ -156,15 +157,20 @@ const Schedule: React.FC = () => {
                 ) : filteredSessions.length > 0 ? (
                   filteredSessions.map(sess => (
                     <div key={sess.id} className="bg-white/70 backdrop-blur-md p-6 rounded-[2rem] flex justify-between items-center hover:bg-white transition-all group">
-                      <div className="flex items-center gap-6">
+                      <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-6">
                         <div className="flex items-center gap-2">
                           <Clock size={16} className="text-[#4E9F3D]" />
-                          <span className="text-lg font-black text-slate-800">{sess.start_time} - {sess.end_time}</span>
+                          <span className="text-lg font-black text-slate-800">{sess.start_time.slice(0, 5)} - {sess.end_time.slice(0, 5)}</span>
                         </div>
-                        <div className="h-4 w-px bg-slate-200"></div>
+                        <div className="hidden md:block h-4 w-px bg-slate-200"></div>
                         <div className="flex items-center gap-2">
                           <User size={14} className="text-slate-400" />
                           <span className="text-sm font-bold text-slate-500">HLV {sess.coaches?.name}</span>
+                        </div>
+                        <div className="hidden md:block h-4 w-px bg-slate-200"></div>
+                        <div className="flex items-center gap-2 text-blue-500">
+                          <MapPin size={14} />
+                          <span className="text-[10px] font-black uppercase tracking-widest">{sess.location}</span>
                         </div>
                       </div>
                       <div className="flex items-center gap-2">
@@ -202,79 +208,96 @@ const Schedule: React.FC = () => {
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {coaches.map(coach => (
-                  <div key={coach.id} className="bg-white rounded-3xl shadow-lg overflow-hidden hover:shadow-xl transition-all hover:scale-105">
-                    {/* Coach Header */}
-                    <div className="bg-gradient-to-r from-[#7AC943] to-[#FFD800] h-24 relative">
-                      <div className="absolute bottom-0 left-6 -translate-y-1/2">
-                        <div className="w-20 h-20 rounded-full border-4 border-white shadow-lg overflow-hidden bg-gray-200 flex items-center justify-center">
+                  <div key={coach.id} className="bg-white rounded-3xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 group border border-slate-100">
+                    {/* Coach Header - Improved Gradient */}
+                    <div className="bg-gradient-to-br from-[#4E9F3D] via-[#7AC943] to-[#a8e063] h-28 relative overflow-hidden">
+                      {/* Decorative circles */}
+                      <div className="absolute -top-6 -right-6 w-24 h-24 bg-white/10 rounded-full"></div>
+                      <div className="absolute -bottom-4 -left-4 w-16 h-16 bg-white/10 rounded-full"></div>
+
+                      {/* Avatar */}
+                      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2">
+                        <div className="w-24 h-24 rounded-full border-4 border-white shadow-xl overflow-hidden bg-gradient-to-br from-slate-100 to-slate-200 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
                           {coach.avatar ? (
                             <img src={coach.avatar} alt={coach.name} className="w-full h-full object-cover" />
                           ) : (
-                            <User size={40} className="text-gray-400" />
+                            <div className="w-full h-full bg-gradient-to-br from-[#7AC943]/20 to-[#FFD800]/20 flex items-center justify-center">
+                              <User size={44} className="text-[#4E9F3D]" strokeWidth={1.5} />
+                            </div>
                           )}
                         </div>
                         {coach.is_featured && (
-                          <div className="absolute -top-1 -right-1 w-5 h-5 bg-yellow-400 rounded-full border-2 border-white flex items-center justify-center">
-                            <span className="text-xs font-black">⭐</span>
+                          <div className="absolute -top-1 -right-1 w-7 h-7 bg-gradient-to-r from-yellow-400 to-orange-400 rounded-full border-2 border-white flex items-center justify-center shadow-lg">
+                            <span className="text-sm">⭐</span>
                           </div>
                         )}
                       </div>
                     </div>
 
                     {/* Coach Info */}
-                    <div className="pt-12 px-6 pb-6">
-                      <h3 className="text-lg font-black text-slate-800 mb-1">{coach.name}</h3>
-                      <p className="text-xs text-slate-400 font-bold mb-4">Huấn luyện viên</p>
+                    <div className="pt-16 px-6 pb-6 text-center">
+                      <h3 className="text-xl font-black text-slate-800 mb-1">{coach.name}</h3>
+                      <p className="text-xs text-[#4E9F3D] font-bold mb-5 uppercase tracking-wider">Huấn luyện viên</p>
 
-                      {/* Rating */}
-                      <div className="flex items-center gap-4 mb-4 text-xs">
-                        <div className="flex items-center gap-1">
-                          <span className="text-yellow-400">⭐</span>
-                          <span className="font-bold text-slate-800">{coach.rating || '5.0'}</span>
+                      {/* Stats Row */}
+                      <div className="flex items-center justify-center gap-6 mb-5">
+                        <div className="flex flex-col items-center">
+                          <span className="text-lg font-black text-slate-800 flex items-center gap-1">⭐ {coach.rating || '5.0'}</span>
+                          <span className="text-[10px] text-slate-400 font-medium">Đánh giá</span>
                         </div>
-                        <div className="flex items-center gap-1">
-                          <Users size={12} className="text-slate-400" />
-                          <span className="font-bold text-slate-600">{coach.students_count || '0'} học sinh</span>
+                        <div className="w-px h-8 bg-slate-200"></div>
+                        <div className="flex flex-col items-center">
+                          <span className="text-lg font-black text-slate-800">{coach.students_count || '0'}</span>
+                          <span className="text-[10px] text-slate-400 font-medium">Học sinh</span>
                         </div>
-                        <div className="flex items-center gap-1">
-                          <span className="font-bold text-slate-600">{coach.experience || '5'} năm</span>
+                        <div className="w-px h-8 bg-slate-200"></div>
+                        <div className="flex flex-col items-center">
+                          <span className="text-lg font-black text-slate-800">{coach.experience || '1'}+</span>
+                          <span className="text-[10px] text-slate-400 font-medium">Năm KN</span>
                         </div>
                       </div>
 
-                      {/* Pricing */}
-                      <div className="bg-slate-50 rounded-2xl p-4 mb-4 space-y-2">
+                      {/* Pricing - Better Design */}
+                      <div className="bg-gradient-to-r from-[#4E9F3D]/5 to-[#7AC943]/10 rounded-2xl p-4 mb-4 space-y-3">
                         <div className="flex justify-between items-center">
-                          <span className="text-xs font-bold text-slate-600">Học phí:</span>
-                          <span className="text-sm font-black text-[#4E9F3D]">{coach.hourly_rate ? coach.hourly_rate.toLocaleString() : '250,000'}đ/giờ</span>
+                          <span className="text-xs font-bold text-slate-500">Học phí:</span>
+                          <span className="text-lg font-black text-[#4E9F3D]">{coach.hourly_rate ? coach.hourly_rate.toLocaleString() : '250,000'}đ<span className="text-xs text-slate-400 font-medium">/giờ</span></span>
                         </div>
                         <div className="flex justify-between items-center">
-                          <span className="text-xs font-bold text-slate-600">Thử bài:</span>
-                          <span className="text-sm font-black text-slate-600">{coach.trial_rate ? coach.trial_rate.toLocaleString() : '50,000'}đ/giờ</span>
+                          <span className="text-xs font-bold text-slate-500">Thử bài:</span>
+                          <span className="text-sm font-black text-slate-600">{coach.trial_rate ? coach.trial_rate.toLocaleString() : '50,000'}đ<span className="text-xs text-slate-400 font-medium">/giờ</span></span>
                         </div>
                       </div>
 
                       {/* Schedule */}
                       {coach.schedule && (
-                        <div className="text-xs font-bold text-slate-600 mb-4 space-y-1">
+                        <div className="text-xs font-bold text-slate-600 mb-4 space-y-1 text-left bg-slate-50 rounded-xl p-3">
                           {Object.entries(coach.schedule).map(([day, times]: any) => (
-                            <div key={day}>
-                              <span className="font-black text-slate-800">{day}:</span> {times}
+                            <div key={day} className="flex gap-2">
+                              <span className="font-black text-[#4E9F3D] min-w-[24px]">{day}:</span>
+                              <span className="text-slate-500">{times}</span>
                             </div>
                           ))}
                           {coach.additional_schedule && (
-                            <div className="text-blue-600 font-black">+{coach.additional_schedule}</div>
+                            <div className="text-blue-500 font-black">+{coach.additional_schedule}</div>
                           )}
                         </div>
                       )}
 
                       {/* Action Buttons */}
-                      <div className="flex gap-3 pt-4 border-t border-slate-100">
-                        <button className="flex-1 bg-white text-slate-600 border border-slate-300 rounded-full py-2.5 text-xs font-black uppercase hover:bg-slate-50 transition-all">
+                      <div className="flex gap-3 pt-4">
+                        <button
+                          onClick={() => setSelectedCoach(coach)}
+                          className="flex-1 bg-white text-slate-600 border-2 border-slate-200 rounded-full py-3 text-xs font-black uppercase hover:bg-slate-50 hover:border-slate-300 transition-all"
+                        >
                           Chi tiết
                         </button>
-                        <button className="flex-1 bg-[#4E9F3D] text-white rounded-full py-2.5 text-xs font-black uppercase hover:bg-[#3d8230] transition-all shadow-md">
+                        <a
+                          href="tel:0913909012"
+                          className="flex-1 bg-gradient-to-r from-[#4E9F3D] to-[#7AC943] text-white rounded-full py-3 text-xs font-black uppercase hover:shadow-lg hover:shadow-green-200 transition-all text-center"
+                        >
                           Liên hệ
-                        </button>
+                        </a>
                       </div>
                     </div>
                   </div>
@@ -315,6 +338,127 @@ const Schedule: React.FC = () => {
           </div>
         </div>
       </section>
+
+      {/* Coach Detail Modal */}
+      {selectedCoach && (
+        <div
+          className="fixed inset-0 z-[100] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4"
+          onClick={() => setSelectedCoach(null)}
+        >
+          <div
+            className="bg-white rounded-3xl max-w-lg w-full max-h-[90vh] overflow-y-auto shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Modal Header */}
+            <div className="bg-gradient-to-br from-[#4E9F3D] via-[#7AC943] to-[#a8e063] p-8 rounded-t-3xl relative">
+              <button
+                onClick={() => setSelectedCoach(null)}
+                className="absolute top-4 right-4 bg-white/20 hover:bg-white/30 p-2 rounded-full text-white transition-all"
+              >
+                <X size={20} />
+              </button>
+
+              <div className="flex items-center gap-5">
+                <div className="w-20 h-20 rounded-full border-4 border-white shadow-xl overflow-hidden bg-white flex items-center justify-center">
+                  {selectedCoach.avatar ? (
+                    <img src={selectedCoach.avatar} alt={selectedCoach.name} className="w-full h-full object-cover" />
+                  ) : (
+                    <User size={40} className="text-[#4E9F3D]" />
+                  )}
+                </div>
+                <div>
+                  <h3 className="text-2xl font-black text-white mb-1">{selectedCoach.name}</h3>
+                  <p className="text-white/80 text-sm font-medium">Huấn luyện viên</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Modal Body */}
+            <div className="p-6 space-y-6">
+              {/* Stats */}
+              <div className="flex justify-around py-4 bg-slate-50 rounded-2xl">
+                <div className="text-center">
+                  <div className="flex items-center justify-center gap-1 text-xl font-black text-slate-800">
+                    <Star size={18} className="text-yellow-400 fill-yellow-400" />
+                    {selectedCoach.rating || '5.0'}
+                  </div>
+                  <p className="text-xs text-slate-400 font-medium">Đánh giá</p>
+                </div>
+                <div className="text-center">
+                  <div className="text-xl font-black text-slate-800">{selectedCoach.students_count || '0'}</div>
+                  <p className="text-xs text-slate-400 font-medium">Học sinh</p>
+                </div>
+                <div className="text-center">
+                  <div className="text-xl font-black text-slate-800">{selectedCoach.experience || '1'}+</div>
+                  <p className="text-xs text-slate-400 font-medium">Năm KN</p>
+                </div>
+              </div>
+
+              {/* Bio */}
+              {selectedCoach.bio && (
+                <div>
+                  <h4 className="font-black text-slate-800 mb-2 flex items-center gap-2">
+                    <Award size={16} className="text-[#4E9F3D]" /> Giới thiệu
+                  </h4>
+                  <p className="text-slate-600 text-sm leading-relaxed">{selectedCoach.bio}</p>
+                </div>
+              )}
+
+              {/* Pricing */}
+              <div className="bg-gradient-to-r from-[#4E9F3D]/5 to-[#7AC943]/10 rounded-2xl p-5">
+                <h4 className="font-black text-slate-800 mb-3">💰 Học phí</h4>
+                <div className="space-y-2">
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm text-slate-600">Học phí/giờ:</span>
+                    <span className="text-lg font-black text-[#4E9F3D]">
+                      {selectedCoach.hourly_rate ? selectedCoach.hourly_rate.toLocaleString() : '250,000'}đ
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm text-slate-600">Thử bài/giờ:</span>
+                    <span className="text-lg font-black text-slate-600">
+                      {selectedCoach.trial_rate ? selectedCoach.trial_rate.toLocaleString() : '50,000'}đ
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Schedule */}
+              {selectedCoach.schedule && (
+                <div>
+                  <h4 className="font-black text-slate-800 mb-3">📅 Lịch dạy</h4>
+                  <div className="bg-slate-50 rounded-xl p-4 space-y-2">
+                    {Object.entries(selectedCoach.schedule).map(([day, times]: any) => (
+                      <div key={day} className="flex gap-3 text-sm">
+                        <span className="font-black text-[#4E9F3D] min-w-[30px]">{day}:</span>
+                        <span className="text-slate-600">{times}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Contact Buttons */}
+              <div className="flex gap-3 pt-4">
+                <a
+                  href="tel:0913909012"
+                  className="flex-1 bg-gradient-to-r from-[#4E9F3D] to-[#7AC943] text-white rounded-full py-4 text-sm font-black uppercase text-center hover:shadow-lg hover:shadow-green-200 transition-all flex items-center justify-center gap-2"
+                >
+                  <Phone size={18} /> Gọi ngay
+                </a>
+                <a
+                  href="https://zalo.me/0913909012"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex-1 bg-blue-500 text-white rounded-full py-4 text-sm font-black uppercase text-center hover:shadow-lg hover:shadow-blue-200 transition-all"
+                >
+                  Chat Zalo
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </main>
   );
 };

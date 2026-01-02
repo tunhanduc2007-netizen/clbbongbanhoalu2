@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import {
-    Wallet, LogOut, TrendingUp, FileSpreadsheet, FileText,
+    Wallet, LogOut, TrendingUp, FileSpreadsheet, FileText, LayoutDashboard, Coffee, Circle,
     Trash2, Search, LogIn, PlusCircle, ChevronDown,
     AlertTriangle, CheckCircle, X as CloseIcon, Calendar, Users
 } from 'lucide-react';
@@ -21,14 +21,21 @@ export default function Admin() {
     const [records, setRecords] = useState([]);
     const [categories, setCategories] = useState([]);
 
+    // --- TABLE MANAGER STATE ---
+    const [tables, setTables] = useState<any[]>([]);
+    const [selectedTable, setSelectedTable] = useState<any>(null);
+    const [playerNameInput, setPlayerNameInput] = useState('');
+    const [currentTime, setCurrentTime] = useState(new Date());
+
     // UI Effects
     const [toasts, setToasts] = useState<any[]>([]);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [deleteTargetId, setDeleteTargetId] = useState<number | null>(null);
+    const [deleteTargetTable, setDeleteTargetTable] = useState('transactions');
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     // Filters
-    const [timeRange, setTimeRange] = useState('month');
+    const [timeRange, setTimeRange] = useState('year');
     const [searchTerm, setSearchTerm] = useState('');
 
     // --- LỊCH TẬP STATE ---
@@ -40,8 +47,9 @@ export default function Admin() {
     // Form Lịch tập
     const [coachName, setCoachName] = useState('');
     const [coachLevel, setCoachLevel] = useState('HLV Cơ bản');
+    const [coachFee, setCoachFee] = useState('');
+    const [coachTableFee, setCoachTableFee] = useState('');
     const [sessCoachId, setSessCoachId] = useState('');
-    const [sessGroupId, setSessGroupId] = useState('');
     const [sessDay, setSessDay] = useState('Monday');
     const [sessStart, setSessStart] = useState('');
     const [sessEnd, setSessEnd] = useState('');
@@ -59,6 +67,11 @@ export default function Admin() {
     const chartInstance = useRef<any>(null);
 
     useEffect(() => {
+        const timer = setInterval(() => setCurrentTime(new Date()), 1000);
+        return () => clearInterval(timer);
+    }, []);
+
+    useEffect(() => {
         const savedUser = localStorage.getItem('adminUser');
         if (savedUser) {
             const parsedUser = JSON.parse(savedUser);
@@ -69,18 +82,20 @@ export default function Admin() {
             setLoading(false);
         }
 
-        // --- KÍCH HOẠT REALTIME: TỰ ĐỘNG LOAD KHI CÓ THAY ĐỔI ---
-        const channel = supabase
-            .channel('realtime_transactions')
+        // --- REALTIME CHANNELS ---
+        const channelTrans = supabase.channel('realtime_transactions')
             .on('postgres_changes', { event: '*', schema: 'public', table: 'transactions' }, () => {
-                console.log('Dữ liệu thay đổi, đang tự động làm mới...');
-                fetchStats();
-                fetchRecords();
-            })
-            .subscribe();
+                fetchStats(); fetchRecords();
+            }).subscribe();
+
+        const channelTables = supabase.channel('realtime_tables')
+            .on('postgres_changes', { event: '*', schema: 'public', table: 'table_manager' }, () => {
+                fetchTableData();
+            }).subscribe();
 
         return () => {
-            supabase.removeChannel(channel);
+            supabase.removeChannel(channelTrans);
+            supabase.removeChannel(channelTables);
         };
     }, [timeRange]);
 
@@ -90,7 +105,9 @@ export default function Admin() {
                 fetchStats(),
                 fetchCategories(),
                 fetchRecords(),
-                fetchScheduleData()
+                fetchRecords(),
+                fetchScheduleData(),
+                fetchTableData()
             ]);
         } catch (err) {
             console.error(err);
@@ -101,27 +118,58 @@ export default function Admin() {
 
     const fetchScheduleData = async () => {
         try {
-            const [cRes, gRes, sRes] = await Promise.all([
+            const [cRes, sRes] = await Promise.all([
                 supabase.from('coaches').select('*'),
-                supabase.from('training_groups').select('*'),
-                supabase.from('training_sessions').select(`
-                    *,
-                    coaches(name, color),
-                    training_groups(name)
-                `)
+                supabase.from('training_sessions').select('*')
             ]);
 
             if (cRes.data) setCoaches(cRes.data);
-            if (gRes.data) setGroups(gRes.data);
-            if (sRes.data) setSessions(sRes.data);
+
+            if (sRes.error) console.error("Lỗi Supabase (Sessions):", sRes.error);
+            if (sRes.data) {
+                console.log("Dữ liệu Sessions tải về:", sRes.data);
+                setSessions(sRes.data);
+            }
         } catch (err) {
             console.error("Lỗi tải dữ liệu lịch tập:", err);
         }
     };
 
+    // --- HELPER: DATE RANGE ---
+    const calculateDateRange = (range: string) => {
+        const now = new Date();
+        const y = now.getFullYear();
+        const m = now.getMonth();
+        let start = new Date(y, m, 1);
+        let end = new Date(y, m + 1, 0);
+
+        if (range === 'today') {
+            start = now; end = now;
+        } else if (range === 'day') { // Fallback
+            start = now; end = now;
+        } else if (range === 'week') {
+            const day = now.getDay() || 7;
+            start = new Date(now);
+            if (day !== 1) start.setHours(-24 * (day - 1));
+            end = new Date(start);
+            end.setDate(end.getDate() + 6);
+        } else if (range === 'month') {
+            start = new Date(y, m, 1);
+            end = new Date(y, m + 1, 0);
+        } else if (range === 'year') {
+            start = new Date(y, 0, 1);
+            end = new Date(y, 11, 31);
+        }
+
+        return {
+            start: start.toISOString().split('T')[0],
+            end: end.toISOString().split('T')[0]
+        };
+    };
+
     // --- DATA FETCHING ---
     const fetchStats = async () => {
-        const { start, end } = getDateRange(timeRange);
+        const { start, end } = calculateDateRange(timeRange);
         const { data, error } = await supabase
             .from('transactions')
             .select('amount, categories!inner(type)')
@@ -151,14 +199,14 @@ export default function Admin() {
     };
 
     const fetchRecords = async () => {
-        const { start, end } = getDateRange(timeRange);
+        const { start, end } = calculateDateRange(timeRange);
         const { data, error } = await supabase
             .from('transactions')
             .select(`
-                *,
-                categories (name),
-                users (full_name)
-            `)
+                                *,
+                                categories (name),
+                                users (full_name)
+                                `)
             .eq('is_active', true)
             .gte('transaction_date', `${start} 00:00:00`)
             .lte('transaction_date', `${end} 23:59:59`)
@@ -235,7 +283,7 @@ export default function Admin() {
         if (!catId) return addToast("Vui lòng chọn hạng mục", "warning");
 
         setIsSubmitting(true);
-        let finalAmount = parseFloat(amount);
+        let finalAmount = parseFloat(amount.replace(/,/g, ''));
         if (finalAmount > 0 && finalAmount < 10000) finalAmount *= 1000;
 
         try {
@@ -262,17 +310,25 @@ export default function Admin() {
 
     const handleDelete = async () => {
         if (!deleteTargetId) return;
-        const { error } = await supabase
-            .from('transactions')
-            .update({ is_active: false })
-            .eq('id', deleteTargetId);
+
+        let error = null;
+
+        if (deleteTargetTable === 'transactions') {
+            const res = await supabase.from('transactions').update({ is_active: false }).eq('id', deleteTargetId);
+            error = res.error;
+        } else {
+            const res = await supabase.from(deleteTargetTable).delete().eq('id', deleteTargetId);
+            error = res.error;
+        }
 
         if (!error) {
             setShowDeleteModal(false);
-            addToast("Đã xóa giao dịch", "success");
-            initDashboard();
+            addToast("Đã xóa thành công!", "success");
+            if (deleteTargetTable === 'transactions') initDashboard();
+            else fetchScheduleData();
         } else {
-            addToast("Lỗi khi xóa", "error");
+            console.error(error);
+            addToast("Lỗi khi xóa: " + error.message, "error");
         }
     };
 
@@ -282,6 +338,8 @@ export default function Admin() {
         const newCoach = {
             name: coachName,
             level: coachLevel,
+            tuition_fee: coachFee || '300.000đ/buổi',
+            table_fee: coachTableFee || '50.000đ/giờ',
             color: colors[coaches.length % colors.length]
         };
 
@@ -291,7 +349,8 @@ export default function Admin() {
             setCoachName('');
             fetchScheduleData();
         } else {
-            addToast("Lỗi thêm HLV", "error");
+            console.error("Lỗi thêm HLV:", error);
+            addToast("Lỗi: " + error.message + " (Check Console F12)", "error");
         }
     };
 
@@ -300,17 +359,16 @@ export default function Admin() {
         const conflict = sessions.some(s => {
             if (s.day !== sessDay) return false;
             const overlap = (sessStart < s.end_time && sessEnd > s.start_time);
-            return overlap && (s.coach_id === sessCoachId || s.group_id === sessGroupId);
+            return overlap && (s.coach_id === sessCoachId || s.location === sessLoc);
         });
 
         if (conflict) {
-            addToast("Bị trùng lịch với HLV hoặc Nhóm đã có!", "error");
+            addToast("Bị trùng lịch với HLV hoặc Bàn đã có!", "error");
             return;
         }
 
         const newSess = {
             coach_id: sessCoachId,
-            group_id: sessGroupId,
             day: sessDay,
             start_time: sessStart,
             end_time: sessEnd,
@@ -324,17 +382,14 @@ export default function Admin() {
             fetchScheduleData();
         } else {
             addToast("Lỗi khi xếp lịch", "error");
+            console.error(error);
         }
     };
 
-    const deleteTableItem = async (table: string, id: any) => {
-        const { error } = await supabase.from(table).delete().eq('id', id);
-        if (!error) {
-            addToast("Đã xóa!", "success");
-            fetchScheduleData();
-        } else {
-            addToast("Lỗi khi xóa", "error");
-        }
+    const deleteTableItem = (table: string, id: any) => {
+        setDeleteTargetTable(table);
+        setDeleteTargetId(id);
+        setShowDeleteModal(true);
     };
 
     const exportExcel = () => {
@@ -388,6 +443,107 @@ export default function Admin() {
         XLSX.writeFile(wb, `BaoCao_HoaLu_${new Date().toISOString().split('T')[0]}.xlsx`);
     };
 
+    const fetchTableData = async () => {
+        const { data, error } = await supabase.from('table_manager').select('*').order('table_number', { ascending: true });
+        if (error) {
+            console.error("Error fetching tables:", error);
+        }
+        if (data) setTables(data);
+    };
+
+    const initTables = async () => {
+        if (!confirm('Bạn có chắc muốn tạo mới 15 bàn?')) return;
+        setLoading(true);
+        const newTables = Array.from({ length: 15 }, (_, i) => ({
+            table_number: i + 1,
+            status: 'available',
+            player_name: '',
+            start_time: null,
+            services: []
+        }));
+
+        const { error } = await supabase.from('table_manager').insert(newTables);
+        if (error) {
+            addToast("Lỗi khởi tạo: " + error.message, 'error');
+        } else {
+            addToast("Đã khởi tạo 15 bàn thành công!", 'success');
+            fetchTableData();
+        }
+        setLoading(false);
+    };
+
+    // --- TABLE CALCULATIONS ---
+    const getDuration = (startTime: string) => {
+        if (!startTime) return 0;
+        const start = new Date(startTime).getTime();
+        const now = currentTime.getTime();
+        return Math.max(0, (now - start) / 1000 / 3600); // hours
+    };
+
+    const calculateTableFee = (t: any) => {
+        if (!t || t.status === 'available') return 0;
+        // Bàn 10 trở đi tính tiền giờ (70k/h), Bàn dưới 10 tính tiền lượt (40k/session)
+        if (t.table_number >= 10) {
+            const hours = getDuration(t.start_time);
+            return Math.floor(hours * 70000);
+        }
+        return 40000;
+    };
+
+    const calculateTotal = (t: any) => {
+        if (!t || t.status === 'available') return 0;
+        const serviceTotal = (t.services || []).reduce((sum: number, s: any) => sum + (s.price * s.qty), 0);
+        return calculateTableFee(t) + serviceTotal;
+    };
+
+    const handleTableAction = async (action: 'start' | 'stop' | 'update_service', payload: any = null) => {
+        if (!selectedTable) return;
+
+        let updateData: any = {};
+
+        if (action === 'start') {
+            updateData = { status: 'occupied', start_time: new Date().toISOString(), player_name: payload, services: [] };
+        }
+        else if (action === 'stop') {
+            // 1. Create Transaction
+            const total = calculateTotal(selectedTable);
+            await supabase.from('transactions').insert([{
+                category_id: 1, // Assume 1 is 'Thu Tiền Bàn' or similar placeholder
+                amount: total,
+                description: `Tiền bàn ${selectedTable.table_number}: ${selectedTable.player_name}`,
+                transaction_date: new Date().toISOString(),
+                created_by: user.id,
+                is_active: true
+            }]);
+            // 2. Reset Table
+            updateData = { status: 'available', start_time: null, player_name: null, services: [] };
+            addToast(`Đã thanh toán bàn ${selectedTable.table_number}: ${total.toLocaleString()}đ`, 'success');
+        }
+        else if (action === 'update_service') {
+            const currentServices = selectedTable.services || [];
+            const existingIdx = currentServices.findIndex((s: any) => s.item === payload.item);
+            let newServices = JSON.parse(JSON.stringify(currentServices)); // Deep copy to avoid mutation issues
+            const change = payload.qty !== undefined ? payload.qty : 1;
+
+            if (existingIdx >= 0) {
+                newServices[existingIdx].qty = (newServices[existingIdx].qty || 0) + change;
+                if (newServices[existingIdx].qty <= 0) {
+                    newServices.splice(existingIdx, 1);
+                }
+            } else if (change > 0) {
+                newServices.push({ item: payload.item, price: payload.price, qty: change });
+            }
+            updateData = { services: newServices };
+        }
+
+        const { error } = await supabase.from('table_manager').update(updateData).eq('id', selectedTable.id);
+        if (!error) {
+            if (action === 'start') addToast('Đã bắt đầu tính giờ!', 'success');
+            fetchTableData();
+            // Update local selection to reflect changes immediately
+            setSelectedTable({ ...selectedTable, ...updateData });
+        }
+    };
     // --- UTILS ---
     const addToast = (msg: string, type: string) => {
         const id = Date.now();
@@ -485,44 +641,263 @@ export default function Admin() {
                 <div className="flex flex-col md:flex-row justify-between items-end mb-10 gap-6">
                     <div>
                         <h1 className="text-4xl font-black text-[#1e293b] tracking-tight">
-                            {activeTab === 'finance' ? 'Tổng Quan Tài Chính' : 'Quản Lý Lịch Tập'}
+                            {activeTab === 'finance' ? 'Tổng Quan Tài Chính' : (activeTab === 'tables' ? 'Quản Lý Bàn' : 'Quản Lý Lịch Tập')}
                         </h1>
-                        <div className="flex gap-4 mt-4">
+                        <div className="flex gap-4 mt-4 overflow-x-auto pb-2">
                             <button
                                 onClick={() => setActiveTab('finance')}
-                                className={`px-6 py-2 rounded-full font-bold text-sm transition-all ${activeTab === 'finance' ? 'bg-[#1e293b] text-white shadow-lg' : 'bg-white text-slate-400 border border-slate-100'}`}
+                                className={`px-6 py-3 rounded-2xl font-black text-sm flex items-center gap-3 transition-all ${activeTab === 'finance' ? 'bg-[#1e293b] text-white shadow-xl shadow-slate-900/20' : 'bg-white text-slate-400 hover:bg-slate-50'}`}
                             >
-                                <Wallet size={16} className="inline mr-2" /> TÀI CHÍNH
+                                <Wallet size={18} /> TÀI CHÍNH
+                            </button>
+                            <button
+                                onClick={() => setActiveTab('tables')}
+                                className={`px-6 py-3 rounded-2xl font-black text-sm flex items-center gap-3 transition-all ${activeTab === 'tables' ? 'bg-[#1e293b] text-white shadow-xl shadow-slate-900/20' : 'bg-white text-slate-400 hover:bg-slate-50'}`}
+                            >
+                                <LayoutDashboard size={18} /> QUẢN LÝ BÀN
                             </button>
                             <button
                                 onClick={() => setActiveTab('schedule')}
-                                className={`px-6 py-2 rounded-full font-bold text-sm transition-all ${activeTab === 'schedule' ? 'bg-[#1e293b] text-white shadow-lg' : 'bg-white text-slate-400 border border-slate-100'}`}
+                                className={`px-6 py-3 rounded-2xl font-black text-sm flex items-center gap-3 transition-all ${activeTab === 'schedule' ? 'bg-[#1e293b] text-white shadow-xl shadow-slate-900/20' : 'bg-white text-slate-400 hover:bg-slate-50'}`}
                             >
-                                <Calendar size={16} className="inline mr-2" /> LỊCH TẬP
+                                <Calendar size={18} /> LỊCH TẬP
                             </button>
                         </div>
                     </div>
-                    <div className="flex items-center gap-3">
-                        <div className="relative group">
-                            <select
-                                value={timeRange}
-                                onChange={(e) => setTimeRange(e.target.value)}
-                                className="appearance-none bg-white border-none shadow-sm rounded-2xl px-6 py-3.5 pr-12 font-bold text-sm text-slate-600 outline-none cursor-pointer ring-1 ring-slate-100 focus:ring-2 focus:ring-green-500/20 transition-all"
-                            >
-                                <option value="today">Hôm nay</option>
-                                <option value="week">Tuần này</option>
-                                <option value="month">Tháng này</option>
-                                <option value="year">Năm nay</option>
-                            </select>
-                            <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400" size={18} />
+
+                    {activeTab === 'finance' && (
+                        <div className="flex items-center gap-3">
+                            <div className="relative group">
+                                <select
+                                    value={timeRange}
+                                    onChange={(e) => setTimeRange(e.target.value)}
+                                    className="appearance-none bg-white border-none shadow-sm rounded-2xl px-6 py-3.5 pr-12 font-bold text-sm text-slate-600 outline-none cursor-pointer ring-1 ring-slate-100 focus:ring-2 focus:ring-green-500/20 transition-all"
+                                >
+                                    <option value="today">Hôm nay</option>
+                                    <option value="week">Tuần này</option>
+                                    <option value="month">Tháng này</option>
+                                    <option value="year">Năm nay</option>
+                                </select>
+                                <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400" size={18} />
+                            </div>
+                            <button onClick={exportExcel} className="flex items-center gap-2 bg-white px-5 py-3.5 rounded-2xl shadow-sm text-sm font-bold text-slate-600 border border-slate-100 hover:bg-slate-50 transition-all">
+                                <FileSpreadsheet size={18} className="text-green-600" /> XUẤT EXCEL
+                            </button>
                         </div>
-                        <button onClick={exportExcel} className="flex items-center gap-2 bg-white px-5 py-3.5 rounded-2xl shadow-sm text-sm font-bold text-slate-600 border border-slate-100 hover:bg-slate-50 transition-all">
-                            <FileSpreadsheet size={18} className="text-green-600" /> XUẤT EXCEL
-                        </button>
-                    </div>
+                    )}
                 </div>
 
-                {activeTab === 'finance' ? (
+                {/* --- TAB CONTENT: TABLES MANAGER --- */}
+                {activeTab === 'tables' && (
+                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 animate-in fade-in zoom-in duration-500">
+                        {/* Left: Table Grid (3 Columns) */}
+                        <div className="lg:col-span-8">
+                            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                                {(tables.length > 0 ? tables : Array.from({ length: 15 }, (_, i) => ({
+                                    id: `temp-${i}`,
+                                    table_number: i + 1,
+                                    status: 'available',
+                                    isTemp: true,
+                                    player_name: '',
+                                    start_time: null
+                                }))).map((t: any) => (
+                                    <div
+                                        key={t.id}
+                                        onClick={() => {
+                                            if (t.isTemp) {
+                                                initTables();
+                                            } else {
+                                                setSelectedTable(t);
+                                                setPlayerNameInput('');
+                                            }
+                                        }}
+                                        className={`relative h-48 rounded-[1.5rem] p-6 cursor-pointer transition-all border-2 
+                                            ${selectedTable?.id === t.id ? 'ring-4 ring-offset-2 ring-blue-500 scale-105 z-10' : 'hover:scale-105 hover:shadow-xl'} 
+                                            ${t.status === 'occupied'
+                                                ? 'bg-blue-600 text-white border-blue-600 shadow-lg shadow-blue-500/30'
+                                                : t.status === 'reserved'
+                                                    ? 'bg-white border-orange-200'
+                                                    : 'bg-white border-slate-100'} 
+                                            ${t.isTemp ? 'opacity-70 border-dashed border-slate-300' : ''}`}
+                                    >
+                                        <div className="flex justify-between items-start">
+                                            <span className={`text-3xl font-black tracking-tight ${t.status === 'occupied' ? 'text-white' : 'text-slate-700'}`}>
+                                                {t.table_number < 10 ? `0${t.table_number}` : t.table_number}
+                                            </span>
+                                            <div className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest 
+                                                ${t.status === 'occupied' ? 'bg-white/20 text-white' : t.isTemp ? 'bg-slate-100 text-slate-400' : t.status === 'reserved' ? 'bg-orange-100 text-orange-500' : 'bg-green-100 text-green-600'}`}>
+                                                {t.status === 'occupied' ? 'Playing' : t.isTemp ? 'Setup Needed' : t.status === 'reserved' ? 'Reserved' : 'Available'}
+                                            </div>
+                                        </div>
+
+                                        <div className="mt-8">
+                                            {t.status === 'occupied' ? (
+                                                <>
+                                                    <div className="text-sm font-medium text-blue-100 truncate flex items-center gap-2">
+                                                        <Users size={14} /> {t.player_name}
+                                                    </div>
+                                                    <div className="text-3xl font-black text-white mt-2 font-mono tracking-wider">
+                                                        {new Date(currentTime.getTime() - new Date(t.start_time).getTime()).toISOString().substr(11, 8)}
+                                                    </div>
+                                                </>
+                                            ) : (
+                                                <div className="flex flex-col items-center justify-center h-full text-slate-300 gap-2 mt-4">
+                                                    {t.isTemp ? (
+                                                        <span className="text-xs font-bold uppercase tracking-wider text-slate-400">Bấm để tạo bàn</span>
+                                                    ) : (
+                                                        <>
+                                                            <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse"></div>
+                                                            <span className="text-xs font-bold uppercase tracking-wider">Sẵn sàng</span>
+                                                        </>
+                                                    )}
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* Right: Sidebar Actions */}
+                        <div className="lg:col-span-4">
+                            <div className="bg-white p-6 rounded-[2rem] shadow-2xl border border-slate-100 min-h-[700px] sticky top-28 flex flex-col">
+                                {selectedTable ? (
+                                    <>
+                                        {/* Top: HeaderInfo */}
+                                        <div className="flex justify-between items-center mb-6 pb-6 border-b border-slate-100">
+                                            <div>
+                                                <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Bàn đang chọn</div>
+                                                <div className="text-4xl font-black text-[#1e293b]">Bàn {selectedTable.table_number}</div>
+                                            </div>
+                                            <div className={`w-12 h-12 rounded-2xl flex items-center justify-center text-white shadow-lg ${selectedTable.status === 'occupied' ? 'bg-blue-600 shadow-blue-500/30' : 'bg-slate-200'}`}>
+                                                <LayoutDashboard size={24} />
+                                            </div>
+                                        </div>
+
+                                        {selectedTable.status === 'available' ? (
+                                            <div className="space-y-6 flex-grow flex flex-col justify-center animate-in slide-in-from-right-10">
+                                                <div className="bg-slate-50 p-6 rounded-3xl border border-slate-100">
+                                                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Khách hàng</label>
+                                                    <input
+                                                        type="text"
+                                                        className="w-full p-4 bg-white border-none rounded-2xl mt-2 font-bold text-[#1e293b] outline-none shadow-sm focus:ring-2 ring-blue-500/20"
+                                                        placeholder="Nhập tên khách..."
+                                                        value={playerNameInput}
+                                                        onChange={(e) => setPlayerNameInput(e.target.value)}
+                                                    />
+                                                </div>
+                                                <button
+                                                    onClick={() => handleTableAction('start', playerNameInput || 'Khách vãng lai')}
+                                                    className="w-full py-6 bg-[#1e293b] text-white rounded-3xl font-black shadow-2xl shadow-slate-900/20 hover:bg-slate-800 transition-all active:scale-95 text-lg flex items-center justify-center gap-3"
+                                                >
+                                                    <TrendingUp size={24} /> BẮT ĐẦU CHƠI
+                                                </button>
+                                            </div>
+                                        ) : (
+                                            <div className="flex flex-col h-full animate-in slide-in-from-right-10">
+                                                {/* Timer Display */}
+                                                <div className="bg-[#1e293b] rounded-3xl p-6 text-white shadow-xl shadow-slate-900/20 mb-6 relative overflow-hidden">
+                                                    <div className="relative z-10 flex justify-between items-end">
+                                                        <div>
+                                                            <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Thời gian</div>
+                                                            <div className="text-4xl font-black font-mono tracking-wider text-[#FFD800]">
+                                                                {new Date(currentTime.getTime() - new Date(selectedTable.start_time).getTime()).toISOString().substr(11, 8)}
+                                                            </div>
+                                                        </div>
+                                                        <div className="text-right">
+                                                            <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Tạm tính</div>
+                                                            <div className="text-xl font-bold text-white">{calculateTableFee(selectedTable).toLocaleString()}đ</div>
+                                                        </div>
+                                                    </div>
+                                                    <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2 blur-2xl"></div>
+                                                </div>
+
+                                                {/* Quick Addons - Menu */}
+                                                <div className="flex-grow overflow-y-auto mb-6 pr-2">
+                                                    <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4 sticky top-0 bg-white z-10 py-2">Thêm dịch vụ</div>
+                                                    <div className="space-y-3">
+                                                        {[
+                                                            { name: 'Sting', price: 15000, icon: <Coffee size={18} className="text-red-500" /> },
+                                                            { name: 'Nước suối', price: 10000, icon: <Coffee size={18} className="text-blue-500" /> },
+                                                            { name: 'Revive', price: 15000, icon: <Coffee size={18} className="text-yellow-500" /> },
+                                                            { name: 'Thuê vợt', price: 20000, icon: <Search size={18} className="text-purple-500" /> },
+                                                            { name: 'Bóng', price: 130000, icon: <Circle size={18} className="text-orange-500" /> }
+                                                        ].map((item, idx) => {
+                                                            const inCart = selectedTable.services?.find((s: any) => s.item === item.name);
+                                                            const qty = inCart ? inCart.qty : 0;
+
+                                                            return (
+                                                                <div key={idx} className="flex justify-between items-center p-3 bg-slate-50 rounded-2xl hover:bg-slate-100 transition-colors">
+                                                                    <div className="flex items-center gap-3">
+                                                                        <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-sm text-slate-600">
+                                                                            {item.icon}
+                                                                        </div>
+                                                                        <div>
+                                                                            <div className="text-sm font-bold text-slate-700">{item.name}</div>
+                                                                            <div className="text-[10px] font-bold text-slate-400">{item.price.toLocaleString()}đ</div>
+                                                                        </div>
+                                                                    </div>
+
+                                                                    <div className="flex items-center gap-3 bg-white rounded-xl p-1 shadow-sm">
+                                                                        <button
+                                                                            onClick={() => qty > 0 && handleTableAction('update_service', { item: item.name, price: item.price, qty: -1 })}
+                                                                            className={`w-8 h-8 flex items-center justify-center rounded-lg transition-all ${qty > 0 ? 'bg-slate-100 hover:bg-slate-200 text-slate-600' : 'text-slate-300 cursor-not-allowed'}`}
+                                                                        >
+                                                                            -
+                                                                        </button>
+                                                                        <span className="text-sm font-black w-4 text-center">{qty}</span>
+                                                                        <button
+                                                                            onClick={() => handleTableAction('update_service', { item: item.name, price: item.price, qty: 1 })}
+                                                                            className="w-8 h-8 flex items-center justify-center rounded-lg bg-[#1e293b] text-white hover:bg-slate-700 shadow-lg shadow-slate-900/10"
+                                                                        >
+                                                                            +
+                                                                        </button>
+                                                                    </div>
+                                                                </div>
+                                                            );
+                                                        })}
+                                                    </div>
+                                                </div>
+
+                                                {/* Bill Summary Footer */}
+                                                <div className="mt-auto bg-slate-50 p-6 rounded-3xl space-y-3 border border-slate-100">
+                                                    <div className="flex justify-between text-sm text-slate-500">
+                                                        <span>{selectedTable.table_number >= 10 ? `Tiền giờ (${getDuration(selectedTable.start_time).toFixed(1)}h)` : 'Phí lượt chơi'}</span>
+                                                        <span className="font-bold">{calculateTableFee(selectedTable).toLocaleString()}đ</span>
+                                                    </div>
+                                                    <div className="flex justify-between text-sm text-slate-500">
+                                                        <span>Dịch vụ ({selectedTable.services?.reduce((acc: any, cur: any) => acc + cur.qty, 0) || 0})</span>
+                                                        <span className="font-bold">{(calculateTotal(selectedTable) - calculateTableFee(selectedTable)).toLocaleString()}đ</span>
+                                                    </div>
+                                                    <div className="pt-4 border-t border-slate-200 flex justify-between items-center">
+                                                        <span className="font-black text-slate-800 uppercase text-xs tracking-widest">TỔNG THANH TOÁN</span>
+                                                        <span className="text-3xl font-black text-[#1e293b]">{calculateTotal(selectedTable).toLocaleString()}đ</span>
+                                                    </div>
+                                                </div>
+
+                                                <button
+                                                    onClick={() => handleTableAction('stop')}
+                                                    className="w-full mt-4 py-5 bg-green-500 text-white rounded-2xl font-black text-lg shadow-xl shadow-green-500/30 hover:bg-green-600 transition-all active:scale-95 flex items-center justify-center gap-2"
+                                                >
+                                                    <Wallet size={24} /> THANH TOÁN
+                                                </button>
+                                            </div>
+                                        )}
+                                    </>
+                                ) : (
+                                    <div className="h-full flex flex-col items-center justify-center text-slate-300 gap-6 opacity-60">
+                                        <div className="w-32 h-32 bg-slate-50 rounded-full flex items-center justify-center animate-pulse">
+                                            <LayoutDashboard size={64} className="text-slate-200" />
+                                        </div>
+                                        <div className="font-bold text-sm uppercase tracking-widest text-center">Chọn một bàn<br />để xem chi tiết</div>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {activeTab === 'finance' && (
                     <>
                         {/* Stats & Chart Grid */}
                         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-10">
@@ -572,7 +947,7 @@ export default function Admin() {
                                                         if (selectedCat.name === 'Khác' || Number(selectedCat.default_amount) === 0) {
                                                             setAmount('');
                                                         } else {
-                                                            const cleanAmount = Math.floor(Number(selectedCat.default_amount)).toString();
+                                                            const cleanAmount = Number(selectedCat.default_amount).toLocaleString();
                                                             setAmount(cleanAmount);
                                                         }
                                                     }
@@ -588,16 +963,15 @@ export default function Admin() {
                                         <div>
                                             <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Số tiền (VNĐ)</label>
                                             <input
-                                                type="number"
+                                                type="text"
                                                 className="w-full p-4 bg-slate-50 border-none rounded-2xl mt-2 font-black text-slate-800 text-xl md:text-2xl placeholder:text-slate-200 outline-none focus:ring-2 ring-green-500/10 transition-all"
-                                                value={amount} onChange={(e) => setAmount(e.target.value)}
-                                                placeholder="Ví dụ: 230" required
+                                                value={amount}
+                                                onChange={(e) => {
+                                                    const raw = e.target.value.replace(/[^0-9]/g, '');
+                                                    setAmount(raw ? parseInt(raw).toLocaleString() : '');
+                                                }}
+                                                placeholder="Ví dụ: 100 = 100,000" required
                                             />
-                                            {amount && parseFloat(amount) > 0 && (
-                                                <div className="mt-2 ml-1 text-xs font-bold text-green-600 animate-pulse">
-                                                    💡 Sẽ lưu thành: {((parseFloat(amount) < 10000) ? parseFloat(amount) * 1000 : parseFloat(amount)).toLocaleString()} đ
-                                                </div>
-                                            )}
                                         </div>
                                         <div>
                                             <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Ngày thực hiện</label>
@@ -611,8 +985,8 @@ export default function Admin() {
                                             <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Họ và tên người nộp</label>
                                             <input
                                                 type="text"
-                                                className="w-full p-4 bg-slate-50 border-none rounded-2xl mt-2 font-medium text-slate-600 outline-none"
-                                                value={desc} onChange={(e) => setDesc(e.target.value)}
+                                                className="w-full p-4 bg-slate-50 border-none rounded-2xl mt-2 font-black text-slate-800 outline-none uppercase placeholder:normal-case"
+                                                value={desc} onChange={(e) => setDesc(e.target.value.toUpperCase())}
                                                 placeholder="Tên khách hàng..."
                                             />
                                         </div>
@@ -698,7 +1072,9 @@ export default function Admin() {
                             </div>
                         </div>
                     </>
-                ) : (
+                )}
+
+                {activeTab === 'schedule' && (
                     <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 animate-in fade-in slide-in-from-bottom-4 duration-500">
                         {/* Schedule Management UI */}
                         <div className="lg:col-span-4 space-y-8">
@@ -719,6 +1095,14 @@ export default function Admin() {
                                             <option value="HLV Nâng cao">HLV Nâng cao</option>
                                             <option value="HLV Chuyên nghiệp">HLV Chuyên nghiệp</option>
                                         </select>
+                                    </div>
+                                    <div>
+                                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Học phí (VND/Buổi)</label>
+                                        <input type="text" className="w-full p-4 bg-slate-50 border-none rounded-2xl mt-2 font-bold text-slate-700 outline-none" placeholder="300.000đ" value={coachFee} onChange={e => setCoachFee(e.target.value)} />
+                                    </div>
+                                    <div>
+                                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Tiền thuê bàn (VND/Giờ)</label>
+                                        <input type="text" className="w-full p-4 bg-slate-50 border-none rounded-2xl mt-2 font-bold text-slate-700 outline-none" placeholder="50.000đ" value={coachTableFee} onChange={e => setCoachTableFee(e.target.value)} />
                                     </div>
                                     <button type="submit" className="w-full bg-[#1e293b] text-white p-5 rounded-3xl font-black flex items-center justify-center gap-3 shadow-xl hover:bg-slate-800 transition-all">
                                         THÊM HLV MỚI <PlusCircle size={20} />
@@ -761,10 +1145,12 @@ export default function Admin() {
                                             </select>
                                         </div>
                                         <div>
-                                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Nhóm tập</label>
-                                            <select className="w-full p-4 bg-slate-50 border-none rounded-2xl mt-2 font-bold text-slate-700 outline-none" value={sessGroupId} onChange={e => setSessGroupId(e.target.value)} required>
-                                                <option value="">-- Chọn Nhóm --</option>
-                                                {groups.map(g => <option key={g.id} value={g.id}>{g.name}</option>)}
+                                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Số bàn</label>
+                                            <select className="w-full p-4 bg-slate-50 border-none rounded-2xl mt-2 font-bold text-slate-700 outline-none" value={sessLoc} onChange={e => setSessLoc(e.target.value)} required>
+                                                <option value="">-- Chọn Bàn --</option>
+                                                {[...Array(15)].map((_, i) => (
+                                                    <option key={i + 1} value={`Bàn ${i + 1}`}>Bàn {i + 1}</option>
+                                                ))}
                                             </select>
                                         </div>
                                         <div>
@@ -781,10 +1167,6 @@ export default function Admin() {
                                         </div>
                                     </div>
                                     <div className="space-y-6">
-                                        <div>
-                                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Địa điểm / Bàn số</label>
-                                            <input type="text" className="w-full p-4 bg-slate-50 border-none rounded-2xl mt-2 font-bold text-slate-700 outline-none" placeholder="Bàn 1-4" value={sessLoc} onChange={e => setSessLoc(e.target.value)} required />
-                                        </div>
                                         <div className="grid grid-cols-2 gap-4">
                                             <div>
                                                 <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Bắt đầu</label>
@@ -816,24 +1198,29 @@ export default function Admin() {
                                                 <th className="px-8 py-5">Thứ</th>
                                                 <th className="px-8 py-5">Giờ tập</th>
                                                 <th className="px-8 py-5">HLV</th>
-                                                <th className="px-8 py-5">Nhóm</th>
-                                                <th className="px-8 py-5">Vị trí</th>
+                                                <th className="px-8 py-5">Bàn số</th>
                                                 <th className="px-8 py-5 text-right">Thao tác</th>
                                             </tr>
                                         </thead>
                                         <tbody className="divide-y divide-slate-50">
+                                            {sessions.length === 0 && (
+                                                <tr>
+                                                    <td colSpan={5} className="text-center py-8 text-slate-400 font-bold bg-slate-50/30">
+                                                        Chưa có lịch tập nào. Hãy "Lưu thời khóa biểu" ở form trên.
+                                                    </td>
+                                                </tr>
+                                            )}
                                             {sessions.map((s: any) => (
                                                 <tr key={s.id} className="hover:bg-slate-50 transition-colors group">
                                                     <td className="px-8 py-5 text-sm font-black text-slate-700">{s.day === 'Monday' ? 'Thứ 2' : s.day === 'Tuesday' ? 'Thứ 3' : s.day === 'Wednesday' ? 'Thứ 4' : s.day === 'Thursday' ? 'Thứ 5' : s.day === 'Friday' ? 'Thứ 6' : s.day === 'Saturday' ? 'Thứ 7' : 'Chủ nhật'}</td>
                                                     <td className="px-8 py-5 text-xs font-bold text-slate-400">{s.start_time} - {s.end_time}</td>
                                                     <td className="px-8 py-5">
                                                         <div className="flex items-center gap-2">
-                                                            <div className="w-2.5 h-2.5 rounded-full" style={{ background: s.coaches?.color }}></div>
-                                                            <span className="text-xs font-black">{s.coaches?.name}</span>
+                                                            <div className="w-2.5 h-2.5 rounded-full" style={{ background: coaches.find((c: any) => c.id == s.coach_id)?.color || '#ccc' }}></div>
+                                                            <span className="text-xs font-black">{coaches.find((c: any) => c.id == s.coach_id)?.name || 'HLV ẩn'}</span>
                                                         </div>
                                                     </td>
-                                                    <td className="px-8 py-5 text-xs font-bold text-slate-600">{s.training_groups?.name}</td>
-                                                    <td className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">{s.location}</td>
+                                                    <td className="px-8 py-5 text-xs font-bold text-slate-600">{s.location}</td>
                                                     <td className="px-8 py-5 text-right">
                                                         <button onClick={() => deleteTableItem('training_sessions', s.id)} className="text-slate-200 hover:text-red-500 p-2"><Trash2 size={18} /></button>
                                                     </td>
@@ -845,25 +1232,28 @@ export default function Admin() {
                             </div>
                         </div>
                     </div>
-                )}
-            </main>
+                )
+                }
+            </main >
 
             {/* --- MODALS --- */}
-            {showDeleteModal && (
-                <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[200] flex items-center justify-center p-4 animate-in fade-in duration-300">
-                    <div className="bg-white p-10 rounded-[2.5rem] max-w-sm w-full shadow-2xl text-center scale-in duration-300">
-                        <div className="w-16 h-16 bg-red-50 text-red-500 rounded-2xl flex items-center justify-center mx-auto mb-6">
-                            <AlertTriangle size={32} />
-                        </div>
-                        <h3 className="text-2xl font-black text-slate-800 tracking-tight">Xác nhận xóa?</h3>
-                        <p className="text-slate-400 font-medium mt-3">Giao dịch sẽ bị ẩn khỏi các báo cáo doanh thu. Bạn không thể hoàn tác.</p>
-                        <div className="grid grid-cols-2 gap-4 mt-8">
-                            <button onClick={() => setShowDeleteModal(false)} className="p-4 rounded-2xl font-bold bg-slate-50 text-slate-600 hover:bg-slate-100 transition-all">HỦY BỎ</button>
-                            <button onClick={handleDelete} className="p-4 rounded-2xl font-bold bg-red-500 text-white shadow-lg shadow-red-500/20 hover:bg-red-600 transition-all">ĐỒNG Ý XÓA</button>
+            {
+                showDeleteModal && (
+                    <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[200] flex items-center justify-center p-4 animate-in fade-in duration-300">
+                        <div className="bg-white p-10 rounded-[2.5rem] max-w-sm w-full shadow-2xl text-center scale-in duration-300">
+                            <div className="w-16 h-16 bg-red-50 text-red-500 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                                <AlertTriangle size={32} />
+                            </div>
+                            <h3 className="text-2xl font-black text-slate-800 tracking-tight">Xác nhận xóa?</h3>
+                            <p className="text-slate-400 font-medium mt-3">Giao dịch sẽ bị ẩn khỏi các báo cáo doanh thu. Bạn không thể hoàn tác.</p>
+                            <div className="grid grid-cols-2 gap-4 mt-8">
+                                <button onClick={() => setShowDeleteModal(false)} className="p-4 rounded-2xl font-bold bg-slate-50 text-slate-600 hover:bg-slate-100 transition-all">HỦY BỎ</button>
+                                <button onClick={handleDelete} className="p-4 rounded-2xl font-bold bg-red-500 text-white shadow-lg shadow-red-500/20 hover:bg-red-600 transition-all">ĐỒNG Ý XÓA</button>
+                            </div>
                         </div>
                     </div>
-                </div>
-            )}
+                )
+            }
 
             {/* --- TOASTS --- */}
             <div className="fixed bottom-10 right-10 z-[300] flex flex-col gap-3">
@@ -876,6 +1266,6 @@ export default function Admin() {
                     </div>
                 ))}
             </div>
-        </div>
+        </div >
     );
 }
