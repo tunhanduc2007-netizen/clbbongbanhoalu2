@@ -1,12 +1,15 @@
 import React, { useState, useEffect, useRef } from 'react';
 import {
-    Wallet, LogOut, TrendingUp, FileSpreadsheet, FileText, LayoutDashboard, Coffee, Circle,
-    Trash2, Search, LogIn, PlusCircle, ChevronDown,
-    AlertTriangle, CheckCircle, X as CloseIcon, Calendar, Users
+    Wallet, LogOut, TrendingUp, FileSpreadsheet, LayoutDashboard, Coffee, Circle,
+    Trash2, Search, LogIn, PlusCircle, ChevronDown, Play, Pause, Square,
+    AlertTriangle, CheckCircle, X as CloseIcon, Calendar, Users, Home, Settings,
+    Clock, DollarSign, Minus, Plus, Moon, Sun
 } from 'lucide-react';
 import SEO from '../components/SEO';
 import { Chart, registerables } from 'chart.js';
 import * as XLSX from 'xlsx';
+import { Card, Button, BottomSheet, StatsCard, BottomNav } from '../components/ui';
+import { formatCurrency, formatTime, calculatePrice, PRICE_PER_PERSON, ADMIN_CONFIG, formatDuration } from '../utils/helpers';
 
 Chart.register(...registerables);
 
@@ -25,6 +28,7 @@ export default function Admin() {
     const [tables, setTables] = useState<any[]>([]);
     const [selectedTable, setSelectedTable] = useState<any>(null);
     const [playerNameInput, setPlayerNameInput] = useState('');
+    const [playerCountInput, setPlayerCountInput] = useState(2); // Số người chơi (mặc định 2)
     const [currentTime, setCurrentTime] = useState(new Date());
 
     // UI Effects
@@ -33,6 +37,28 @@ export default function Admin() {
     const [deleteTargetId, setDeleteTargetId] = useState<number | null>(null);
     const [deleteTargetTable, setDeleteTargetTable] = useState('transactions');
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [darkMode, setDarkMode] = useState(() => {
+        if (typeof window !== 'undefined') {
+            return localStorage.getItem('adminDarkMode') === 'true';
+        }
+        return false;
+    });
+    const [userRole, setUserRole] = useState<'owner' | 'staff'>(() => {
+        if (typeof window !== 'undefined') {
+            return (localStorage.getItem('adminRole') as 'owner' | 'staff') || 'staff';
+        }
+        return 'staff';
+    });
+
+    // Check if user is owner
+    const isOwner = userRole === 'owner';
+
+    // Toggle dark mode
+    const toggleDarkMode = () => {
+        const newMode = !darkMode;
+        setDarkMode(newMode);
+        localStorage.setItem('adminDarkMode', String(newMode));
+    };
 
     // Filters
     const [timeRange, setTimeRange] = useState('year');
@@ -41,6 +67,9 @@ export default function Admin() {
     // --- LỊCH TẬP STATE ---
     const [activeTab, setActiveTab] = useState('finance');
     const [coaches, setCoaches] = useState<any[]>([]);
+
+    // --- MODALS STATE ---
+    const [showHistoryModal, setShowHistoryModal] = useState(false);
     const [groups, setGroups] = useState<any[]>([]);
     const [sessions, setSessions] = useState<any[]>([]);
 
@@ -165,9 +194,16 @@ export default function Admin() {
             end = new Date(y, 11, 31);
         }
 
+        const formatDate = (d: Date) => {
+            const year = d.getFullYear();
+            const month = String(d.getMonth() + 1).padStart(2, '0');
+            const day = String(d.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        };
+
         return {
-            start: start.toISOString().split('T')[0],
-            end: end.toISOString().split('T')[0]
+            start: formatDate(start),
+            end: formatDate(end)
         };
     };
 
@@ -209,7 +245,7 @@ export default function Admin() {
             .select(`
                                 *,
                                 categories (name),
-                                users (full_name)
+                                admin_users (full_name)
                                 `)
             .eq('is_active', true)
             .gte('transaction_date', `${start} 00:00:00`)
@@ -224,7 +260,7 @@ export default function Admin() {
         const formattedRows = data.map((r: any) => ({
             ...r,
             category_name: r.categories?.name,
-            creator_name: r.users?.full_name
+            creator_name: r.admin_users?.full_name
         }));
 
         setRecords(formattedRows);
@@ -486,12 +522,16 @@ export default function Admin() {
 
     const calculateTableFee = (t: any) => {
         if (!t || t.status === 'available') return 0;
-        // Bàn 10 trở đi tính tiền giờ (70k/h), Bàn dưới 10 tính tiền lượt (40k/session)
+
+        // Bàn 10+ tính tiền giờ (70k/h)
         if (t.table_number >= 10) {
             const hours = getDuration(t.start_time);
             return Math.floor(hours * 70000);
         }
-        return 40000;
+
+        // Bàn 1-9: 40,000đ × số người chơi
+        const playerCount = t.player_count || 2;
+        return playerCount * 40000;
     };
 
     const calculateTotal = (t: any) => {
@@ -506,7 +546,14 @@ export default function Admin() {
         let updateData: any = {};
 
         if (action === 'start') {
-            updateData = { status: 'occupied', start_time: new Date().toISOString(), player_name: payload, services: [] };
+            // payload = { playerName, playerCount }
+            updateData = {
+                status: 'occupied',
+                start_time: new Date().toISOString(),
+                player_name: payload?.playerName || 'Khách vãng lai',
+                player_count: payload?.playerCount || 2,
+                services: []
+            };
         }
         else if (action === 'stop') {
             // 1. Create Transaction
@@ -577,24 +624,29 @@ export default function Admin() {
 
     if (!isLoggedIn) {
         return (
-            <div className="min-h-screen bg-[#1e293b] flex items-center justify-center p-4">
-                <div className="bg-white p-10 rounded-[2.5rem] shadow-2xl w-full max-w-md text-center">
-                    <img src="/logo.png" className="w-24 h-24 mx-auto rounded-full border-4 border-[#7AC943] mb-6" alt="Logo" />
-                    <h2 className="text-3xl font-black text-slate-800 tracking-tight">HOA LƯ ADMIN</h2>
+            <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-emerald-50 flex items-center justify-center p-4">
+                <div className="bg-white p-8 md:p-10 rounded-3xl shadow-2xl shadow-emerald-500/10 w-full max-w-md text-center border border-emerald-100">
+                    <div className="w-20 h-20 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-2xl mx-auto flex items-center justify-center shadow-xl shadow-emerald-500/30 mb-6">
+                        <LayoutDashboard size={36} className="text-white" />
+                    </div>
+                    <h2 className="text-2xl md:text-3xl font-black text-slate-800 tracking-tight">CLB Bóng Bàn</h2>
+                    <p className="text-emerald-600 font-bold text-sm mt-1">Hoa Lư - Admin Panel</p>
                     <form className="mt-8 space-y-4" onSubmit={async (e) => {
                         e.preventDefault();
                         setIsSubmitting(true);
                         const form = e.target as any;
                         try {
                             const { data, error } = await supabase
-                                .from('users')
+                                .from('admin_users')
                                 .select('*')
-                                .eq('username', form.user.value)
+                                .eq('email', form.user.value)
                                 .eq('password_hash', form.pass.value)
                                 .single();
 
                             if (data && !error) {
                                 localStorage.setItem('adminUser', JSON.stringify(data));
+                                localStorage.setItem('adminRole', data.role || 'staff');
+                                setUserRole(data.role || 'staff');
                                 setUser(data); setIsLoggedIn(true); initDashboard();
                             } else {
                                 addToast("Sai tài khoản hoặc mật khẩu!", "error");
@@ -605,10 +657,20 @@ export default function Admin() {
                             setIsSubmitting(false);
                         }
                     }}>
-                        <input name="user" type="text" placeholder="Tài khoản" className="w-full p-4 bg-slate-50 rounded-2xl outline-none border-2 border-transparent focus:border-green-500/20" required />
-                        <input name="pass" type="password" placeholder="Mật khẩu" className="w-full p-4 bg-slate-50 rounded-2xl outline-none border-2 border-transparent focus:border-green-500/20" required />
-                        <button type="submit" disabled={isSubmitting} className="w-full bg-[#1e293b] text-white p-4 rounded-2xl font-bold flex items-center justify-center gap-2 mt-4 shadow-xl disabled:opacity-50">
-                            {isSubmitting ? "Đang kiểm tra..." : <><LogIn size={20} /> ĐĂNG NHẬP</>}
+                        <div>
+                            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block text-left mb-2 ml-1">Tài khoản</label>
+                            <input name="user" type="text" placeholder="Nhập tên đăng nhập" className="w-full p-4 bg-slate-50 rounded-2xl outline-none border-2 border-transparent focus:border-emerald-500/30 focus:bg-white transition-all font-medium" required />
+                        </div>
+                        <div>
+                            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block text-left mb-2 ml-1">Mật khẩu</label>
+                            <input name="pass" type="password" placeholder="••••••" className="w-full p-4 bg-slate-50 rounded-2xl outline-none border-2 border-transparent focus:border-emerald-500/30 focus:bg-white transition-all font-medium" required />
+                        </div>
+                        <button type="submit" disabled={isSubmitting} className="w-full bg-emerald-600 hover:bg-emerald-700 text-white p-4 rounded-2xl font-bold flex items-center justify-center gap-2 mt-6 shadow-xl shadow-emerald-500/30 disabled:opacity-50 transition-all active:scale-[0.98]">
+                            {isSubmitting ? (
+                                <span className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                            ) : (
+                                <><LogIn size={20} /> Đăng Nhập</>
+                            )}
                         </button>
                     </form>
                 </div>
@@ -617,55 +679,77 @@ export default function Admin() {
     }
 
     return (
-        <div className="min-h-screen bg-[#f8fafc] text-slate-800 font-sans pb-20">
+        <div className={`min-h-screen font-sans pb-24 md:pb-10 transition-colors duration-300 ${darkMode ? 'bg-slate-900 text-slate-100' : 'bg-slate-50 text-slate-800'}`}>
             <SEO title="Tổng Quan Tài Chính" description="Admin Dashboard" />
 
-            {/* Header V3 Premium */}
-            <header className="bg-[#2d3a4b] text-white py-4 px-8 sticky top-0 z-[100] shadow-xl">
+            {/* Header - Mobile Optimized */}
+            <header className={`py-4 px-4 md:px-8 sticky top-0 z-[100] shadow-xl transition-colors ${darkMode ? 'bg-slate-800 shadow-slate-900/50' : 'bg-gradient-to-r from-emerald-600 to-emerald-700 shadow-emerald-600/20'}`}>
                 <div className="max-w-[1600px] mx-auto flex justify-between items-center">
-                    <div className="flex items-center gap-4">
-                        <img src="/logo.png" className="w-10 h-10 rounded-full border-2 border-green-400" alt="Logo" />
-                        <span className="font-black text-xl tracking-tighter uppercase">Hoa Lư Admin</span>
+                    <div className="flex items-center gap-3">
+                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center backdrop-blur-sm ${darkMode ? 'bg-emerald-600' : 'bg-white/20'}`}>
+                            <LayoutDashboard size={22} className="text-white" />
+                        </div>
+                        <div>
+                            <span className="font-black text-lg tracking-tight block leading-tight text-white">Hoa Lư</span>
+                            <span className={`text-[10px] font-bold uppercase tracking-wider ${darkMode ? 'text-emerald-400' : 'text-emerald-100'}`}>Admin Panel</span>
+                        </div>
                     </div>
-                    <div className="flex items-center gap-6">
-                        <div className="text-right">
-                            <div className="text-sm font-bold">{user?.full_name || 'Admin'}</div>
-                            <div className="text-[10px] text-green-400 font-black uppercase tracking-widest">Online</div>
+                    <div className="flex items-center gap-2 md:gap-3">
+                        {/* Dark Mode Toggle */}
+                        <button
+                            onClick={toggleDarkMode}
+                            className={`p-2.5 rounded-xl transition-colors touch-target ${darkMode ? 'bg-slate-700 hover:bg-slate-600 text-amber-400' : 'bg-white/10 hover:bg-white/20 text-white'}`}
+                            title={darkMode ? 'Chế độ sáng' : 'Chế độ tối'}
+                        >
+                            {darkMode ? <Sun size={20} /> : <Moon size={20} />}
+                        </button>
+                        <div className="hidden md:block text-right">
+                            <div className="text-sm font-bold text-white">{user?.full_name || 'Admin'}</div>
+                            <div className={`text-[10px] font-bold uppercase tracking-wider flex items-center gap-1 justify-end ${darkMode ? 'text-emerald-400' : 'text-emerald-200'}`}>
+                                <span className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse"></span> Online
+                            </div>
                         </div>
-                        <div className="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center font-black border-2 border-white/20">
-                            {user?.username?.[0].toUpperCase()}
+                        <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center font-black text-sm border-2 border-white/30 backdrop-blur-sm">
+                            {user?.username?.[0]?.toUpperCase() || 'A'}
                         </div>
-                        <button onClick={() => { localStorage.removeItem('adminUser'); setIsLoggedIn(false) }} className="p-2 hover:bg-white/10 rounded-xl"><LogOut size={22} /></button>
+                        <button
+                            onClick={() => { localStorage.removeItem('adminUser'); setIsLoggedIn(false) }}
+                            className="p-2.5 hover:bg-white/10 rounded-xl transition-colors touch-target"
+                        >
+                            <LogOut size={20} />
+                        </button>
                     </div>
                 </div>
             </header>
 
-            <main className="max-w-[1600px] mx-auto px-4 md:px-8 py-10">
-                {/* Top Row: Title & Filter */}
-                <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-10 gap-6">
+            <main className="max-w-[1600px] mx-auto px-4 md:px-8 py-6 md:py-10">
+                {/* Top Row: Title & Filter - Desktop Only */}
+                <div className="hidden md:flex flex-col md:flex-row justify-between items-start md:items-end mb-10 gap-6">
                     <div>
-                        <h1 className="text-2xl md:text-4xl font-black text-[#1e293b] tracking-tight">
+                        <h1 className={`text-2xl md:text-4xl font-black tracking-tight ${darkMode ? 'text-slate-100' : 'text-slate-800'}`}>
                             {activeTab === 'finance' ? 'Tổng Quan Tài Chính' : (activeTab === 'tables' ? 'Quản Lý Bàn' : 'Quản Lý Lịch Tập')}
                         </h1>
-                        <div className="flex gap-4 mt-4 overflow-x-auto pb-2">
+                        <div className="flex gap-3 mt-4 overflow-x-auto pb-2 no-scrollbar">
                             <button
                                 onClick={() => setActiveTab('finance')}
-                                className={`px-6 py-3 rounded-2xl font-black text-sm flex items-center gap-3 transition-all ${activeTab === 'finance' ? 'bg-[#1e293b] text-white shadow-xl shadow-slate-900/20' : 'bg-white text-slate-400 hover:bg-slate-50'}`}
+                                className={`px-5 py-3 rounded-2xl font-bold text-sm flex items-center gap-2 transition-all whitespace-nowrap ${activeTab === 'finance' ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-500/30' : darkMode ? 'bg-slate-800 text-slate-300 hover:bg-slate-700 border border-slate-700' : 'bg-white text-slate-500 hover:bg-slate-50 border border-slate-100'}`}
                             >
-                                <Wallet size={18} /> TÀI CHÍNH
+                                <Wallet size={18} /> Tài Chính
                             </button>
                             <button
                                 onClick={() => setActiveTab('tables')}
-                                className={`px-6 py-3 rounded-2xl font-black text-sm flex items-center gap-3 transition-all ${activeTab === 'tables' ? 'bg-[#1e293b] text-white shadow-xl shadow-slate-900/20' : 'bg-white text-slate-400 hover:bg-slate-50'}`}
+                                className={`px-5 py-3 rounded-2xl font-bold text-sm flex items-center gap-2 transition-all whitespace-nowrap ${activeTab === 'tables' ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-500/30' : darkMode ? 'bg-slate-800 text-slate-300 hover:bg-slate-700 border border-slate-700' : 'bg-white text-slate-500 hover:bg-slate-50 border border-slate-100'}`}
                             >
-                                <LayoutDashboard size={18} /> QUẢN LÝ BÀN
+                                <LayoutDashboard size={18} /> Quản Lý Bàn
                             </button>
-                            <button
-                                onClick={() => setActiveTab('schedule')}
-                                className={`px-6 py-3 rounded-2xl font-black text-sm flex items-center gap-3 transition-all ${activeTab === 'schedule' ? 'bg-[#1e293b] text-white shadow-xl shadow-slate-900/20' : 'bg-white text-slate-400 hover:bg-slate-50'}`}
-                            >
-                                <Calendar size={18} /> LỊCH TẬP
-                            </button>
+                            {isOwner && (
+                                <button
+                                    onClick={() => setActiveTab('schedule')}
+                                    className={`px-5 py-3 rounded-2xl font-bold text-sm flex items-center gap-2 transition-all whitespace-nowrap ${activeTab === 'schedule' ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-500/30' : darkMode ? 'bg-slate-800 text-slate-300 hover:bg-slate-700 border border-slate-700' : 'bg-white text-slate-500 hover:bg-slate-50 border border-slate-100'}`}
+                                >
+                                    <Calendar size={18} /> Lịch Tập
+                                </button>
+                            )}
                         </div>
                     </div>
 
@@ -675,7 +759,7 @@ export default function Admin() {
                                 <select
                                     value={timeRange}
                                     onChange={(e) => setTimeRange(e.target.value)}
-                                    className="appearance-none bg-white border-none shadow-sm rounded-2xl px-6 py-3.5 pr-12 font-bold text-sm text-slate-600 outline-none cursor-pointer ring-1 ring-slate-100 focus:ring-2 focus:ring-green-500/20 transition-all"
+                                    className={`appearance-none shadow-sm rounded-2xl px-5 py-3 pr-12 font-bold text-sm outline-none cursor-pointer focus:ring-2 focus:ring-emerald-500/20 transition-all ${darkMode ? 'bg-slate-800 border border-slate-700 text-slate-200' : 'bg-white border border-slate-100 text-slate-600'}`}
                                 >
                                     <option value="today">Hôm nay</option>
                                     <option value="week">Tuần này</option>
@@ -684,19 +768,48 @@ export default function Admin() {
                                 </select>
                                 <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400" size={18} />
                             </div>
-                            <button onClick={exportExcel} className="hidden md:flex items-center gap-2 bg-white px-5 py-3.5 rounded-2xl shadow-sm text-sm font-bold text-slate-600 border border-slate-100 hover:bg-slate-50 transition-all">
-                                <FileSpreadsheet size={18} className="text-green-600" /> XUẤT EXCEL
-                            </button>
+                            {isOwner && (
+                                <button onClick={exportExcel} className={`flex items-center gap-2 px-5 py-3 rounded-2xl shadow-sm text-sm font-bold transition-all ${darkMode ? 'bg-slate-800 border border-slate-700 text-slate-200 hover:bg-slate-700' : 'bg-white border border-slate-100 text-slate-600 hover:bg-slate-50'}`}>
+                                    <FileSpreadsheet size={18} className="text-emerald-500" /> Xuất Excel
+                                </button>
+                            )}
                         </div>
                     )}
                 </div>
 
+                {/* Mobile: Quick Stats Header for Tables */}
+                {activeTab === 'tables' && (
+                    <div className="md:hidden mb-6">
+                        <h1 className={`text-xl font-black mb-4 ${darkMode ? 'text-slate-100' : 'text-slate-800'}`}>Quản Lý Bàn</h1>
+                        <div className="flex gap-3 overflow-x-auto no-scrollbar pb-2">
+                            <div className={`flex-shrink-0 rounded-2xl p-4 border min-w-[120px] ${darkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-100'}`}>
+                                <div className="flex items-center gap-2 text-emerald-500 mb-1">
+                                    <LayoutDashboard size={16} />
+                                    <span className={`text-xs font-bold ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>Đang chơi</span>
+                                </div>
+                                <div className={`text-2xl font-black ${darkMode ? 'text-slate-100' : 'text-slate-800'}`}>
+                                    {tables.filter((t: any) => t.status === 'occupied').length}/{tables.length || 15}
+                                </div>
+                            </div>
+                            <div className="flex-shrink-0 bg-white rounded-2xl p-4 border border-slate-100 min-w-[120px]">
+                                <div className="flex items-center gap-2 text-orange-600 mb-1">
+                                    <Users size={16} />
+                                    <span className="text-xs font-bold text-slate-500">Khách</span>
+                                </div>
+                                <div className="text-2xl font-black text-slate-800">
+                                    {tables.filter((t: any) => t.status !== 'available').reduce((acc: number, t: any) => acc + (t.player_count || 2), 0)}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
                 {/* --- TAB CONTENT: TABLES MANAGER --- */}
                 {activeTab === 'tables' && (
-                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 animate-in fade-in zoom-in duration-500">
-                        {/* Left: Table Grid (3 Columns) */}
+                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 animate-fade-in">
+                        {/* Left: Table Grid (2 Columns on Mobile) */}
                         <div className="lg:col-span-8">
-                            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                            <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3 md:gap-4">
                                 {(tables.length > 0 ? tables : Array.from({ length: 15 }, (_, i) => ({
                                     id: `temp-${i}`,
                                     table_number: i + 1,
@@ -715,44 +828,59 @@ export default function Admin() {
                                                 setPlayerNameInput('');
                                             }
                                         }}
-                                        className={`relative h-48 rounded-[1.5rem] p-6 cursor-pointer transition-all border-2 
-                                            ${selectedTable?.id === t.id ? 'ring-4 ring-offset-2 ring-blue-500 scale-105 z-10' : 'hover:scale-105 hover:shadow-xl'} 
+                                        className={`relative min-h-[140px] md:min-h-[160px] rounded-2xl p-4 md:p-5 cursor-pointer transition-all border-2 
+                                            ${selectedTable?.id === t.id ? 'ring-4 ring-offset-2 ring-emerald-500 scale-[1.02] z-10' : 'hover:scale-[1.02] active:scale-[0.98]'} 
                                             ${t.status === 'occupied'
-                                                ? 'bg-blue-600 text-white border-blue-600 shadow-lg shadow-blue-500/30'
-                                                : t.status === 'reserved'
-                                                    ? 'bg-white border-orange-200'
-                                                    : 'bg-white border-slate-100'} 
-                                            ${t.isTemp ? 'opacity-70 border-dashed border-slate-300' : ''}`}
+                                                ? 'bg-gradient-to-br from-emerald-500 to-emerald-600 text-white border-emerald-500 shadow-lg shadow-emerald-500/30'
+                                                : t.status === 'paused'
+                                                    ? darkMode ? 'bg-amber-900/30 border-amber-700' : 'bg-amber-50 border-amber-300'
+                                                    : t.status === 'reserved'
+                                                        ? darkMode ? 'bg-orange-900/30 border-orange-700' : 'bg-white border-orange-200'
+                                                        : darkMode ? 'bg-slate-800 border-slate-700 hover:border-emerald-600' : 'bg-white border-slate-100 hover:border-emerald-200'} 
+                                            ${t.isTemp ? 'opacity-70 border-dashed' : ''} ${t.isTemp && darkMode ? 'border-slate-600' : t.isTemp ? 'border-slate-300' : ''}`}
                                     >
                                         <div className="flex justify-between items-start">
-                                            <span className={`text-3xl font-black tracking-tight ${t.status === 'occupied' ? 'text-white' : 'text-slate-700'}`}>
+                                            <span className={`text-2xl md:text-3xl font-black tracking-tight ${t.status === 'occupied' ? 'text-white' : t.status === 'paused' ? 'text-amber-500' : darkMode ? 'text-slate-200' : 'text-slate-700'}`}>
                                                 {t.table_number < 10 ? `0${t.table_number}` : t.table_number}
                                             </span>
-                                            <div className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest 
-                                                ${t.status === 'occupied' ? 'bg-white/20 text-white' : t.isTemp ? 'bg-slate-100 text-slate-400' : t.status === 'reserved' ? 'bg-orange-100 text-orange-500' : 'bg-green-100 text-green-600'}`}>
-                                                {t.status === 'occupied' ? 'Playing' : t.isTemp ? 'Setup Needed' : t.status === 'reserved' ? 'Reserved' : 'Available'}
-                                            </div>
+                                            <div className={`w-2.5 h-2.5 rounded-full 
+                                                ${t.status === 'occupied' ? 'bg-white animate-pulse' : t.status === 'paused' ? 'bg-amber-400' : t.isTemp ? 'bg-slate-500' : 'bg-emerald-400'}`}
+                                            />
                                         </div>
 
-                                        <div className="mt-8">
+                                        <div className="mt-4 md:mt-6">
                                             {t.status === 'occupied' ? (
                                                 <>
-                                                    <div className="text-sm font-medium text-blue-100 truncate flex items-center gap-2">
-                                                        <Users size={14} /> {t.player_name}
+                                                    <div className="text-[10px] md:text-xs text-emerald-100 truncate flex items-center gap-1">
+                                                        {t.table_number >= 10 ? (
+                                                            <><Clock size={10} /> 70k/giờ</>
+                                                        ) : (
+                                                            <><Users size={10} /> {t.player_count || 2} người</>
+                                                        )}
+                                                        <span className="opacity-60">• {t.player_name || 'Khách'}</span>
                                                     </div>
-                                                    <div className="text-3xl font-black text-white mt-2 font-mono tracking-wider">
-                                                        {new Date(currentTime.getTime() - new Date(t.start_time).getTime()).toISOString().substr(11, 8)}
+                                                    <div className="text-lg md:text-xl font-black text-white mt-1 font-mono tracking-wider">
+                                                        {formatDuration(t.start_time, currentTime)}
+                                                    </div>
+                                                    <div className="text-[10px] text-emerald-200 font-bold mt-0.5">
+                                                        {calculateTableFee(t).toLocaleString()}đ
+                                                    </div>
+                                                </>
+                                            ) : t.status === 'paused' ? (
+                                                <>
+                                                    <div className="text-xs text-amber-600 truncate">
+                                                        {t.player_name || 'Khách'}
+                                                    </div>
+                                                    <div className="text-lg font-bold text-amber-700 mt-1 font-mono">
+                                                        Tạm dừng
                                                     </div>
                                                 </>
                                             ) : (
-                                                <div className="flex flex-col items-center justify-center h-full text-slate-300 gap-2 mt-4">
+                                                <div className={`flex flex-col items-center justify-center gap-1 ${darkMode ? 'text-slate-500' : 'text-slate-400'}`}>
                                                     {t.isTemp ? (
-                                                        <span className="text-xs font-bold uppercase tracking-wider text-slate-400">Bấm để tạo bàn</span>
+                                                        <span className="text-[10px] font-bold uppercase tracking-wider">Bấm để tạo</span>
                                                     ) : (
-                                                        <>
-                                                            <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse"></div>
-                                                            <span className="text-xs font-bold uppercase tracking-wider">Sẵn sàng</span>
-                                                        </>
+                                                        <span className="text-[10px] font-bold uppercase tracking-wider">Sẵn sàng</span>
                                                     )}
                                                 </div>
                                             )}
@@ -763,86 +891,193 @@ export default function Admin() {
                         </div>
 
                         {/* Right: Sidebar Actions */}
-                        <div className={`lg:col-span-4 transition-all duration-300 ${selectedTable ? 'fixed inset-0 z-[200] p-4 bg-slate-50/95 backdrop-blur-sm lg:static lg:p-0 lg:bg-transparent' : 'hidden lg:block'}`}>
-                            <div className="bg-white p-6 rounded-[2rem] shadow-2xl border border-slate-100 lg:min-h-[700px] lg:sticky lg:top-28 flex flex-col h-full lg:h-auto overflow-y-auto">
+                        <div className={`lg:col-span-4 transition-all duration-300 ${selectedTable ? 'fixed inset-0 z-[200] p-4 bg-slate-900/50 backdrop-blur-sm lg:static lg:p-0 lg:bg-transparent' : 'hidden lg:block'}`}>
+                            <div className={`p-5 md:p-6 rounded-3xl shadow-2xl lg:min-h-[600px] lg:sticky lg:top-28 flex flex-col h-full lg:h-auto overflow-y-auto max-h-[90vh] lg:max-h-none animate-slide-up lg:animate-none transition-colors ${darkMode ? 'bg-slate-800 border border-slate-700' : 'bg-white border border-slate-100'}`}>
                                 {selectedTable ? (
                                     <>
                                         {/* Top: HeaderInfo */}
-                                        <div className="flex justify-between items-center mb-6 pb-6 border-b border-slate-100 relative">
+                                        <div className={`flex justify-between items-center mb-5 pb-5 border-b ${darkMode ? 'border-slate-700' : 'border-slate-100'}`}>
                                             <div>
-                                                <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
-                                                    <button onClick={() => setSelectedTable(null)} className="lg:hidden p-1 -ml-2 text-slate-400 hover:text-slate-800"><ChevronDown size={20} className="rotate-90" /></button>
+                                                <div className={`text-[10px] font-bold uppercase tracking-widest flex items-center gap-2 ${darkMode ? 'text-slate-400' : 'text-slate-400'}`}>
+                                                    <button onClick={() => setSelectedTable(null)} className={`lg:hidden p-1 -ml-2 ${darkMode ? 'text-slate-400 hover:text-slate-200' : 'text-slate-400 hover:text-slate-800'}`}><ChevronDown size={20} className="rotate-90" /></button>
                                                     Bàn đang chọn
                                                 </div>
-                                                <div className="text-4xl font-black text-[#1e293b]">Bàn {selectedTable.table_number}</div>
+                                                <div className={`text-3xl font-black ${darkMode ? 'text-slate-100' : 'text-slate-800'}`}>Bàn {selectedTable.table_number}</div>
                                             </div>
-                                            <div className="flex items-center gap-3">
-                                                <button onClick={() => setSelectedTable(null)} className="lg:hidden w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-500">
+                                            <div className="flex items-center gap-2">
+                                                <button onClick={() => setSelectedTable(null)} className={`lg:hidden w-10 h-10 rounded-full flex items-center justify-center touch-target ${darkMode ? 'bg-slate-700 text-slate-300' : 'bg-slate-100 text-slate-500'}`}>
                                                     <CloseIcon size={20} />
                                                 </button>
-                                                <div className={`w-12 h-12 rounded-2xl flex items-center justify-center text-white shadow-lg ${selectedTable.status === 'occupied' ? 'bg-blue-600 shadow-blue-500/30' : 'bg-slate-200'}`}>
-                                                    <LayoutDashboard size={24} />
+                                                <div className={`w-11 h-11 rounded-2xl flex items-center justify-center text-white shadow-lg ${selectedTable.status === 'occupied' ? 'bg-emerald-600 shadow-emerald-500/30' : darkMode ? 'bg-slate-700 text-slate-400' : 'bg-slate-200 text-slate-400'}`}>
+                                                    <LayoutDashboard size={22} />
                                                 </div>
                                             </div>
                                         </div>
 
                                         {selectedTable.status === 'available' ? (
-                                            <div className="space-y-6 flex-grow flex flex-col justify-center animate-in slide-in-from-right-10">
-                                                <div className="bg-slate-50 p-6 rounded-3xl border border-slate-100">
-                                                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Khách hàng</label>
+                                            <div className="space-y-4 flex-grow flex flex-col justify-center animate-fade-in">
+                                                {/* Tên khách */}
+                                                <div className={`p-4 rounded-2xl border ${darkMode ? 'bg-slate-700/50 border-slate-600' : 'bg-slate-50 border-slate-100'}`}>
+                                                    <label className={`text-[10px] font-bold uppercase tracking-widest ml-1 ${darkMode ? 'text-slate-400' : 'text-slate-400'}`}>Tên khách hàng</label>
                                                     <input
                                                         type="text"
-                                                        className="w-full p-4 bg-white border-none rounded-2xl mt-2 font-bold text-[#1e293b] outline-none shadow-sm focus:ring-2 ring-blue-500/20"
+                                                        className={`w-full p-3 border-none rounded-xl mt-2 font-bold outline-none shadow-sm focus:ring-2 ring-emerald-500/20 transition-all ${darkMode ? 'bg-slate-700 text-slate-100 placeholder-slate-400' : 'bg-white text-slate-800'}`}
                                                         placeholder="Nhập tên khách..."
                                                         value={playerNameInput}
                                                         onChange={(e) => setPlayerNameInput(e.target.value)}
                                                     />
                                                 </div>
+
+                                                {/* Số người chơi - Chỉ cho bàn 1-9 */}
+                                                {selectedTable.table_number < 10 ? (
+                                                    <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100">
+                                                        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1 mb-3 block">Số người chơi</label>
+
+                                                        {/* Preset buttons */}
+                                                        <div className="grid grid-cols-3 gap-2 mb-3">
+                                                            <button
+                                                                onClick={() => setPlayerCountInput(2)}
+                                                                className={`h-14 rounded-xl border-2 flex flex-col items-center justify-center transition-all ${playerCountInput === 2
+                                                                    ? 'border-emerald-500 bg-emerald-50 text-emerald-700'
+                                                                    : 'border-slate-200 bg-white text-slate-500 hover:border-emerald-200'
+                                                                    }`}
+                                                            >
+                                                                <Users size={16} className="mb-0.5" />
+                                                                <span className="font-bold text-xs">2 Người</span>
+                                                            </button>
+
+                                                            <button
+                                                                onClick={() => setPlayerCountInput(3)}
+                                                                className={`h-14 rounded-xl border-2 flex flex-col items-center justify-center transition-all ${playerCountInput === 3
+                                                                    ? 'border-emerald-500 bg-emerald-50 text-emerald-700'
+                                                                    : 'border-slate-200 bg-white text-slate-500 hover:border-emerald-200'
+                                                                    }`}
+                                                            >
+                                                                <Users size={16} className="mb-0.5" />
+                                                                <span className="font-bold text-xs">3 Người</span>
+                                                            </button>
+
+                                                            <button
+                                                                onClick={() => setPlayerCountInput(4)}
+                                                                className={`h-14 rounded-xl border-2 flex flex-col items-center justify-center transition-all ${playerCountInput === 4
+                                                                    ? 'border-emerald-500 bg-emerald-50 text-emerald-700'
+                                                                    : 'border-slate-200 bg-white text-slate-500 hover:border-emerald-200'
+                                                                    }`}
+                                                            >
+                                                                <Users size={16} className="mb-0.5" />
+                                                                <span className="font-bold text-xs">4 Người</span>
+                                                            </button>
+                                                        </div>
+
+                                                        {/* Custom adjust */}
+                                                        <div className="flex items-center justify-between bg-white rounded-xl p-2 shadow-sm">
+                                                            <span className="text-xs font-bold text-slate-500 ml-2">Tùy chỉnh</span>
+                                                            <div className="flex items-center gap-2">
+                                                                <button
+                                                                    onClick={() => setPlayerCountInput(Math.max(1, playerCountInput - 1))}
+                                                                    className="w-9 h-9 flex items-center justify-center bg-slate-100 rounded-lg text-slate-600 hover:bg-slate-200 transition-colors touch-target"
+                                                                >
+                                                                    <Minus size={16} />
+                                                                </button>
+                                                                <span className="w-8 text-center font-black text-lg text-slate-800">{playerCountInput}</span>
+                                                                <button
+                                                                    onClick={() => setPlayerCountInput(playerCountInput + 1)}
+                                                                    className="w-9 h-9 flex items-center justify-center bg-emerald-100 rounded-lg text-emerald-700 hover:bg-emerald-200 transition-colors touch-target"
+                                                                >
+                                                                    <Plus size={16} />
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                ) : (
+                                                    /* Bàn 10+ - Thông tin tính theo giờ */
+                                                    <div className="bg-amber-50 p-4 rounded-2xl border border-amber-200">
+                                                        <div className="flex items-center gap-2 text-amber-700 mb-2">
+                                                            <Clock size={18} />
+                                                            <span className="font-bold text-sm">Bàn tính theo giờ</span>
+                                                        </div>
+                                                        <p className="text-amber-600 text-xs">Bàn {selectedTable.table_number} được tính phí <span className="font-bold">70,000đ/giờ</span></p>
+                                                    </div>
+                                                )}
+
+                                                {/* Price Preview - Chỉ cho bàn 1-9 */}
+                                                {selectedTable.table_number < 10 && (
+                                                    <div className="flex justify-between items-center p-4 bg-emerald-50 rounded-2xl border border-emerald-100">
+                                                        <div>
+                                                            <span className="text-xs font-bold text-emerald-600 uppercase tracking-wider block">Tạm tính</span>
+                                                            <span className="text-[10px] text-emerald-500">{playerCountInput} × 40,000đ</span>
+                                                        </div>
+                                                        <span className="text-2xl font-black text-emerald-700">{(playerCountInput * 40000).toLocaleString()}đ</span>
+                                                    </div>
+                                                )}
+
                                                 <button
-                                                    onClick={() => handleTableAction('start', playerNameInput || 'Khách vãng lai')}
-                                                    className="w-full py-6 bg-[#1e293b] text-white rounded-3xl font-black shadow-2xl shadow-slate-900/20 hover:bg-slate-800 transition-all active:scale-95 text-lg flex items-center justify-center gap-3"
+                                                    onClick={() => {
+                                                        handleTableAction('start', {
+                                                            playerName: playerNameInput || 'Khách vãng lai',
+                                                            playerCount: playerCountInput
+                                                        });
+                                                        setPlayerCountInput(2); // Reset về mặc định
+                                                    }}
+                                                    className="w-full py-5 bg-emerald-600 text-white rounded-2xl font-bold shadow-xl shadow-emerald-500/30 hover:bg-emerald-700 transition-all active:scale-[0.98] text-lg flex items-center justify-center gap-3"
                                                 >
-                                                    <TrendingUp size={24} /> BẮT ĐẦU CHƠI
+                                                    <Play size={22} fill="currentColor" /> Bắt đầu chơi
                                                 </button>
                                             </div>
                                         ) : (
-                                            <div className="flex flex-col h-full animate-in slide-in-from-right-10">
+                                            <div className="flex flex-col h-full animate-fade-in">
                                                 {/* Timer Display */}
-                                                <div className="bg-[#1e293b] rounded-3xl p-6 text-white shadow-xl shadow-slate-900/20 mb-6 relative overflow-hidden">
+                                                <div className="bg-gradient-to-br from-emerald-600 to-emerald-700 rounded-2xl p-5 text-white shadow-xl shadow-emerald-500/30 mb-5 relative overflow-hidden">
                                                     <div className="relative z-10 flex justify-between items-end">
                                                         <div>
-                                                            <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Thời gian</div>
-                                                            <div className="text-4xl font-black font-mono tracking-wider text-[#FFD800]">
-                                                                {new Date(currentTime.getTime() - new Date(selectedTable.start_time).getTime()).toISOString().substr(11, 8)}
+                                                            <div className="text-[10px] font-bold text-emerald-200 uppercase tracking-widest mb-1 flex items-center gap-1.5">
+                                                                <Clock size={12} /> Thời gian
+                                                            </div>
+                                                            <div className="text-3xl md:text-4xl font-black font-mono tracking-wider text-white">
+                                                                {formatDuration(selectedTable.start_time, currentTime)}
+                                                            </div>
+                                                            <div className="text-[10px] text-emerald-200 mt-1 flex items-center gap-1">
+                                                                {selectedTable.table_number >= 10 ? (
+                                                                    <><Clock size={10} /> Tính theo giờ</>
+                                                                ) : (
+                                                                    <><Users size={10} /> {selectedTable.player_count || 2} người</>
+                                                                )}
                                                             </div>
                                                         </div>
                                                         <div className="text-right">
-                                                            <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Tạm tính</div>
+                                                            <div className="text-[10px] font-bold text-emerald-200 uppercase tracking-widest mb-1">Tạm tính</div>
                                                             <div className="text-xl font-bold text-white">{calculateTableFee(selectedTable).toLocaleString()}đ</div>
+                                                            <div className="text-[10px] text-emerald-200">
+                                                                {selectedTable.table_number >= 10
+                                                                    ? '70,000đ/giờ'
+                                                                    : `${selectedTable.player_count || 2} × 40,000đ`
+                                                                }
+                                                            </div>
                                                         </div>
                                                     </div>
-                                                    <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2 blur-2xl"></div>
+                                                    <div className="absolute top-0 right-0 w-24 h-24 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2 blur-2xl"></div>
                                                 </div>
 
                                                 {/* Quick Addons - Menu */}
-                                                <div className="flex-grow overflow-y-auto mb-6 pr-2">
-                                                    <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4 sticky top-0 bg-white z-10 py-2">Thêm dịch vụ</div>
-                                                    <div className="space-y-3">
-                                                        {[
-                                                            { name: 'Sting', price: 15000, icon: <Coffee size={18} className="text-red-500" /> },
-                                                            { name: 'Nước suối', price: 10000, icon: <Coffee size={18} className="text-blue-500" /> },
-                                                            { name: 'Revive', price: 15000, icon: <Coffee size={18} className="text-yellow-500" /> },
-                                                            { name: 'Thuê vợt', price: 20000, icon: <Search size={18} className="text-purple-500" /> },
-                                                            { name: 'Bóng', price: 130000, icon: <Circle size={18} className="text-orange-500" /> }
-                                                        ].map((item, idx) => {
+                                                <div className="flex-grow overflow-y-auto mb-4 -mx-1 px-1">
+                                                    <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3 sticky top-0 bg-white z-10 py-2">Thêm dịch vụ</div>
+                                                    <div className="space-y-2">
+                                                        {ADMIN_CONFIG.ADDITIONAL_SERVICES.map((item, idx) => {
                                                             const inCart = selectedTable.services?.find((s: any) => s.item === item.name);
                                                             const qty = inCart ? inCart.qty : 0;
+                                                            const icons: any = {
+                                                                'Sting': <Coffee size={16} className="text-rose-500" />,
+                                                                'Nước suối': <Coffee size={16} className="text-blue-500" />,
+                                                                'Revive': <Coffee size={16} className="text-amber-500" />,
+                                                                'Thuê vợt': <Search size={16} className="text-purple-500" />,
+                                                                'Bóng': <Circle size={16} className="text-orange-500" />
+                                                            };
 
                                                             return (
-                                                                <div key={idx} className="flex justify-between items-center p-3 bg-slate-50 rounded-2xl hover:bg-slate-100 transition-colors">
-                                                                    <div className="flex items-center gap-3">
-                                                                        <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-sm text-slate-600">
-                                                                            {item.icon}
+                                                                <div key={idx} className="flex justify-between items-center p-3 bg-slate-50 rounded-xl hover:bg-slate-100 transition-colors">
+                                                                    <div className="flex items-center gap-2.5">
+                                                                        <div className="w-9 h-9 bg-white rounded-lg flex items-center justify-center shadow-sm">
+                                                                            {icons[item.name] || <Coffee size={16} />}
                                                                         </div>
                                                                         <div>
                                                                             <div className="text-sm font-bold text-slate-700">{item.name}</div>
@@ -850,19 +1085,19 @@ export default function Admin() {
                                                                         </div>
                                                                     </div>
 
-                                                                    <div className="flex items-center gap-3 bg-white rounded-xl p-1 shadow-sm">
+                                                                    <div className="flex items-center gap-2 bg-white rounded-lg p-1 shadow-sm">
                                                                         <button
                                                                             onClick={() => qty > 0 && handleTableAction('update_service', { item: item.name, price: item.price, qty: -1 })}
-                                                                            className={`w-8 h-8 flex items-center justify-center rounded-lg transition-all ${qty > 0 ? 'bg-slate-100 hover:bg-slate-200 text-slate-600' : 'text-slate-300 cursor-not-allowed'}`}
+                                                                            className={`w-8 h-8 flex items-center justify-center rounded-md transition-all touch-target ${qty > 0 ? 'bg-slate-100 hover:bg-slate-200 text-slate-600' : 'text-slate-300 cursor-not-allowed'}`}
                                                                         >
-                                                                            -
+                                                                            <Minus size={14} />
                                                                         </button>
                                                                         <span className="text-sm font-black w-4 text-center">{qty}</span>
                                                                         <button
                                                                             onClick={() => handleTableAction('update_service', { item: item.name, price: item.price, qty: 1 })}
-                                                                            className="w-8 h-8 flex items-center justify-center rounded-lg bg-[#1e293b] text-white hover:bg-slate-700 shadow-lg shadow-slate-900/10"
+                                                                            className="w-8 h-8 flex items-center justify-center rounded-md bg-emerald-600 text-white hover:bg-emerald-700 shadow-sm touch-target"
                                                                         >
-                                                                            +
+                                                                            <Plus size={14} />
                                                                         </button>
                                                                     </div>
                                                                 </div>
@@ -872,26 +1107,26 @@ export default function Admin() {
                                                 </div>
 
                                                 {/* Bill Summary Footer */}
-                                                <div className="mt-auto bg-slate-50 p-6 rounded-3xl space-y-3 border border-slate-100">
-                                                    <div className="flex justify-between text-sm text-slate-500">
-                                                        <span>{selectedTable.table_number >= 10 ? `Tiền giờ (${getDuration(selectedTable.start_time).toFixed(1)}h)` : 'Phí lượt chơi'}</span>
+                                                <div className="mt-auto bg-emerald-50 p-4 rounded-2xl space-y-2 border border-emerald-100">
+                                                    <div className="flex justify-between text-sm text-slate-600">
+                                                        <span>{selectedTable.table_number >= 10 ? `Tiền giờ` : 'Phí lượt chơi'}</span>
                                                         <span className="font-bold">{calculateTableFee(selectedTable).toLocaleString()}đ</span>
                                                     </div>
-                                                    <div className="flex justify-between text-sm text-slate-500">
+                                                    <div className="flex justify-between text-sm text-slate-600">
                                                         <span>Dịch vụ ({selectedTable.services?.reduce((acc: any, cur: any) => acc + cur.qty, 0) || 0})</span>
                                                         <span className="font-bold">{(calculateTotal(selectedTable) - calculateTableFee(selectedTable)).toLocaleString()}đ</span>
                                                     </div>
-                                                    <div className="pt-4 border-t border-slate-200 flex justify-between items-center">
-                                                        <span className="font-black text-slate-800 uppercase text-xs tracking-widest">TỔNG THANH TOÁN</span>
-                                                        <span className="text-3xl font-black text-[#1e293b]">{calculateTotal(selectedTable).toLocaleString()}đ</span>
+                                                    <div className="pt-3 border-t border-emerald-200 flex justify-between items-center">
+                                                        <span className="font-bold text-emerald-700 text-xs uppercase tracking-wider">Tổng</span>
+                                                        <span className="text-2xl font-black text-emerald-700">{calculateTotal(selectedTable).toLocaleString()}đ</span>
                                                     </div>
                                                 </div>
 
                                                 <button
                                                     onClick={() => handleTableAction('stop')}
-                                                    className="w-full mt-4 py-5 bg-green-500 text-white rounded-2xl font-black text-lg shadow-xl shadow-green-500/30 hover:bg-green-600 transition-all active:scale-95 flex items-center justify-center gap-2"
+                                                    className="w-full mt-4 py-4 bg-emerald-600 text-white rounded-2xl font-bold text-base shadow-xl shadow-emerald-500/30 hover:bg-emerald-700 transition-all active:scale-[0.98] flex items-center justify-center gap-2"
                                                 >
-                                                    <Wallet size={24} /> THANH TOÁN
+                                                    <Square size={18} fill="currentColor" /> Thanh Toán
                                                 </button>
                                             </div>
                                         )}
@@ -913,43 +1148,64 @@ export default function Admin() {
                     <>
                         {/* Stats & Chart Grid */}
                         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-10">
-                            <div className="bg-white p-10 rounded-[2.5rem] shadow-sm border border-slate-100 relative overflow-hidden group hover:shadow-xl transition-all">
-                                <span className="text-slate-400 font-black uppercase text-[10px] tracking-[0.2em]">Tổng Thu Nhập Thực Tế</span>
+                            <div className={`p-10 rounded-[2.5rem] shadow-sm border relative overflow-hidden group hover:shadow-xl transition-all ${darkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-100'}`}>
+                                <span className={`font-black uppercase text-[10px] tracking-[0.2em] ${darkMode ? 'text-slate-400' : 'text-slate-400'}`}>Tổng Thu Nhập Thực Tế</span>
                                 <div className="mt-4 flex items-baseline gap-2">
-                                    <h2 className="text-5xl font-black text-[#1e293b] tracking-tighter">{stats.income.toLocaleString()}đ</h2>
+                                    <h2 className={`text-5xl font-black tracking-tighter ${darkMode ? 'text-emerald-400' : 'text-slate-800'}`}>{stats.income.toLocaleString()}đ</h2>
                                 </div>
-                                <div className="flex items-center gap-1.5 text-green-500 text-sm mt-6 font-black">
+                                <div className="flex items-center gap-1.5 text-emerald-500 text-sm mt-6 font-black">
                                     <TrendingUp size={18} /> <span>Dữ liệu ổn định</span>
                                 </div>
-                                <Wallet className="absolute -right-8 -bottom-8 w-44 h-44 text-green-500 opacity-[0.03] group-hover:scale-110 transition-transform duration-700" />
+                                <Wallet className="absolute -right-8 -bottom-8 w-44 h-44 text-emerald-500 opacity-[0.05] group-hover:scale-110 transition-transform duration-700" />
                             </div>
 
-                            <div className="lg:col-span-2 bg-white p-10 rounded-[2.5rem] shadow-sm border border-slate-100">
-                                <h3 className="text-sm font-black text-slate-800 mb-8 uppercase tracking-wider flex justify-between items-center">
-                                    Dòng Tiền Thu Nhập (Theo Tháng)
-                                    <div className="flex items-center gap-2 text-[10px]">
-                                        <span className="w-2.5 h-2.5 bg-green-500 rounded-full"></span> Doanh thu
+                            {isOwner && (
+                                <div className={`lg:col-span-2 p-10 rounded-[2.5rem] shadow-sm border ${darkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-100'}`}>
+                                    <h3 className={`text-sm font-black mb-8 uppercase tracking-wider flex justify-between items-center ${darkMode ? 'text-slate-200' : 'text-slate-800'}`}>
+                                        Thống Kê Nhanh
+                                    </h3>
+                                    <div className="grid grid-cols-2 gap-6">
+                                        <div
+                                            onClick={() => setShowHistoryModal(true)}
+                                            className={`p-6 rounded-2xl cursor-pointer hover:scale-105 transition-transform border border-transparent hover:border-emerald-500/30 shadow-sm hover:shadow-emerald-500/10 ${darkMode ? 'bg-slate-700/50' : 'bg-slate-50'}`}
+                                        >
+                                            <div className="flex justify-between items-start">
+                                                <div className={`text-3xl font-black ${darkMode ? 'text-emerald-400' : 'text-emerald-600'}`}>{records.length}</div>
+                                                <div className={`p-2 rounded-full ${darkMode ? 'bg-emerald-500/10 text-emerald-400' : 'bg-emerald-100 text-emerald-600'}`}><FileSpreadsheet size={16} /></div>
+                                            </div>
+                                            <div className={`text-xs font-bold mt-2 ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>Giao dịch trong kỳ</div>
+                                            <div className="text-[10px] text-emerald-500 font-bold mt-1">Bấm để xem chi tiết →</div>
+                                        </div>
+                                        <div className={`p-6 rounded-2xl ${darkMode ? 'bg-slate-700/50' : 'bg-slate-50'}`}>
+                                            <div className={`text-3xl font-black ${darkMode ? 'text-amber-400' : 'text-amber-600'}`}>{tables.filter((t: any) => t.status === 'occupied').length}</div>
+                                            <div className={`text-xs font-bold mt-2 ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>Bàn đang chơi</div>
+                                        </div>
+                                        <div className={`p-6 rounded-2xl ${darkMode ? 'bg-slate-700/50' : 'bg-slate-50'}`}>
+                                            <div className={`text-3xl font-black ${darkMode ? 'text-blue-400' : 'text-blue-600'}`}>{coaches.length}</div>
+                                            <div className={`text-xs font-bold mt-2 ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>Huấn luyện viên</div>
+                                        </div>
+                                        <div className={`p-6 rounded-2xl ${darkMode ? 'bg-slate-700/50' : 'bg-slate-50'}`}>
+                                            <div className={`text-3xl font-black ${darkMode ? 'text-purple-400' : 'text-purple-600'}`}>{sessions.length}</div>
+                                            <div className={`text-xs font-bold mt-2 ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>Lịch tập trong tuần</div>
+                                        </div>
                                     </div>
-                                </h3>
-                                <div className="h-[280px]">
-                                    <canvas ref={chartRef}></canvas>
                                 </div>
-                            </div>
+                            )}
                         </div>
 
                         {/* Form & Table Grid */}
                         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
                             {/* Left: Form */}
                             <div className="lg:col-span-4">
-                                <div className="bg-white p-10 rounded-[2.5rem] shadow-xl border border-slate-100 sticky top-28">
-                                    <h3 className="font-black text-xl text-[#1e293b] mb-10 flex items-center gap-3">
-                                        <div className="w-1.5 h-6 bg-green-500 rounded-full"></div> Ghi Chép Giao Dịch
+                                <div className={`p-10 rounded-[2.5rem] shadow-xl border sticky top-28 ${darkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-100'}`}>
+                                    <h3 className={`font-black text-xl mb-10 flex items-center gap-3 ${darkMode ? 'text-slate-100' : 'text-slate-800'}`}>
+                                        <div className="w-1.5 h-6 bg-emerald-500 rounded-full"></div> Ghi Chép Giao Dịch
                                     </h3>
                                     <form className="space-y-6" onSubmit={handleAddTransaction}>
                                         <div>
-                                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Hạng Mục</label>
+                                            <label className={`text-[10px] font-black uppercase tracking-widest ml-1 ${darkMode ? 'text-slate-400' : 'text-slate-400'}`}>Hạng Mục</label>
                                             <select
-                                                className="w-full p-4 bg-slate-50 border-none rounded-2xl mt-2 font-bold text-slate-700 outline-none focus:ring-2 ring-green-500/10 transition-all appearance-none"
+                                                className={`w-full p-4 border-none rounded-2xl mt-2 font-bold outline-none focus:ring-2 ring-emerald-500/10 transition-all appearance-none ${darkMode ? 'bg-slate-700 text-slate-200' : 'bg-slate-50 text-slate-700'}`}
                                                 value={catId}
                                                 onChange={(e) => {
                                                     const selectedId = e.target.value;
@@ -973,10 +1229,10 @@ export default function Admin() {
                                             </select>
                                         </div>
                                         <div>
-                                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Số tiền (VNĐ)</label>
+                                            <label className={`text-[10px] font-black uppercase tracking-widest ml-1 ${darkMode ? 'text-slate-400' : 'text-slate-400'}`}>Số tiền (VNĐ)</label>
                                             <input
                                                 type="text"
-                                                className="w-full p-4 bg-slate-50 border-none rounded-2xl mt-2 font-black text-slate-800 text-xl md:text-2xl placeholder:text-slate-200 outline-none focus:ring-2 ring-green-500/10 transition-all"
+                                                className={`w-full p-4 border-none rounded-2xl mt-2 font-black text-xl md:text-2xl outline-none focus:ring-2 ring-emerald-500/10 transition-all ${darkMode ? 'bg-slate-700 text-emerald-400 placeholder:text-slate-500' : 'bg-slate-50 text-slate-800 placeholder:text-slate-200'}`}
                                                 value={amount}
                                                 onChange={(e) => {
                                                     const raw = e.target.value.replace(/[^0-9]/g, '');
@@ -986,33 +1242,33 @@ export default function Admin() {
                                             />
                                         </div>
                                         <div>
-                                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Ngày thực hiện</label>
+                                            <label className={`text-[10px] font-black uppercase tracking-widest ml-1 ${darkMode ? 'text-slate-400' : 'text-slate-400'}`}>Ngày thực hiện</label>
                                             <div className="relative w-full mt-2 group">
                                                 <input
                                                     type="date"
                                                     className="absolute inset-0 w-full h-full opacity-0 z-10 cursor-pointer"
                                                     value={date} onChange={(e) => setDate(e.target.value)} required
                                                 />
-                                                <div className="w-full p-4 bg-slate-50 rounded-2xl font-bold text-slate-600 flex justify-between items-center group-focus-within:ring-2 ring-green-500/10 transition-all">
+                                                <div className={`w-full p-4 rounded-2xl font-bold flex justify-between items-center group-focus-within:ring-2 ring-emerald-500/10 transition-all ${darkMode ? 'bg-slate-700 text-slate-300' : 'bg-slate-50 text-slate-600'}`}>
                                                     <span>{date ? date.split('-').reverse().join('/') : 'dd/mm/yyyy'}</span>
-                                                    <Calendar size={20} className="text-slate-400" />
+                                                    <Calendar size={20} className={darkMode ? 'text-slate-400' : 'text-slate-400'} />
                                                 </div>
                                             </div>
                                         </div>
                                         <div>
-                                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Họ và tên người nộp</label>
+                                            <label className={`text-[10px] font-black uppercase tracking-widest ml-1 ${darkMode ? 'text-slate-400' : 'text-slate-400'}`}>Họ và tên người nộp</label>
                                             <input
                                                 type="text"
-                                                className="w-full p-4 bg-slate-50 border-none rounded-2xl mt-2 font-black text-slate-800 outline-none uppercase placeholder:normal-case"
+                                                className={`w-full p-4 border-none rounded-2xl mt-2 font-black outline-none uppercase placeholder:normal-case ${darkMode ? 'bg-slate-700 text-slate-100 placeholder:text-slate-500' : 'bg-slate-50 text-slate-800'}`}
                                                 value={desc} onChange={(e) => setDesc(e.target.value.toUpperCase())}
                                                 placeholder="Tên khách hàng..."
                                             />
                                         </div>
                                         <div>
-                                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Tên dụng cụ (nếu có)</label>
+                                            <label className={`text-[10px] font-black uppercase tracking-widest ml-1 ${darkMode ? 'text-slate-400' : 'text-slate-400'}`}>Tên dụng cụ (nếu có)</label>
                                             <input
                                                 type="text"
-                                                className="w-full p-4 bg-slate-50 border-none rounded-2xl mt-2 font-medium text-slate-600 outline-none"
+                                                className={`w-full p-4 border-none rounded-2xl mt-2 font-medium outline-none ${darkMode ? 'bg-slate-700 text-slate-300 placeholder:text-slate-500' : 'bg-slate-50 text-slate-600'}`}
                                                 value={equipment} onChange={(e) => setEquipment(e.target.value)}
                                                 placeholder="Ví dụ: Cốt vợt Viscaria, mặt vợt..."
                                             />
@@ -1029,14 +1285,14 @@ export default function Admin() {
 
                             {/* Right: Table */}
                             <div className="lg:col-span-8">
-                                <div className="bg-white rounded-[2.5rem] shadow-sm border border-slate-100 overflow-hidden min-h-[700px] flex flex-col">
-                                    <div className="p-8 border-b border-slate-50 flex justify-between items-center">
+                                <div className={`rounded-[2.5rem] shadow-sm border overflow-hidden min-h-[700px] flex flex-col ${darkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-100'}`}>
+                                    <div className={`p-8 border-b flex justify-between items-center ${darkMode ? 'border-slate-700' : 'border-slate-50'}`}>
                                         <div className="relative w-full max-w-sm group">
-                                            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-green-500 transition-colors" size={18} />
+                                            <Search className={`absolute left-4 top-1/2 -translate-y-1/2 group-focus-within:text-emerald-500 transition-colors ${darkMode ? 'text-slate-500' : 'text-slate-300'}`} size={18} />
                                             <input
                                                 type="text"
                                                 placeholder="Tìm tên khách, nội dung..."
-                                                className="w-full pl-12 pr-6 py-4 bg-slate-50 border-none rounded-2xl text-sm font-bold focus:ring-2 ring-green-500/10 outline-none transition-all"
+                                                className={`w-full pl-12 pr-6 py-4 border-none rounded-2xl text-sm font-bold focus:ring-2 ring-emerald-500/10 outline-none transition-all ${darkMode ? 'bg-slate-700 text-slate-200 placeholder:text-slate-500' : 'bg-slate-50 text-slate-800'}`}
                                                 value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)}
                                             />
                                         </div>
@@ -1045,7 +1301,7 @@ export default function Admin() {
                                     <div className="overflow-x-auto flex-grow">
                                         <table className="w-full text-left border-collapse">
                                             <thead>
-                                                <tr className="bg-slate-50/50 text-slate-400 text-[10px] font-black uppercase tracking-[0.15em]">
+                                                <tr className={`text-[10px] font-black uppercase tracking-[0.15em] ${darkMode ? 'bg-slate-700/50 text-slate-400' : 'bg-slate-50/50 text-slate-400'}`}>
                                                     <th className="px-4 md:px-10 py-6 hidden md:table-cell">Ngày</th>
                                                     <th className="px-4 md:px-10 py-6">Hạng mục</th>
                                                     <th className="px-4 md:px-10 py-6">Dụng cụ</th>
@@ -1054,21 +1310,21 @@ export default function Admin() {
                                                     <th className="px-4 md:px-10 py-6 text-center">Thao tác</th>
                                                 </tr>
                                             </thead>
-                                            <tbody className="divide-y divide-slate-50">
+                                            <tbody className={`divide-y ${darkMode ? 'divide-slate-700' : 'divide-slate-50'}`}>
                                                 {records.filter((r: any) =>
                                                     r.category_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                                                     (r.description && r.description.toLowerCase().includes(searchTerm.toLowerCase())) ||
                                                     (r.equipment_name && r.equipment_name.toLowerCase().includes(searchTerm.toLowerCase()))
                                                 ).map((r: any) => (
-                                                    <tr key={r.id} className="hover:bg-slate-50/80 transition-all group">
-                                                        <td className="px-4 md:px-10 py-7 text-sm font-bold text-slate-400 hidden md:table-cell">
+                                                    <tr key={r.id} className={`transition-all group ${darkMode ? 'hover:bg-slate-700/50' : 'hover:bg-slate-50/80'}`}>
+                                                        <td className={`px-4 md:px-10 py-7 text-sm font-bold hidden md:table-cell ${darkMode ? 'text-slate-400' : 'text-slate-400'}`}>
                                                             {new Date(r.transaction_date).toLocaleDateString()}
                                                         </td>
                                                         <td className="px-4 md:px-10 py-7">
-                                                            <span className="font-black text-slate-700 block text-base">{r.category_name}</span>
-                                                            <span className="bg-green-50 text-green-600 px-2.5 py-1 rounded-md text-[9px] font-black uppercase tracking-wider mt-1 inline-block">Đã duyệt</span>
+                                                            <span className={`font-black block text-base ${darkMode ? 'text-slate-200' : 'text-slate-700'}`}>{r.category_name}</span>
+                                                            <span className="bg-emerald-500/20 text-emerald-500 px-2.5 py-1 rounded-md text-[9px] font-black uppercase tracking-wider mt-1 inline-block">Đã duyệt</span>
                                                         </td>
-                                                        <td className="px-4 md:px-10 py-7 text-sm font-medium text-slate-400 italic line-clamp-1">{r.equipment_name || '-'}</td>
+                                                        <td className={`px-4 md:px-10 py-7 text-sm font-medium italic line-clamp-1 ${darkMode ? 'text-slate-400' : 'text-slate-400'}`}>{r.equipment_name || '-'}</td>
                                                         <td className="px-4 md:px-10 py-7">
                                                             <div id={`desc-${r.id}`} className="text-sm font-medium text-slate-400 italic line-clamp-1 transition-all">
                                                                 {r.description || '-'}
@@ -1086,12 +1342,14 @@ export default function Admin() {
                                                             +{parseFloat(r.amount).toLocaleString()} đ
                                                         </td>
                                                         <td className="px-4 md:px-10 py-7 text-center">
-                                                            <button
-                                                                onClick={() => { setDeleteTargetId(r.id); setShowDeleteModal(true) }}
-                                                                className="p-3 text-red-500 bg-red-50 hover:bg-red-100 rounded-xl transition-all shadow-sm"
-                                                            >
-                                                                <Trash2 size={20} />
-                                                            </button>
+                                                            {isOwner && (
+                                                                <button
+                                                                    onClick={() => { setDeleteTargetId(r.id); setShowDeleteModal(true) }}
+                                                                    className="p-3 text-red-500 bg-red-50 hover:bg-red-100 rounded-xl transition-all shadow-sm"
+                                                                >
+                                                                    <Trash2 size={20} />
+                                                                </button>
+                                                            )}
                                                         </td>
                                                     </tr>
                                                 ))}
@@ -1109,49 +1367,49 @@ export default function Admin() {
                         {/* Schedule Management UI */}
                         <div className="lg:col-span-4 space-y-8">
                             {/* Coach Form */}
-                            <div className="bg-white p-10 rounded-[2.5rem] shadow-xl border border-slate-100">
-                                <h3 className="font-black text-xl text-[#1e293b] mb-10 flex items-center gap-3">
-                                    <Users size={24} className="text-green-500" /> Quản Lý Huấn Luyện Viên
+                            <div className={`p-10 rounded-[2.5rem] shadow-xl border ${darkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-100'}`}>
+                                <h3 className={`font-black text-xl mb-10 flex items-center gap-3 ${darkMode ? 'text-slate-100' : 'text-slate-800'}`}>
+                                    <Users size={24} className="text-emerald-500" /> Quản Lý Huấn Luyện Viên
                                 </h3>
                                 <form className="space-y-6" onSubmit={handleAddCoach}>
                                     <div>
-                                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Họ và tên</label>
-                                        <input type="text" className="w-full p-4 bg-slate-50 border-none rounded-2xl mt-2 font-bold text-slate-700 outline-none" value={coachName} onChange={e => setCoachName(e.target.value)} required />
+                                        <label className={`text-[10px] font-black uppercase tracking-widest ml-1 ${darkMode ? 'text-slate-400' : 'text-slate-400'}`}>Họ và tên</label>
+                                        <input type="text" className={`w-full p-4 border-none rounded-2xl mt-2 font-bold outline-none ${darkMode ? 'bg-slate-700 text-slate-100' : 'bg-slate-50 text-slate-700'}`} value={coachName} onChange={e => setCoachName(e.target.value)} required />
                                     </div>
                                     <div>
-                                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Trình độ</label>
-                                        <select className="w-full p-4 bg-slate-50 border-none rounded-2xl mt-2 font-bold text-slate-700 outline-none" value={coachLevel} onChange={e => setCoachLevel(e.target.value)}>
+                                        <label className={`text-[10px] font-black uppercase tracking-widest ml-1 ${darkMode ? 'text-slate-400' : 'text-slate-400'}`}>Trình độ</label>
+                                        <select className={`w-full p-4 border-none rounded-2xl mt-2 font-bold outline-none ${darkMode ? 'bg-slate-700 text-slate-100' : 'bg-slate-50 text-slate-700'}`} value={coachLevel} onChange={e => setCoachLevel(e.target.value)}>
                                             <option value="HLV Cơ bản">HLV Cơ bản</option>
                                             <option value="HLV Nâng cao">HLV Nâng cao</option>
                                             <option value="HLV Chuyên nghiệp">HLV Chuyên nghiệp</option>
                                         </select>
                                     </div>
                                     <div>
-                                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Học phí (VND/Buổi)</label>
-                                        <input type="text" className="w-full p-4 bg-slate-50 border-none rounded-2xl mt-2 font-bold text-slate-700 outline-none" placeholder="300.000đ" value={coachFee} onChange={e => setCoachFee(e.target.value)} />
+                                        <label className={`text-[10px] font-black uppercase tracking-widest ml-1 ${darkMode ? 'text-slate-400' : 'text-slate-400'}`}>Học phí (VND/Buổi)</label>
+                                        <input type="text" className={`w-full p-4 border-none rounded-2xl mt-2 font-bold outline-none ${darkMode ? 'bg-slate-700 text-slate-100' : 'bg-slate-50 text-slate-700'}`} placeholder="300.000đ" value={coachFee} onChange={e => setCoachFee(e.target.value)} />
                                     </div>
                                     <div>
-                                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Tiền thuê bàn (VND/Giờ)</label>
-                                        <input type="text" className="w-full p-4 bg-slate-50 border-none rounded-2xl mt-2 font-bold text-slate-700 outline-none" placeholder="50.000đ" value={coachTableFee} onChange={e => setCoachTableFee(e.target.value)} />
+                                        <label className={`text-[10px] font-black uppercase tracking-widest ml-1 ${darkMode ? 'text-slate-400' : 'text-slate-400'}`}>Tiền thuê bàn (VND/Giờ)</label>
+                                        <input type="text" className={`w-full p-4 border-none rounded-2xl mt-2 font-bold outline-none ${darkMode ? 'bg-slate-700 text-slate-100' : 'bg-slate-50 text-slate-700'}`} placeholder="50.000đ" value={coachTableFee} onChange={e => setCoachTableFee(e.target.value)} />
                                     </div>
-                                    <button type="submit" className="w-full bg-[#1e293b] text-white p-5 rounded-3xl font-black flex items-center justify-center gap-3 shadow-xl hover:bg-slate-800 transition-all">
+                                    <button type="submit" className={`w-full p-5 rounded-3xl font-black flex items-center justify-center gap-3 shadow-xl transition-all ${darkMode ? 'bg-emerald-600 text-white hover:bg-emerald-500' : 'bg-slate-800 text-white hover:bg-slate-700'}`}>
                                         THÊM HLV MỚI <PlusCircle size={20} />
                                     </button>
                                 </form>
 
-                                <div className="mt-10 border-t border-slate-50 pt-8">
-                                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1 mb-4 block">Danh sách HLV</label>
+                                <div className={`mt-10 border-t pt-8 ${darkMode ? 'border-slate-700' : 'border-slate-50'}`}>
+                                    <label className={`text-[10px] font-black uppercase tracking-widest ml-1 mb-4 block ${darkMode ? 'text-slate-400' : 'text-slate-400'}`}>Danh sách HLV</label>
                                     <div className="space-y-4">
                                         {coaches.map(c => (
-                                            <div key={c.id} className="flex justify-between items-center p-4 bg-slate-50 rounded-2xl">
+                                            <div key={c.id} className={`flex justify-between items-center p-4 rounded-2xl ${darkMode ? 'bg-slate-700' : 'bg-slate-50'}`}>
                                                 <div className="flex items-center gap-3">
                                                     <div className="w-3 h-3 rounded-full" style={{ background: c.color }}></div>
                                                     <div>
-                                                        <div className="text-sm font-black text-slate-700">{c.name}</div>
-                                                        <div className="text-[10px] font-bold text-slate-400 uppercase">{c.level}</div>
+                                                        <div className={`text-sm font-black ${darkMode ? 'text-slate-100' : 'text-slate-700'}`}>{c.name}</div>
+                                                        <div className={`text-[10px] font-bold uppercase ${darkMode ? 'text-slate-400' : 'text-slate-400'}`}>{c.level}</div>
                                                     </div>
                                                 </div>
-                                                <button onClick={() => deleteTableItem('coaches', c.id)} className="text-slate-300 hover:text-red-500 p-2"><Trash2 size={16} /></button>
+                                                <button onClick={() => deleteTableItem('coaches', c.id)} className={`p-2 ${darkMode ? 'text-slate-500 hover:text-red-400' : 'text-slate-300 hover:text-red-500'}`}><Trash2 size={16} /></button>
                                             </div>
                                         ))}
                                     </div>
@@ -1161,22 +1419,22 @@ export default function Admin() {
 
                         <div className="lg:col-span-8 space-y-8">
                             {/* Session Form */}
-                            <div className="bg-white p-10 rounded-[2.5rem] shadow-xl border border-slate-100">
-                                <h3 className="font-black text-xl text-[#1e293b] mb-10 flex items-center gap-3">
-                                    <Calendar size={24} className="text-[#FFD800]" /> Xếp Lịch Huấn Luyện
+                            <div className={`p-10 rounded-[2.5rem] shadow-xl border ${darkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-100'}`}>
+                                <h3 className={`font-black text-xl mb-10 flex items-center gap-3 ${darkMode ? 'text-slate-100' : 'text-slate-800'}`}>
+                                    <Calendar size={24} className="text-amber-400" /> Xếp Lịch Huấn Luyện
                                 </h3>
                                 <form className="grid grid-cols-1 md:grid-cols-2 gap-8" onSubmit={handleAddSession}>
                                     <div className="space-y-6">
                                         <div>
-                                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Huấn luyện viên</label>
-                                            <select className="w-full p-4 bg-slate-50 border-none rounded-2xl mt-2 font-bold text-slate-700 outline-none" value={sessCoachId} onChange={e => setSessCoachId(e.target.value)} required>
+                                            <label className={`text-[10px] font-black uppercase tracking-widest ml-1 ${darkMode ? 'text-slate-400' : 'text-slate-400'}`}>Huấn luyện viên</label>
+                                            <select className={`w-full p-4 border-none rounded-2xl mt-2 font-bold outline-none ${darkMode ? 'bg-slate-700 text-slate-100' : 'bg-slate-50 text-slate-700'}`} value={sessCoachId} onChange={e => setSessCoachId(e.target.value)} required>
                                                 <option value="">-- Chọn HLV --</option>
                                                 {coaches.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
                                             </select>
                                         </div>
                                         <div>
-                                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Số bàn</label>
-                                            <select className="w-full p-4 bg-slate-50 border-none rounded-2xl mt-2 font-bold text-slate-700 outline-none" value={sessLoc} onChange={e => setSessLoc(e.target.value)} required>
+                                            <label className={`text-[10px] font-black uppercase tracking-widest ml-1 ${darkMode ? 'text-slate-400' : 'text-slate-400'}`}>Số bàn</label>
+                                            <select className={`w-full p-4 border-none rounded-2xl mt-2 font-bold outline-none ${darkMode ? 'bg-slate-700 text-slate-100' : 'bg-slate-50 text-slate-700'}`} value={sessLoc} onChange={e => setSessLoc(e.target.value)} required>
                                                 <option value="">-- Chọn Bàn --</option>
                                                 {[...Array(15)].map((_, i) => (
                                                     <option key={i + 1} value={`Bàn ${i + 1}`}>Bàn {i + 1}</option>
@@ -1184,8 +1442,8 @@ export default function Admin() {
                                             </select>
                                         </div>
                                         <div>
-                                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Ngày (Thứ)</label>
-                                            <select className="w-full p-4 bg-slate-50 border-none rounded-2xl mt-2 font-bold text-slate-700 outline-none" value={sessDay} onChange={e => setSessDay(e.target.value)}>
+                                            <label className={`text-[10px] font-black uppercase tracking-widest ml-1 ${darkMode ? 'text-slate-400' : 'text-slate-400'}`}>Ngày (Thứ)</label>
+                                            <select className={`w-full p-4 border-none rounded-2xl mt-2 font-bold outline-none ${darkMode ? 'bg-slate-700 text-slate-100' : 'bg-slate-50 text-slate-700'}`} value={sessDay} onChange={e => setSessDay(e.target.value)}>
                                                 <option value="Monday">Thứ 2</option>
                                                 <option value="Tuesday">Thứ 3</option>
                                                 <option value="Wednesday">Thứ 4</option>
@@ -1199,15 +1457,15 @@ export default function Admin() {
                                     <div className="space-y-6">
                                         <div className="grid grid-cols-2 gap-4">
                                             <div>
-                                                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Bắt đầu</label>
-                                                <input type="time" className="w-full p-4 bg-slate-50 border-none rounded-2xl mt-2 font-bold text-slate-700 outline-none" value={sessStart} onChange={e => setSessStart(e.target.value)} required />
+                                                <label className={`text-[10px] font-black uppercase tracking-widest ml-1 ${darkMode ? 'text-slate-400' : 'text-slate-400'}`}>Bắt đầu</label>
+                                                <input type="time" className={`w-full p-4 border-none rounded-2xl mt-2 font-bold outline-none ${darkMode ? 'bg-slate-700 text-slate-100' : 'bg-slate-50 text-slate-700'}`} value={sessStart} onChange={e => setSessStart(e.target.value)} required />
                                             </div>
                                             <div>
-                                                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Kết thúc</label>
-                                                <input type="time" className="w-full p-4 bg-slate-50 border-none rounded-2xl mt-2 font-bold text-slate-700 outline-none" value={sessEnd} onChange={e => setSessEnd(e.target.value)} required />
+                                                <label className={`text-[10px] font-black uppercase tracking-widest ml-1 ${darkMode ? 'text-slate-400' : 'text-slate-400'}`}>Kết thúc</label>
+                                                <input type="time" className={`w-full p-4 border-none rounded-2xl mt-2 font-bold outline-none ${darkMode ? 'bg-slate-700 text-slate-100' : 'bg-slate-50 text-slate-700'}`} value={sessEnd} onChange={e => setSessEnd(e.target.value)} required />
                                             </div>
                                         </div>
-                                        <button type="submit" className="w-full h-[68px] bg-[#1e293b] text-white rounded-3xl font-black flex items-center justify-center gap-3 shadow-xl hover:bg-slate-800 transition-all mt-4">
+                                        <button type="submit" className={`w-full h-[68px] rounded-3xl font-black flex items-center justify-center gap-3 shadow-xl transition-all mt-4 ${darkMode ? 'bg-emerald-600 text-white hover:bg-emerald-500' : 'bg-slate-800 text-white hover:bg-slate-700'}`}>
                                             LƯU THỜI KHÓA BIỂU
                                         </button>
                                     </div>
@@ -1215,16 +1473,16 @@ export default function Admin() {
                             </div>
 
                             {/* Sessions Table */}
-                            <div className="bg-white rounded-[2.5rem] shadow-sm border border-slate-100 overflow-hidden">
-                                <div className="p-8 border-b border-slate-50 bg-slate-50/50">
-                                    <h3 className="font-black text-slate-800 uppercase text-xs tracking-widest flex items-center gap-2">
-                                        <FileSpreadsheet size={16} className="text-green-500" /> Bảng phân phối lịch tuần
+                            <div className={`rounded-[2.5rem] shadow-sm border overflow-hidden ${darkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-100'}`}>
+                                <div className={`p-8 border-b ${darkMode ? 'border-slate-700 bg-slate-700/50' : 'border-slate-50 bg-slate-50/50'}`}>
+                                    <h3 className={`font-black uppercase text-xs tracking-widest flex items-center gap-2 ${darkMode ? 'text-slate-100' : 'text-slate-800'}`}>
+                                        <FileSpreadsheet size={16} className="text-emerald-500" /> Bảng phân phối lịch tuần
                                     </h3>
                                 </div>
                                 <div className="overflow-x-auto">
                                     <table className="w-full text-left">
                                         <thead>
-                                            <tr className="bg-slate-50/50 text-slate-400 text-[10px] font-black uppercase tracking-widest">
+                                            <tr className={`text-[10px] font-black uppercase tracking-widest ${darkMode ? 'bg-slate-700/50 text-slate-400' : 'bg-slate-50/50 text-slate-400'}`}>
                                                 <th className="px-8 py-5">Thứ</th>
                                                 <th className="px-8 py-5">Giờ tập</th>
                                                 <th className="px-8 py-5">HLV</th>
@@ -1232,17 +1490,17 @@ export default function Admin() {
                                                 <th className="px-8 py-5 text-right">Thao tác</th>
                                             </tr>
                                         </thead>
-                                        <tbody className="divide-y divide-slate-50">
+                                        <tbody className={`divide-y ${darkMode ? 'divide-slate-700' : 'divide-slate-50'}`}>
                                             {sessions.length === 0 && (
                                                 <tr>
-                                                    <td colSpan={5} className="text-center py-8 text-slate-400 font-bold bg-slate-50/30">
+                                                    <td colSpan={5} className={`text-center py-8 font-bold ${darkMode ? 'text-slate-500 bg-slate-700/30' : 'text-slate-400 bg-slate-50/30'}`}>
                                                         Chưa có lịch tập nào. Hãy "Lưu thời khóa biểu" ở form trên.
                                                     </td>
                                                 </tr>
                                             )}
                                             {sessions.map((s: any) => (
-                                                <tr key={s.id} className="hover:bg-slate-50 transition-colors group">
-                                                    <td className="px-8 py-5 text-sm font-black text-slate-700">{s.day === 'Monday' ? 'Thứ 2' : s.day === 'Tuesday' ? 'Thứ 3' : s.day === 'Wednesday' ? 'Thứ 4' : s.day === 'Thursday' ? 'Thứ 5' : s.day === 'Friday' ? 'Thứ 6' : s.day === 'Saturday' ? 'Thứ 7' : 'Chủ nhật'}</td>
+                                                <tr key={s.id} className={`transition-colors group ${darkMode ? 'hover:bg-slate-700/50' : 'hover:bg-slate-50'}`}>
+                                                    <td className={`px-8 py-5 text-sm font-black ${darkMode ? 'text-slate-200' : 'text-slate-700'}`}>{s.day === 'Monday' ? 'Thứ 2' : s.day === 'Tuesday' ? 'Thứ 3' : s.day === 'Wednesday' ? 'Thứ 4' : s.day === 'Thursday' ? 'Thứ 5' : s.day === 'Friday' ? 'Thứ 6' : s.day === 'Saturday' ? 'Thứ 7' : 'Chủ nhật'}</td>
                                                     <td className="px-8 py-5 text-xs font-bold text-slate-400">{s.start_time} - {s.end_time}</td>
                                                     <td className="px-8 py-5">
                                                         <div className="flex items-center gap-2">
@@ -1286,16 +1544,175 @@ export default function Admin() {
             }
 
             {/* --- TOASTS --- */}
-            <div className="fixed bottom-10 right-10 z-[300] flex flex-col gap-3">
+            <div className="fixed bottom-24 md:bottom-10 right-4 md:right-10 z-[300] flex flex-col gap-3 max-w-[calc(100vw-2rem)]">
                 {toasts.map(t => (
-                    <div key={t.id} className={`bg-white px-6 py-4 rounded-2xl shadow-2xl border-l-4 ${t.type === 'error' ? 'border-red-500' : t.type === 'warning' ? 'border-yellow-500' : 'border-green-500'} flex items-center gap-4 animate-in slide-in-from-right-10 duration-500`}>
-                        <div className={`${t.type === 'error' ? 'text-red-500 bg-red-50' : t.type === 'warning' ? 'text-yellow-500 bg-yellow-50' : 'text-green-500 bg-green-50'} p-2 rounded-full`}>
-                            {t.type === 'error' ? <AlertTriangle size={20} /> : t.type === 'warning' ? <AlertTriangle size={20} /> : <CheckCircle size={20} />}
+                    <div key={t.id} className={`bg-white px-5 py-4 rounded-2xl shadow-2xl border-l-4 ${t.type === 'error' ? 'border-rose-500' : t.type === 'warning' ? 'border-amber-500' : 'border-emerald-500'} flex items-center gap-3 animate-slide-in`}>
+                        <div className={`${t.type === 'error' ? 'text-rose-500 bg-rose-50' : t.type === 'warning' ? 'text-amber-500 bg-amber-50' : 'text-emerald-500 bg-emerald-50'} p-2 rounded-full flex-shrink-0`}>
+                            {t.type === 'error' ? <AlertTriangle size={18} /> : t.type === 'warning' ? <AlertTriangle size={18} /> : <CheckCircle size={18} />}
                         </div>
-                        <span className="font-bold text-slate-700">{t.msg}</span>
+                        <span className="font-bold text-slate-700 text-sm">{t.msg}</span>
                     </div>
                 ))}
             </div>
+
+            {/* --- MOBILE BOTTOM NAVIGATION --- */}
+            <div className={`fixed bottom-0 left-0 right-0 pb-safe pt-2 px-4 shadow-[0_-4px_20px_-4px_rgba(0,0,0,0.15)] z-40 md:hidden transition-colors ${darkMode ? 'bg-slate-800 border-t border-slate-700' : 'bg-white border-t border-slate-100'}`}>
+                <div className="flex justify-around items-center h-16 max-w-md mx-auto">
+                    <button
+                        onClick={() => setActiveTab('finance')}
+                        className={`flex flex-col items-center justify-center w-16 transition-colors ${activeTab === 'finance' ? 'text-emerald-500' : darkMode ? 'text-slate-500' : 'text-slate-400'}`}
+                    >
+                        <Wallet size={24} strokeWidth={activeTab === 'finance' ? 2.5 : 2} />
+                        <span className="text-[10px] font-bold mt-1">Tài chính</span>
+                    </button>
+                    <button
+                        onClick={() => setActiveTab('tables')}
+                        className={`flex flex-col items-center justify-center w-16 transition-colors ${activeTab === 'tables' ? 'text-emerald-500' : darkMode ? 'text-slate-500' : 'text-slate-400'}`}
+                    >
+                        <LayoutDashboard size={24} strokeWidth={activeTab === 'tables' ? 2.5 : 2} />
+                        <span className="text-[10px] font-bold mt-1">Bàn</span>
+                    </button>
+                    {isOwner && (
+                        <button
+                            onClick={() => setActiveTab('schedule')}
+                            className={`flex flex-col items-center justify-center w-16 transition-colors ${activeTab === 'schedule' ? 'text-emerald-500' : darkMode ? 'text-slate-500' : 'text-slate-400'}`}
+                        >
+                            <Calendar size={24} strokeWidth={activeTab === 'schedule' ? 2.5 : 2} />
+                            <span className="text-[10px] font-bold mt-1">Lịch tập</span>
+                        </button>
+                    )}
+                    <button
+                        onClick={toggleDarkMode}
+                        className={`flex flex-col items-center justify-center w-16 transition-colors ${darkMode ? 'text-amber-400' : 'text-slate-400'}`}
+                    >
+                        {darkMode ? <Sun size={24} strokeWidth={2} /> : <Moon size={24} strokeWidth={2} />}
+                        <span className="text-[10px] font-bold mt-1">{darkMode ? 'Sáng' : 'Tối'}</span>
+                    </button>
+                </div>
+            </div>
+            {/* --- TRANSACTION HISTORY MODAL (PC + MOBILE RESPONSIVE) --- */}
+            {showHistoryModal && (
+                <div className="fixed inset-0 z-[200] flex items-center justify-center p-0 md:p-6 lg:p-10">
+                    <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setShowHistoryModal(false)}></div>
+                    <div className={`relative w-full h-full md:h-auto md:max-h-[85vh] md:max-w-4xl rounded-none md:rounded-[2.5rem] shadow-2xl overflow-hidden flex flex-col ${darkMode ? 'bg-slate-900 border border-slate-700' : 'bg-white'}`}>
+                        {/* Header */}
+                        <div className={`p-6 md:p-8 border-b flex justify-between items-center ${darkMode ? 'border-slate-800 bg-slate-900' : 'border-slate-100 bg-white'}`}>
+                            <div>
+                                <h3 className={`text-xl font-black flex items-center gap-3 ${darkMode ? 'text-slate-100' : 'text-slate-800'}`}>
+                                    <FileSpreadsheet className="text-emerald-500" /> Lịch Sử Giao Dịch
+                                </h3>
+                                <p className={`text-xs font-bold mt-1 ${darkMode ? 'text-slate-400' : 'text-slate-400'}`}>
+                                    Tổng: {records.length} giao dịch • {records.reduce((acc: number, r: any) => acc + Number(r.amount), 0).toLocaleString()}đ
+                                </p>
+                            </div>
+                            <button onClick={() => setShowHistoryModal(false)} className={`p-3 rounded-full hover:rotate-90 transition-all ${darkMode ? 'bg-slate-800 text-slate-400 hover:text-white' : 'bg-slate-100 text-slate-500 hover:bg-slate-200'}`}>
+                                <CloseIcon size={24} />
+                            </button>
+                        </div>
+
+                        {/* Content Scrollable */}
+                        <div className="flex-1 overflow-y-auto p-4 md:p-8">
+                            {records.length === 0 ? (
+                                <div className="h-64 flex flex-col items-center justify-center text-slate-400 opacity-60">
+                                    <FileSpreadsheet size={48} className="mb-4" />
+                                    <p className="font-bold">Chưa có giao dịch nào</p>
+                                </div>
+                            ) : (
+                                <>
+                                    {/* Mobile View: Cards */}
+                                    <div className="md:hidden space-y-3">
+                                        {records.map((r: any) => (
+                                            <div key={r.id} className={`p-4 rounded-2xl border flex flex-col gap-3 ${darkMode ? 'bg-slate-800 border-slate-700' : 'bg-slate-50 border-slate-100'}`}>
+                                                <div className="flex justify-between items-start">
+                                                    <div>
+                                                        <span className={`text-[10px] font-black uppercase tracking-wider px-2 py-1 rounded-md ${darkMode ? 'bg-slate-700 text-slate-300' : 'bg-white text-slate-500'}`}>
+                                                            {r.category_name || 'Khác'}
+                                                        </span>
+                                                        <h4 className={`text-lg font-black mt-2 ${darkMode ? 'text-emerald-400' : 'text-emerald-600'}`}>
+                                                            +{parseFloat(r.amount).toLocaleString()}
+                                                        </h4>
+                                                    </div>
+                                                    <div className="text-right">
+                                                        <div className={`text-[10px] font-bold ${darkMode ? 'text-slate-500' : 'text-slate-400'}`}>
+                                                            {new Date(r.transaction_date).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })}
+                                                        </div>
+                                                        <div className={`text-[10px] font-bold ${darkMode ? 'text-slate-600' : 'text-slate-400'}`}>
+                                                            {new Date(r.transaction_date).toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit' })}
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div className={`h-px w-full ${darkMode ? 'bg-slate-700' : 'bg-slate-200/50'}`}></div>
+
+                                                <div className="flex justify-between items-end">
+                                                    <div className="flex-1 mr-4">
+                                                        <p className={`text-xs font-medium line-clamp-2 ${darkMode ? 'text-slate-300' : 'text-slate-600'}`}>
+                                                            {r.description || 'Không có ghi chú'}
+                                                        </p>
+                                                    </div>
+                                                    <div className="flex items-center gap-1.5 shrink-0">
+                                                        <div className="w-4 h-4 rounded-full bg-emerald-500 flex items-center justify-center text-[8px] text-white font-bold">
+                                                            {r.creator_name ? r.creator_name.charAt(0) : 'S'}
+                                                        </div>
+                                                        <span className={`text-[10px] font-bold ${darkMode ? 'text-slate-500' : 'text-slate-400'}`}>
+                                                            {r.creator_name || 'System'}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+
+                                    {/* PC View: Table */}
+                                    <div className="hidden md:block">
+                                        <table className="w-full text-left border-collapse">
+                                            <thead>
+                                                <tr className={`text-[10px] uppercase tracking-wider font-black ${darkMode ? 'text-slate-500 border-b border-slate-800' : 'text-slate-400 border-b border-slate-100'}`}>
+                                                    <th className="pb-4 pl-4">Thời gian</th>
+                                                    <th className="pb-4">Nội dung</th>
+                                                    <th className="pb-4">Phân loại</th>
+                                                    <th className="pb-4 text-right">Số tiền</th>
+                                                    <th className="pb-4 pr-4 text-right">Người tạo</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody className={`divide-y ${darkMode ? 'divide-slate-800' : 'divide-slate-50'}`}>
+                                                {records.map((r: any) => (
+                                                    <tr key={r.id} className={`group transition-colors ${darkMode ? 'hover:bg-slate-800/50' : 'hover:bg-slate-50'}`}>
+                                                        <td className="py-4 pl-4">
+                                                            <div className={`font-bold text-xs ${darkMode ? 'text-slate-300' : 'text-slate-700'}`}>
+                                                                {new Date(r.transaction_date).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })}
+                                                            </div>
+                                                            <div className={`text-[10px] font-medium ${darkMode ? 'text-slate-500' : 'text-slate-400'}`}>
+                                                                {new Date(r.transaction_date).toLocaleDateString('vi-VN')}
+                                                            </div>
+                                                        </td>
+                                                        <td className="py-4 max-w-[250px]">
+                                                            <div className={`text-sm font-medium truncate ${darkMode ? 'text-slate-300' : 'text-slate-700'}`}>{r.description}</div>
+                                                        </td>
+                                                        <td className="py-4">
+                                                            <span className={`text-[10px] font-bold uppercase px-2 py-1 rounded-md ${darkMode ? 'bg-slate-800 text-slate-400' : 'bg-slate-100 text-slate-500'}`}>
+                                                                {r.category_name}
+                                                            </span>
+                                                        </td>
+                                                        <td className={`py-4 text-right font-black ${darkMode ? 'text-emerald-400' : 'text-emerald-600'}`}>
+                                                            {parseFloat(r.amount).toLocaleString()}
+                                                        </td>
+                                                        <td className="py-4 pr-4 text-right">
+                                                            <span className={`text-[10px] font-bold ${darkMode ? 'text-slate-500' : 'text-slate-400'}`}>
+                                                                {r.creator_name || 'System'}
+                                                            </span>
+                                                        </td>
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            )}
         </div >
     );
 }
