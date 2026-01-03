@@ -791,7 +791,7 @@ export default function Admin() {
                                     {tables.filter((t: any) => t.status === 'occupied').length}/{tables.length || 15}
                                 </div>
                             </div>
-                            <div className="flex-shrink-0 bg-white rounded-2xl p-4 border border-slate-100 min-w-[120px]">
+                            <div className={`flex-shrink-0 rounded-2xl p-4 border min-w-[120px] ${darkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-100'}`}>
                                 <div className="flex items-center gap-2 text-orange-600 mb-1">
                                     <Users size={16} />
                                     <span className="text-xs font-bold text-slate-500">Khách</span>
@@ -930,7 +930,7 @@ export default function Admin() {
 
                                                 {/* Số người chơi - Chỉ cho bàn 1-9 */}
                                                 {selectedTable.table_number < 10 ? (
-                                                    <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100">
+                                                    <div className={`p-4 rounded-2xl border ${darkMode ? 'bg-slate-700/50 border-slate-600' : 'bg-slate-50 border-slate-100'}`}>
                                                         <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1 mb-3 block">Số người chơi</label>
 
                                                         {/* Preset buttons */}
@@ -938,8 +938,8 @@ export default function Admin() {
                                                             <button
                                                                 onClick={() => setPlayerCountInput(2)}
                                                                 className={`h-14 rounded-xl border-2 flex flex-col items-center justify-center transition-all ${playerCountInput === 2
-                                                                    ? 'border-emerald-500 bg-emerald-50 text-emerald-700'
-                                                                    : 'border-slate-200 bg-white text-slate-500 hover:border-emerald-200'
+                                                                    ? (darkMode ? 'border-emerald-500 bg-emerald-500/20 text-emerald-400' : 'border-emerald-500 bg-emerald-50 text-emerald-700')
+                                                                    : (darkMode ? 'border-slate-600 bg-slate-700 text-slate-400 hover:border-emerald-500/50' : 'border-slate-200 bg-white text-slate-500 hover:border-emerald-200')
                                                                     }`}
                                                             >
                                                                 <Users size={16} className="mb-0.5" />
@@ -949,8 +949,8 @@ export default function Admin() {
                                                             <button
                                                                 onClick={() => setPlayerCountInput(3)}
                                                                 className={`h-14 rounded-xl border-2 flex flex-col items-center justify-center transition-all ${playerCountInput === 3
-                                                                    ? 'border-emerald-500 bg-emerald-50 text-emerald-700'
-                                                                    : 'border-slate-200 bg-white text-slate-500 hover:border-emerald-200'
+                                                                    ? (darkMode ? 'border-emerald-500 bg-emerald-500/20 text-emerald-400' : 'border-emerald-500 bg-emerald-50 text-emerald-700')
+                                                                    : (darkMode ? 'border-slate-600 bg-slate-700 text-slate-400 hover:border-emerald-500/50' : 'border-slate-200 bg-white text-slate-500 hover:border-emerald-200')
                                                                     }`}
                                                             >
                                                                 <Users size={16} className="mb-0.5" />
@@ -960,8 +960,8 @@ export default function Admin() {
                                                             <button
                                                                 onClick={() => setPlayerCountInput(4)}
                                                                 className={`h-14 rounded-xl border-2 flex flex-col items-center justify-center transition-all ${playerCountInput === 4
-                                                                    ? 'border-emerald-500 bg-emerald-50 text-emerald-700'
-                                                                    : 'border-slate-200 bg-white text-slate-500 hover:border-emerald-200'
+                                                                    ? (darkMode ? 'border-emerald-500 bg-emerald-500/20 text-emerald-400' : 'border-emerald-500 bg-emerald-50 text-emerald-700')
+                                                                    : (darkMode ? 'border-slate-600 bg-slate-700 text-slate-400 hover:border-emerald-500/50' : 'border-slate-200 bg-white text-slate-500 hover:border-emerald-200')
                                                                     }`}
                                                             >
                                                                 <Users size={16} className="mb-0.5" />
@@ -970,19 +970,19 @@ export default function Admin() {
                                                         </div>
 
                                                         {/* Custom adjust */}
-                                                        <div className="flex items-center justify-between bg-white rounded-xl p-2 shadow-sm">
+                                                        <div className={`flex items-center justify-between rounded-xl p-2 shadow-sm ${darkMode ? 'bg-slate-700 border border-slate-600' : 'bg-white'}`}>
                                                             <span className="text-xs font-bold text-slate-500 ml-2">Tùy chỉnh</span>
                                                             <div className="flex items-center gap-2">
                                                                 <button
                                                                     onClick={() => setPlayerCountInput(Math.max(1, playerCountInput - 1))}
-                                                                    className="w-9 h-9 flex items-center justify-center bg-slate-100 rounded-lg text-slate-600 hover:bg-slate-200 transition-colors touch-target"
+                                                                    className={`w-9 h-9 flex items-center justify-center rounded-lg transition-colors touch-target ${darkMode ? 'bg-slate-600 text-slate-300 hover:bg-slate-500' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}
                                                                 >
                                                                     <Minus size={16} />
                                                                 </button>
-                                                                <span className="w-8 text-center font-black text-lg text-slate-800">{playerCountInput}</span>
+                                                                <span className={`w-8 text-center font-black text-lg ${darkMode ? 'text-slate-200' : 'text-slate-800'}`}>{playerCountInput}</span>
                                                                 <button
                                                                     onClick={() => setPlayerCountInput(playerCountInput + 1)}
-                                                                    className="w-9 h-9 flex items-center justify-center bg-emerald-100 rounded-lg text-emerald-700 hover:bg-emerald-200 transition-colors touch-target"
+                                                                    className={`w-9 h-9 flex items-center justify-center rounded-lg transition-colors touch-target ${darkMode ? 'bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30' : 'bg-emerald-100 text-emerald-700 hover:bg-emerald-200'}`}
                                                                 >
                                                                     <Plus size={16} />
                                                                 </button>
@@ -991,7 +991,7 @@ export default function Admin() {
                                                     </div>
                                                 ) : (
                                                     /* Bàn 10+ - Thông tin tính theo giờ */
-                                                    <div className="bg-amber-50 p-4 rounded-2xl border border-amber-200">
+                                                    <div className={`p-4 rounded-2xl border ${darkMode ? 'bg-amber-900/20 border-amber-800' : 'bg-amber-50 border-amber-200'}`}>
                                                         <div className="flex items-center gap-2 text-amber-700 mb-2">
                                                             <Clock size={18} />
                                                             <span className="font-bold text-sm">Bàn tính theo giờ</span>
@@ -1002,7 +1002,7 @@ export default function Admin() {
 
                                                 {/* Price Preview - Chỉ cho bàn 1-9 */}
                                                 {selectedTable.table_number < 10 && (
-                                                    <div className="flex justify-between items-center p-4 bg-emerald-50 rounded-2xl border border-emerald-100">
+                                                    <div className={`flex justify-between items-center p-4 rounded-2xl border ${darkMode ? 'bg-emerald-500/10 border-emerald-500/20' : 'bg-emerald-50 border-emerald-100'}`}>
                                                         <div>
                                                             <span className="text-xs font-bold text-emerald-600 uppercase tracking-wider block">Tạm tính</span>
                                                             <span className="text-[10px] text-emerald-500">{playerCountInput} × 40,000đ</span>
@@ -1060,7 +1060,7 @@ export default function Admin() {
 
                                                 {/* Quick Addons - Menu */}
                                                 <div className="flex-grow overflow-y-auto mb-4 -mx-1 px-1">
-                                                    <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3 sticky top-0 bg-white z-10 py-2">Thêm dịch vụ</div>
+                                                    <div className={`text-[10px] font-bold uppercase tracking-widest mb-3 sticky top-0 z-10 py-2 ${darkMode ? 'bg-slate-800 text-slate-400' : 'bg-white text-slate-400'}`}>Thêm dịch vụ</div>
                                                     <div className="space-y-2">
                                                         {ADMIN_CONFIG.ADDITIONAL_SERVICES.map((item, idx) => {
                                                             const inCart = selectedTable.services?.find((s: any) => s.item === item.name);
@@ -1074,21 +1074,21 @@ export default function Admin() {
                                                             };
 
                                                             return (
-                                                                <div key={idx} className="flex justify-between items-center p-3 bg-slate-50 rounded-xl hover:bg-slate-100 transition-colors">
+                                                                <div key={idx} className={`flex justify-between items-center p-3 rounded-xl transition-colors ${darkMode ? 'bg-slate-700/50 hover:bg-slate-700' : 'bg-slate-50 hover:bg-slate-100'}`}>
                                                                     <div className="flex items-center gap-2.5">
-                                                                        <div className="w-9 h-9 bg-white rounded-lg flex items-center justify-center shadow-sm">
+                                                                        <div className={`w-9 h-9 rounded-lg flex items-center justify-center shadow-sm ${darkMode ? 'bg-slate-600' : 'bg-white'}`}>
                                                                             {icons[item.name] || <Coffee size={16} />}
                                                                         </div>
                                                                         <div>
-                                                                            <div className="text-sm font-bold text-slate-700">{item.name}</div>
+                                                                            <div className={`text-sm font-bold ${darkMode ? 'text-slate-200' : 'text-slate-700'}`}>{item.name}</div>
                                                                             <div className="text-[10px] font-bold text-slate-400">{item.price.toLocaleString()}đ</div>
                                                                         </div>
                                                                     </div>
 
-                                                                    <div className="flex items-center gap-2 bg-white rounded-lg p-1 shadow-sm">
+                                                                    <div className={`flex items-center gap-2 rounded-lg p-1 shadow-sm ${darkMode ? 'bg-slate-800' : 'bg-white'}`}>
                                                                         <button
                                                                             onClick={() => qty > 0 && handleTableAction('update_service', { item: item.name, price: item.price, qty: -1 })}
-                                                                            className={`w-8 h-8 flex items-center justify-center rounded-md transition-all touch-target ${qty > 0 ? 'bg-slate-100 hover:bg-slate-200 text-slate-600' : 'text-slate-300 cursor-not-allowed'}`}
+                                                                            className={`w-8 h-8 flex items-center justify-center rounded-md transition-all touch-target ${qty > 0 ? (darkMode ? 'bg-slate-700 hover:bg-slate-600 text-slate-300' : 'bg-slate-100 hover:bg-slate-200 text-slate-600') : 'text-slate-300 cursor-not-allowed'}`}
                                                                         >
                                                                             <Minus size={14} />
                                                                         </button>
@@ -1107,8 +1107,8 @@ export default function Admin() {
                                                 </div>
 
                                                 {/* Bill Summary Footer */}
-                                                <div className="mt-auto bg-emerald-50 p-4 rounded-2xl space-y-2 border border-emerald-100">
-                                                    <div className="flex justify-between text-sm text-slate-600">
+                                                <div className={`mt-auto p-4 rounded-2xl space-y-2 border ${darkMode ? 'bg-emerald-900/20 border-emerald-800' : 'bg-emerald-50 border-emerald-100'}`}>
+                                                    <div className={`flex justify-between text-sm ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>
                                                         <span>{selectedTable.table_number >= 10 ? `Tiền giờ` : 'Phí lượt chơi'}</span>
                                                         <span className="font-bold">{calculateTableFee(selectedTable).toLocaleString()}đ</span>
                                                     </div>
