@@ -794,9 +794,9 @@ export default function Admin() {
                             <div className={`flex-shrink-0 rounded-2xl p-4 border min-w-[120px] ${darkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-100'}`}>
                                 <div className="flex items-center gap-2 text-orange-600 mb-1">
                                     <Users size={16} />
-                                    <span className="text-xs font-bold text-slate-500">Khách</span>
+                                    <span className={`text-xs font-bold ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>Khách</span>
                                 </div>
-                                <div className="text-2xl font-black text-slate-800">
+                                <div className={`text-2xl font-black ${darkMode ? 'text-white' : 'text-slate-800'}`}>
                                     {tables.filter((t: any) => t.status !== 'available').reduce((acc: number, t: any) => acc + (t.player_count || 2), 0)}
                                 </div>
                             </div>
