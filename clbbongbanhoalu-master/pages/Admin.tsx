@@ -686,8 +686,8 @@ export default function Admin() {
             <header className={`py-4 px-4 md:px-8 sticky top-0 z-[100] shadow-xl transition-colors ${darkMode ? 'bg-slate-800 shadow-slate-900/50' : 'bg-gradient-to-r from-emerald-600 to-emerald-700 shadow-emerald-600/20'}`}>
                 <div className="max-w-[1600px] mx-auto flex justify-between items-center">
                     <div className="flex items-center gap-3">
-                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center backdrop-blur-sm ${darkMode ? 'bg-emerald-600' : 'bg-white/20'}`}>
-                            <LayoutDashboard size={22} className="text-white" />
+                        <div className="w-10 h-10 rounded-xl overflow-hidden">
+                            <img src="/logo.png" alt="Logo CLB Hoa Lư" className="w-full h-full object-cover" />
                         </div>
                         <div>
                             <span className="font-black text-lg tracking-tight block leading-tight text-white">Hoa Lư</span>
