@@ -78,49 +78,7 @@ const Home: React.FC = () => {
     setIsVisible(true);
   }, []);
 
-  const homeSchema = {
-    "@context": "https://schema.org",
-    "@type": "SportsClub",
-    "name": "CLB Bóng Bàn Hoa Lư",
-    "description": "Câu lạc bộ bóng bàn uy tín hàng đầu khu vực Hoa Lư. Đào tạo bóng bàn chuyên nghiệp cho mọi lứa tuổi.",
-    "url": "https://clbbongbanhoalu.vn",
-    "logo": "https://clbbongbanhoalu.vn/logo.png",
-    "address": {
-      "@type": "PostalAddress",
-      "streetAddress": "2 Đinh Tiên Hoàng, Đa Kao, Quận 1",
-      "addressLocality": "Thành phố Hồ Chí Minh",
-      "addressCountry": "VN"
-    },
-    "mainEntity": {
-      "@type": "FAQPage",
-      "mainEntity": [
-        {
-          "@type": "Question",
-          "name": "CLB Bóng bàn Hoa Lư có lớp học cho người mới bắt đầu không?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "Có, chúng tôi có các lớp đào tạo bóng bàn từ cơ bản đến nâng cao dành cho mọi lứa tuổi, từ trẻ em đến người lớn."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "Chi phí thuê bàn bóng bàn tại Hoa Lư là bao nhiêu?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "Chi phí thuê bàn là 70.000đ/giờ. Ngoài ra chúng tôi còn có vé lượt 40.000đ và thẻ hội viên tháng 700.000đ."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "Thời gian hoạt động của CLB như thế nào?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "CLB mở cửa tất cả các ngày trong tuần. Thứ 2, 4, 6 từ 17h-19h; Thứ 3, 5, 7 từ 18h-20h; Chủ nhật từ 8h-11h."
-          }
-        }
-      ]
-    }
-  };
+  // Schema is now pre-rendered in index.html - no need for client-side injection
 
   return (
     <div className={`transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
@@ -128,7 +86,6 @@ const Home: React.FC = () => {
         title="Trang Chủ - Đào Tạo & Giao Lưu Bóng Bàn Chuyên Nghiệp"
         description="Chào mừng đến với CLB Bóng bàn Hoa Lư - Môi trường tập luyện bóng bàn chuyên nghiệp, hiện đại hàng đầu với huấn luyện viên đội tuyển quốc gia."
         keywords="bóng bàn Hoa Lư, CLB bóng bàn Ninh Bình, học bóng bàn, thuê bàn bóng bàn, dụng cụ bóng bàn"
-        schema={homeSchema}
       />
       <Hero />
 
