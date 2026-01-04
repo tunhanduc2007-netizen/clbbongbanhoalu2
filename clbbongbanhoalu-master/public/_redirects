@@ -1,1 +1,5 @@
+# Admin panel - serve static files directly
+/admin/*  /admin/:splat  200
+
+# SPA fallback for React app (exclude admin)
 /*  /index.html  200
