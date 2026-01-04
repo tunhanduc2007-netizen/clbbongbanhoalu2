@@ -23,7 +23,7 @@ const SEO: React.FC<SEOProps> = ({
 }) => {
     const location = useLocation();
     const siteName = 'CLB Bóng Bàn Hoa Lư';
-    const baseUrl = 'https://clbbongbanhoalu.vn';
+    const baseUrl = 'https://clbbongbanhoalu.netlify.app';
     const fullTitle = `${title} | ${siteName}`;
 
     useEffect(() => {

@@ -6,7 +6,7 @@ import { PRODUCTS } from '../constants';
 
 const Hero: React.FC = () => {
   return (
-    <section className="relative h-[400px] bg-gradient-to-br from-[#7AC943] to-[#4E9F3D] overflow-hidden rounded-b-[40px] flex items-center justify-center">
+    <section className="relative h-[450px] bg-gradient-to-br from-[#7AC943] to-[#4E9F3D] overflow-hidden rounded-b-[40px] flex items-center justify-center">
       {/* Decorative Animated Ball - Updated to match logo yellow-green style */}
       <div className="absolute w-12 h-12 bg-[#FFD800] rounded-full shadow-lg z-10 animate-bounce" style={{ left: '10%', top: '20%', animationDuration: '3s' }}>
         <div className="w-full h-full border-t-2 border-white/30 rounded-full"></div>
@@ -21,22 +21,43 @@ const Hero: React.FC = () => {
         </svg>
       </div>
 
-      <div className="relative z-20 text-center px-6">
-        <h1 className="text-4xl font-extrabold text-white leading-tight mb-4 drop-shadow-md">
-          Chinh Phục <br /> Đam Mê <span className="text-[#FFD800]">Hoa Lư</span>
+      <div className="relative z-20 text-center px-6 max-w-3xl">
+        {/* H1 - SEO Optimized với Primary Keywords */}
+        <h1 className="text-3xl md:text-4xl font-extrabold text-white leading-tight mb-3 drop-shadow-md">
+          CLB Bóng Bàn <span className="text-[#FFD800]">Hoa Lư Quận 1</span>
+          <br className="hidden md:block" />
+          <span className="text-2xl md:text-3xl"> Đào Tạo Chuyên Nghiệp</span>
         </h1>
-        <p className="text-white/90 text-sm mb-8 max-w-xs mx-auto">
-          Môi trường tập luyện chuyên nghiệp, năng động và thân thiện hàng đầu tại khu vực Hoa Lư.
+
+        {/* Trust Signals - Above the fold */}
+        <div className="flex flex-wrap items-center justify-center gap-3 mb-4 text-white/95 text-xs md:text-sm font-medium">
+          <span className="flex items-center gap-1">
+            🏆 <strong>HLV Đội Tuyển Quốc Gia</strong>
+          </span>
+          <span className="hidden md:inline">|</span>
+          <span className="flex items-center gap-1">
+            🏃 <strong>Thảm Enlio Chuẩn Quốc Tế</strong>
+          </span>
+          <span className="hidden md:inline">|</span>
+          <span className="flex items-center gap-1">
+            ⭐ <strong>500+ Hội Viên</strong>
+          </span>
+        </div>
+
+        <p className="text-white/90 text-sm md:text-base mb-6 max-w-xl mx-auto leading-relaxed">
+          Môi trường tập luyện <strong>bóng bàn chuyên nghiệp</strong> hàng đầu tại <strong>trung tâm Quận 1, TP.HCM</strong>.
+          Từ người mới bắt đầu đến vận động viên chuyên nghiệp.
         </p>
+
         <div className="flex flex-col items-center gap-3">
           <Link
             to="/register"
             className="ripple inline-flex items-center gap-2 bg-[#FFD800] text-[#4E9F3D] px-8 py-3 rounded-full font-bold shadow-xl transition-all hover:bg-white hover:scale-105"
           >
-            THAM GIA NGAY <ArrowRight size={20} />
+            ĐĂNG KÝ NGAY - NHẬN TƯ VẤN MIỄN PHÍ <ArrowRight size={20} />
           </Link>
           <Link to="/shop" className="text-white text-xs font-bold underline underline-offset-4 flex items-center gap-1 opacity-80 hover:opacity-100 transition-opacity">
-            MUA SẮM DỤNG CỤ <ShoppingBag size={14} />
+            MUA SẮM DỤNG CỤ CHÍNH HÃNG <ShoppingBag size={14} />
           </Link>
         </div>
       </div>
@@ -111,23 +132,140 @@ const Home: React.FC = () => {
       />
       <Hero />
 
-      {/* Intro Section */}
-      <section className="px-6 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center mb-12">
-          <article className="glass p-8 rounded-[32px] shadow-sm border border-gray-100 overflow-hidden relative h-full">
+      {/* Intro Section - EXPANDED for SEO */}
+      <section className="px-6 py-16">
+        <div className="max-w-6xl mx-auto">
+          {/* Main About Section - Expanded */}
+          <article className="glass p-8 md:p-12 rounded-[32px] shadow-sm border border-gray-100 overflow-hidden relative mb-12">
             <div className="absolute -top-10 -right-10 w-32 h-32 bg-[#7AC943]/10 rounded-full blur-2xl"></div>
-            <h2 className="text-3xl font-bold text-gray-800 mb-6 flex items-center gap-2">
-              <Users className="text-[#4E9F3D]" size={32} /> Về CLB Bóng Bàn Hoa Lư
-            </h2>
-            <p className="text-gray-600 leading-relaxed text-lg mb-4">
-              <strong>CLB Bóng bàn Hoa Lư</strong> tự hào là điểm đến mới dành cho những người yêu thích bóng bàn tại khu vực. Với trang thiết bị hiện đại, hệ thống bàn thi đấu đạt tiêu chuẩn ITTF, thảm Enlio chuyên nghiệp và đội ngũ huấn luyện viên tâm huyết, chúng tôi cam kết mang đến trải nghiệm tập luyện chất lượng nhất.
-            </p>
-            <p className="text-gray-500 text-sm italic">
-              Dù bạn là người mới bắt đầu hay vận động viên có kinh nghiệm, Hoa Lư luôn có không gian phù hợp để bạn khám phá đam mê và phát triển kỹ năng.
-            </p>
+
+            <header className="mb-8">
+              <h2 className="text-3xl md:text-4xl font-bold text-gray-800 mb-4 flex items-center gap-3">
+                <Users className="text-[#4E9F3D]" size={36} />
+                Về CLB Bóng Bàn Hoa Lư - Điểm Đến Lý Tưởng Cho Người Yêu Bóng Bàn
+              </h2>
+              <div className="h-1 w-24 bg-gradient-to-r from-[#7AC943] to-[#FFD800] rounded-full"></div>
+            </header>
+
+            <div className="prose prose-lg max-w-none text-gray-600 leading-relaxed space-y-6">
+              <p className="text-lg">
+                <strong className="text-gray-800">CLB Bóng bàn Hoa Lư</strong> tọa lạc tại <strong>2 Đinh Tiên Hoàng, Đa Kao, Quận 1, TP.HCM</strong>,
+                là một trong những <em className="text-[#4E9F3D]">câu lạc bộ bóng bàn uy tín hàng đầu khu vực trung tâm thành phố</em>.
+                Với hơn 10 năm kinh nghiệm đào tạo và phát triển phong trào <strong>bóng bàn tại Quận 1</strong>, chúng tôi tự hào là
+                nơi hội tụ của những tay vợt đam mê từ người mới bắt đầu đến vận động viên chuyên nghiệp.
+              </p>
+
+              {/* Key Features Grid */}
+              <div className="grid md:grid-cols-2 gap-6 my-8">
+                <div className="bg-gradient-to-br from-[#7AC943]/5 to-[#FFD800]/5 p-6 rounded-2xl border-l-4 border-[#7AC943]">
+                  <h3 className="text-xl font-bold text-gray-800 mb-3 flex items-center gap-2">
+                    🏆 Đội Ngũ Huấn Luyện Viên Chuyên Nghiệp
+                  </h3>
+                  <p className="text-gray-600 text-sm leading-relaxed">
+                    CLB sở hữu đội ngũ <strong>huấn luyện viên là cựu tuyển thủ quốc gia</strong> với nhiều năm kinh nghiệm
+                    thi đấu quốc tế. Phương pháp giảng dạy kết hợp lý thuyết khoa học và thực hành chuyên sâu,
+                    giúp học viên tiến bộ nhanh chóng từ kỹ thuật cơ bản đến chiến thuật thi đấu nâng cao.
+                  </p>
+                </div>
+
+                <div className="bg-gradient-to-br from-[#4E9F3D]/5 to-[#7AC943]/5 p-6 rounded-2xl border-l-4 border-[#4E9F3D]">
+                  <h3 className="text-xl font-bold text-gray-800 mb-3 flex items-center gap-2">
+                    🏃 Cơ Sở Vật Chất Đạt Chuẩn Quốc Tế
+                  </h3>
+                  <ul className="text-gray-600 text-sm space-y-2 leading-relaxed">
+                    <li>✓ <strong>Thảm Enlio chuyên nghiệp</strong>: Bảo vệ khớp gối, giảm chấn thương tối đa</li>
+                    <li>✓ <strong>Bàn thi đấu chuẩn ITTF</strong>: Độ nảy chuẩn quốc tế</li>
+                    <li>✓ <strong>Hệ thống chiếu sáng LED</strong>: Không bóng chết, bảo vệ thị lực</li>
+                    <li>✓ <strong>Điều hòa hiện đại</strong>: Môi trường thoáng mát suốt năm</li>
+                  </ul>
+                </div>
+              </div>
+
+              <h3 className="text-2xl font-bold text-gray-800 mt-10 mb-4">
+                📅 Đa Dạng Hình Thức Tập Luyện Phù Hợp Mọi Đối Tượng
+              </h3>
+              <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+                <ul className="space-y-3 text-gray-700">
+                  <li className="flex items-start gap-3">
+                    <span className="text-2xl">👶</span>
+                    <div>
+                      <strong className="text-gray-800">Lớp năng khiếu trẻ em</strong> (6-15 tuổi):
+                      <span className="text-sm text-gray-600"> Xây dựng nền tảng kỹ thuật vững chắc, phát triển tư duy chiến thuật từ nhỏ</span>
+                    </div>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <span className="text-2xl">🎓</span>
+                    <div>
+                      <strong className="text-gray-800">Lớp người lớn mới bắt đầu</strong>:
+                      <span className="text-sm text-gray-600"> Học bóng bàn từ zero, phương pháp dễ hiểu, tiến bộ nhanh</span>
+                    </div>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <span className="text-2xl">⚡</span>
+                    <div>
+                      <strong className="text-gray-800">Lớp nâng cao</strong>:
+                      <span className="text-sm text-gray-600"> Chiến thuật thi đấu, training sparring với vận động viên chuyên nghiệp</span>
+                    </div>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <span className="text-2xl">🏓</span>
+                    <div>
+                      <strong className="text-gray-800">Thuê bàn tự do</strong>:
+                      <span className="text-sm text-gray-600"> Giao lưu cộng đồng, tự rèn luyện, linh hoạt thời gian</span>
+                    </div>
+                  </li>
+                </ul>
+              </div>
+
+              <h3 className="text-2xl font-bold text-gray-800 mt-10 mb-4">
+                💎 Tại Sao Chọn CLB Bóng Bàn Hoa Lư?
+              </h3>
+              <div className="grid md:grid-cols-3 gap-4">
+                {[
+                  { icon: "📍", title: "Vị trí trung tâm Quận 1", desc: "Gần Nhà hát TP, dễ dàng di chuyển" },
+                  { icon: "💰", title: "Giá cả hợp lý", desc: "Từ 40.000đ/lượt, phù hợp mọi đối tượng" },
+                  { icon: "🤝", title: "Cộng đồng văn minh", desc: "Hơn 500 hội viên thường xuyên" },
+                  { icon: "🛍️", title: "Cửa hàng dụng cụ", desc: "Butterfly, DHS, Stiga chính hãng" },
+                  { icon: "⏰", title: "Lịch linh hoạt", desc: "Mở cửa cả tuần kể cả Chủ nhật" },
+                  { icon: "🎯", title: "Cam kết chất lượng", desc: "Đào tạo đúng phương pháp quốc tế" }
+                ].map((item, idx) => (
+                  <div key={idx} className="text-center p-4 bg-gray-50 rounded-xl hover:bg-[#7AC943]/5 transition-colors">
+                    <div className="text-3xl mb-2">{item.icon}</div>
+                    <h4 className="font-bold text-gray-800 text-sm mb-1">{item.title}</h4>
+                    <p className="text-xs text-gray-500">{item.desc}</p>
+                  </div>
+                ))}
+              </div>
+
+              <div className="bg-gradient-to-r from-[#7AC943]/10 to-[#FFD800]/10 p-6 md:p-8 rounded-2xl mt-8 border-l-4 border-[#7AC943]">
+                <p className="text-lg font-bold text-[#4E9F3D] mb-3">
+                  🎯 Bạn đang tìm kiếm nơi học bóng bàn uy tín tại Quận 1, TP.HCM?
+                </p>
+                <p className="text-gray-700 leading-relaxed">
+                  Hãy đến <strong>CLB Bóng Bàn Hoa Lư</strong> để trải nghiệm môi trường tập luyện chuyên nghiệp,
+                  được hướng dẫn bởi HLV quốc gia và kết nối với cộng đồng đam mê bóng bàn!
+                  Chúng tôi cam kết mang đến trải nghiệm tốt nhất cho mọi học viên.
+                </p>
+                <div className="mt-4 flex flex-wrap gap-3">
+                  <Link
+                    to="/register"
+                    className="inline-flex items-center gap-2 bg-[#4E9F3D] text-white px-6 py-2 rounded-full font-bold text-sm hover:bg-[#7AC943] transition-colors"
+                  >
+                    Đăng ký ngay <ArrowRight size={16} />
+                  </Link>
+                  <a
+                    href="tel:0913909012"
+                    className="inline-flex items-center gap-2 bg-white text-[#4E9F3D] px-6 py-2 rounded-full font-bold text-sm border-2 border-[#4E9F3D] hover:bg-[#4E9F3D] hover:text-white transition-colors"
+                  >
+                    Gọi tư vấn: 0913.909.012
+                  </a>
+                </div>
+              </div>
+            </div>
           </article>
 
-          <nav className="grid grid-cols-2 gap-4 h-full" aria-label="Quick links">
+          {/* Quick Links Cards */}
+          <nav className="grid grid-cols-2 gap-4" aria-label="Quick links">
             <Link to="/schedule" className="glass p-6 rounded-3xl flex flex-col items-center justify-center text-center group transition-all hover:bg-[#7AC943]/5 h-full">
               <div className="w-16 h-16 bg-[#FFD800]/20 text-[#4E9F3D] rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
                 <Calendar size={32} />
