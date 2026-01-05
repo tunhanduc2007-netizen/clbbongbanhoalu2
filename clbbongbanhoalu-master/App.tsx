@@ -1,16 +1,24 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense, lazy } from 'react';
 import { BrowserRouter, Routes, Route, Link, useLocation } from 'react-router-dom';
 import { Menu, X, ChevronRight, Table, Trophy, Users, Calendar, Image as ImageIcon, MessageSquare, ShoppingBag, Phone, Facebook, MessageCircle } from 'lucide-react';
-import Home from './pages/Home';
-import About from './pages/About';
-import Schedule from './pages/Schedule';
-import Register from './pages/Register';
-import Gallery from './pages/Gallery';
-import Admin from './pages/Admin'; // Đường dẫn admin mới
-import Shop from './pages/Shop';
-import AdminDashboard from './pages/admin/AdminDashboard';
-import AdminLogin from './pages/admin/AdminLogin';
+
+// Lazy load pages for code splitting - reduces initial bundle size
+const Home = lazy(() => import('./pages/Home'));
+const About = lazy(() => import('./pages/About'));
+const Schedule = lazy(() => import('./pages/Schedule'));
+const Register = lazy(() => import('./pages/Register'));
+const Gallery = lazy(() => import('./pages/Gallery'));
+const Admin = lazy(() => import('./pages/Admin'));
+const Shop = lazy(() => import('./pages/Shop'));
+const AdminLogin = lazy(() => import('./pages/admin/AdminLogin'));
+
+// Loading spinner component
+const PageLoader = () => (
+  <div className="min-h-[60vh] flex items-center justify-center">
+    <div className="w-12 h-12 border-4 border-[#7AC943] border-t-transparent rounded-full animate-spin"></div>
+  </div>
+);
 
 // Layout Components
 const Header: React.FC = () => {
@@ -180,16 +188,18 @@ const AppContent: React.FC = () => {
 
       <main className={`${!isAdminPath ? 'flex-grow mt-20' : 'min-h-screen'}`}>
         <div className={`${!isAdminPath ? 'container mx-auto max-w-7xl' : 'w-full'}`}>
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/about" element={<About />} />
-            <Route path="/schedule" element={<Schedule />} />
-            <Route path="/gallery" element={<Gallery />} />
-            <Route path="/register" element={<Register />} />
-            <Route path="/admin" element={<Admin />} />
-            <Route path="/shop" element={<Shop />} />
-            <Route path="/admin/login" element={<AdminLogin />} />
-          </Routes>
+          <Suspense fallback={<PageLoader />}>
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/about" element={<About />} />
+              <Route path="/schedule" element={<Schedule />} />
+              <Route path="/gallery" element={<Gallery />} />
+              <Route path="/register" element={<Register />} />
+              <Route path="/admin" element={<Admin />} />
+              <Route path="/shop" element={<Shop />} />
+              <Route path="/admin/login" element={<AdminLogin />} />
+            </Routes>
+          </Suspense>
         </div>
       </main>
 
