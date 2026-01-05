@@ -24,6 +24,48 @@ const PageLoader = () => (
   </div>
 );
 
+// Mobile Bottom Navigation for better accessibility (especially for older users)
+const MobileBottomNav: React.FC<{ onMenuClick: () => void }> = ({ onMenuClick }) => {
+  const location = useLocation();
+  const isActive = (path: string) => location.pathname === path;
+
+  return (
+    <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-gray-200 pb-safe shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
+      <div className="grid grid-cols-5 h-16">
+        <Link to="/" className={`flex flex-col items-center justify-center gap-1 ${isActive('/') ? 'text-[#7AC943]' : 'text-gray-500'}`}>
+          <Table size={20} strokeWidth={isActive('/') ? 2.5 : 2} />
+          <span className="text-[10px] font-bold">Trang chủ</span>
+        </Link>
+
+        <Link to="/schedule" className={`flex flex-col items-center justify-center gap-1 ${isActive('/schedule') ? 'text-[#7AC943]' : 'text-gray-500'}`}>
+          <Calendar size={20} strokeWidth={isActive('/schedule') ? 2.5 : 2} />
+          <span className="text-[10px] font-bold">Lịch tập</span>
+        </Link>
+
+        <div className="relative -top-5">
+          <a
+            href="tel:0913909012"
+            className="flex flex-col items-center justify-center w-14 h-14 rounded-full bg-gradient-to-r from-[#7AC943] to-[#FFD800] text-white shadow-lg border-4 border-white transform transition-transform active:scale-95"
+          >
+            <Phone size={24} fill="currentColor" />
+          </a>
+          <span className="text-[10px] font-bold text-[#7AC943] w-full text-center block mt-1">GỌI NGAY</span>
+        </div>
+
+        <Link to="/shop" className={`flex flex-col items-center justify-center gap-1 ${isActive('/shop') ? 'text-[#7AC943]' : 'text-gray-500'}`}>
+          <ShoppingBag size={20} strokeWidth={isActive('/shop') ? 2.5 : 2} />
+          <span className="text-[10px] font-bold">Cửa hàng</span>
+        </Link>
+
+        <button onClick={onMenuClick} className="flex flex-col items-center justify-center gap-1 text-gray-500">
+          <Menu size={20} />
+          <span className="text-[10px] font-bold">Menu</span>
+        </button>
+      </div>
+    </nav>
+  );
+};
+
 // Layout Components
 const Header: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -88,6 +130,7 @@ const Header: React.FC = () => {
 
         {/* Mobile Menu Button */}
         <button
+          id="mobile-menu-btn"
           onClick={() => setIsOpen(!isOpen)}
           aria-label={isOpen ? "Đóng menu" : "Mở menu"}
           className={`md:hidden p-2 rounded-full transition-colors ${scrolled ? 'bg-gray-100 text-[#4E9F3D]' : 'bg-white/20 text-white'}`}
@@ -210,13 +253,12 @@ const AppContent: React.FC = () => {
 
       {!isAdminPath && <Footer />}
 
+      {!isAdminPath && <MobileBottomNav onMenuClick={() => document.getElementById('mobile-menu-btn')?.click()} />}
+
       {!isAdminPath && (
-        <div className="fixed bottom-6 right-0 z-40 flex flex-col gap-3 items-end">
-          <a href="tel:0913909012" aria-label="Gọi ngay hotline" className="ripple flex items-center justify-center w-14 h-14 bg-[#7AC943] text-white rounded-full shadow-2xl transition-transform active:scale-90 animate-bounce">
-            <Phone size={28} />
-          </a>
-          <Link to="/register" className="ripple flex items-center gap-2 bg-gradient-to-r from-[#4E9F3D] to-[#7AC943] text-white px-6 py-3 rounded-full shadow-2xl font-bold transition-transform active:scale-90 whitespace-nowrap">
-            <MessageSquare size={20} />
+        <div className="fixed bottom-24 right-4 z-40 flex flex-col gap-3 items-end md:bottom-6 md:right-6">
+          <Link to="/register" className="ripple flex items-center gap-2 bg-gradient-to-r from-[#4E9F3D] to-[#7AC943] text-white px-5 py-3 rounded-full shadow-xl font-bold transition-transform active:scale-90 whitespace-nowrap text-sm md:text-base md:px-6">
+            <MessageSquare size={18} />
             <span>TƯ VẤN NGAY</span>
           </Link>
         </div>
