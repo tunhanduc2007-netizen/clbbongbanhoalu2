@@ -72,16 +72,11 @@ import SEO from '../components/SEO';
 
 
 const Home: React.FC = () => {
-  const [isVisible, setIsVisible] = useState(false);
-
-  useEffect(() => {
-    setIsVisible(true);
-  }, []);
-
-  // Schema is now pre-rendered in index.html - no need for client-side injection
+  // Removed animation state to prevent CLS (Cumulative Layout Shift)
+  // The translate-y animation was causing 0.3+ CLS score
 
   return (
-    <div className={`transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
+    <div className="min-h-screen">
       <SEO
         title="Trang Chủ - Đào Tạo & Giao Lưu Bóng Bàn Chuyên Nghiệp"
         description="Chào mừng đến với CLB Bóng bàn Hoa Lư - Môi trường tập luyện bóng bàn chuyên nghiệp, hiện đại hàng đầu với huấn luyện viên đội tuyển quốc gia."
