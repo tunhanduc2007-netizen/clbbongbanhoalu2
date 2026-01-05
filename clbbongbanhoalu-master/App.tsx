@@ -40,11 +40,16 @@ const Header: React.FC = () => {
         }`}>
         <Link to="/" className="flex items-center gap-3" onClick={() => setIsOpen(false)}>
           <div className="w-14 h-14 rounded-full shadow-md overflow-hidden shrink-0">
-            <img
-              src="/logo.png"
-              alt="Logo CLB Hoa Lư"
-              className="w-full h-full object-cover"
-            />
+            <picture>
+              <source srcSet="/logo.webp" type="image/webp" />
+              <img
+                src="/logo.png"
+                alt="Logo CLB Hoa Lư"
+                className="w-full h-full object-cover"
+                width="56"
+                height="56"
+              />
+            </picture>
           </div>
           <div className={`flex flex-col ${!scrolled ? 'text-white' : 'text-gray-800'}`}>
             <span className="font-bold leading-none text-lg">Bóng bàn</span>
@@ -115,7 +120,10 @@ const Footer: React.FC = () => (
         {/* Brand */}
         <div className="flex flex-col items-center md:items-start space-y-6">
           <div className="w-24 h-24 rounded-full flex items-center justify-center shadow-xl p-2 overflow-hidden">
-            <img src="/logo.png" alt="Logo CLB Hoa Lư" className="w-full h-full object-cover" />
+            <picture>
+              <source srcSet="/logo.webp" type="image/webp" />
+              <img src="/logo.png" alt="Logo CLB Hoa Lư" className="w-full h-full object-cover" width="96" height="96" loading="lazy" />
+            </picture>
           </div>
           <div>
             <h3 className="text-xl font-bold text-gray-800">CLB bóng bàn Hoa Lư</h3>

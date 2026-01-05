@@ -3,5 +3,5 @@ Allow: /
 Disallow: /admin
 Disallow: /private
 
-Sitemap: https://clbbongbanhoalu.vn/sitemap.xml
-Host: https://clbbongbanhoalu.vn
+Sitemap: https://clbbongbanhoalu.netlify.app/sitemap.xml
+Host: https://clbbongbanhoalu.netlify.app

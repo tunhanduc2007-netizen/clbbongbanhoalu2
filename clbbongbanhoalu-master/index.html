@@ -51,14 +51,20 @@
   <link rel="apple-touch-icon" href="/logo.png?v=2">
   <link rel="manifest" href="/manifest.json">
 
-  <!-- Preconnect and Preload -->
+  <!-- DNS Prefetch & Preconnect for Performance -->
+  <link rel="dns-prefetch" href="https://fonts.googleapis.com">
+  <link rel="dns-prefetch" href="https://fonts.gstatic.com">
+  <link rel="dns-prefetch" href="https://esm.sh">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="preload" as="image" href="/logo.png">
 
+  <!-- Preload Critical Assets -->
+  <link rel="preload" as="image" href="/logo.webp" type="image/webp" fetchpriority="high">
+
+  <!-- Google Fonts with display=swap for faster text rendering -->
   <link
     href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Outfit:wght@400;500;600;700;800;900&display=swap"
-    rel="stylesheet">
+    rel="stylesheet" media="print" onload="this.media='all'">
 
   <!-- SCHEMA MARKUP - Pre-rendered for Google Bot -->
   <!-- Schema 1: SportsClub + LocalBusiness -->
@@ -67,10 +73,10 @@
     "@context": "https://schema.org",
     "@type": "SportsClub",
     "name": "CLB Bóng Bàn Hoa Lư",
-    "image": "https://clbbongbanhoalu.netlify.app/logo.png",
+    "image": "https://clbbongbanhoalu.netlify.app/logo.webp",
     "description": "Câu lạc bộ bóng bàn chuyên nghiệp tại Quận 1, TP.HCM. Đào tạo từ cơ bản đến nâng cao với HLV đội tuyển quốc gia, thảm Enlio chuẩn quốc tế.",
     "url": "https://clbbongbanhoalu.netlify.app",
-    "logo": "https://clbbongbanhoalu.netlify.app/logo.png",
+    "logo": "https://clbbongbanhoalu.netlify.app/logo.webp",
     "telephone": "+84913909012",
     "priceRange": "40000 - 700000 VND",
     "address": {
@@ -201,7 +207,21 @@
 </head>
 
 <body class="bg-white text-gray-900 overflow-x-hidden">
-  <div id="root"></div>
+  <!-- Loading placeholder for better perceived performance -->
+  <div id="root">
+    <div style="display:flex;justify-content:center;align-items:center;min-height:100vh;background:#f8fafc">
+      <div
+        style="width:48px;height:48px;border:3px solid #7AC943;border-top-color:transparent;border-radius:50%;animation:spin 1s linear infinite">
+      </div>
+    </div>
+    <style>
+      @keyframes spin {
+        to {
+          transform: rotate(360deg)
+        }
+      }
+    </style>
+  </div>
   <script type="module" src="/index.tsx"></script>
 </body>
 
