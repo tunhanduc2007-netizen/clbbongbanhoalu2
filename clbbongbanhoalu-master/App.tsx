@@ -42,14 +42,16 @@ const MobileBottomNav: React.FC<{ onMenuClick: () => void }> = ({ onMenuClick })
           <span className="text-[10px] font-bold">Lịch tập</span>
         </Link>
 
-        <div className="relative -top-5">
+        {/* Center Call Button - Floating nicely */}
+        <div className="relative flex flex-col items-center justify-end pb-1.5 h-full">
           <a
             href="tel:0913909012"
-            className="flex flex-col items-center justify-center w-14 h-14 rounded-full bg-gradient-to-r from-[#7AC943] to-[#FFD800] text-white shadow-lg border-4 border-white transform transition-transform active:scale-95"
+            aria-label="Gọi ngay"
+            className="absolute -top-6 flex items-center justify-center w-14 h-14 rounded-full bg-gradient-to-r from-[#7AC943] to-[#FFD800] text-white shadow-xl ring-4 ring-white transform transition-transform active:scale-95 z-10"
           >
             <Phone size={24} fill="currentColor" />
           </a>
-          <span className="text-[10px] font-bold text-[#7AC943] w-full text-center block mt-1">GỌI NGAY</span>
+          <span className="text-[10px] font-black text-[#7AC943] tracking-tight">GỌI NGAY</span>
         </div>
 
         <Link to="/shop" className={`flex flex-col items-center justify-center gap-1 ${isActive('/shop') ? 'text-[#7AC943]' : 'text-gray-500'}`}>
