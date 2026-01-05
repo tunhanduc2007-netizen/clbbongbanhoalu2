@@ -89,6 +89,7 @@ const Header: React.FC = () => {
         {/* Mobile Menu Button */}
         <button
           onClick={() => setIsOpen(!isOpen)}
+          aria-label={isOpen ? "Đóng menu" : "Mở menu"}
           className={`md:hidden p-2 rounded-full transition-colors ${scrolled ? 'bg-gray-100 text-[#4E9F3D]' : 'bg-white/20 text-white'}`}
         >
           {isOpen ? <X size={24} /> : <Menu size={24} />}
@@ -161,15 +162,15 @@ const Footer: React.FC = () => (
           <p className="text-gray-500 text-sm">Hotline: 0913.909.012</p>
           <div className="flex gap-4 justify-center md:justify-start pt-2">
             {/* Phone Call Logo - Green and White */}
-            <a href="tel:0913909012" title="Gọi điện thoại" className="w-10 h-10 rounded-full bg-[#7AC943] text-white shadow-sm flex items-center justify-center hover:scale-110 transition-all">
+            <a href="tel:0913909012" aria-label="Gọi điện thoại" title="Gọi điện thoại" className="w-10 h-10 rounded-full bg-[#7AC943] text-white shadow-sm flex items-center justify-center hover:scale-110 transition-all">
               <Phone size={20} fill="currentColor" />
             </a>
             {/* Zalo Logo - Green */}
-            <a href="https://zalo.me/0913909012" target="_blank" rel="noopener noreferrer" title="Chat Zalo" className="w-10 h-10 rounded-full bg-[#4E9F3D] text-white shadow-sm flex items-center justify-center hover:scale-110 transition-all">
+            <a href="https://zalo.me/0913909012" aria-label="Chat Zalo" target="_blank" rel="noopener noreferrer" title="Chat Zalo" className="w-10 h-10 rounded-full bg-[#4E9F3D] text-white shadow-sm flex items-center justify-center hover:scale-110 transition-all">
               <MessageCircle size={22} fill="currentColor" />
             </a>
             {/* FB Logo - Official Blue */}
-            <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" title="Facebook" className="w-10 h-10 rounded-full bg-[#1877F2] text-white shadow-sm flex items-center justify-center hover:scale-110 transition-all">
+            <a href="https://facebook.com" aria-label="Facebook Fanpage" target="_blank" rel="noopener noreferrer" title="Facebook" className="w-10 h-10 rounded-full bg-[#1877F2] text-white shadow-sm flex items-center justify-center hover:scale-110 transition-all">
               <Facebook size={20} fill="currentColor" />
             </a>
           </div>
@@ -211,7 +212,7 @@ const AppContent: React.FC = () => {
 
       {!isAdminPath && (
         <div className="fixed bottom-6 right-0 z-40 flex flex-col gap-3 items-end">
-          <a href="tel:0913909012" className="ripple flex items-center justify-center w-14 h-14 bg-[#7AC943] text-white rounded-full shadow-2xl transition-transform active:scale-90 animate-bounce">
+          <a href="tel:0913909012" aria-label="Gọi ngay hotline" className="ripple flex items-center justify-center w-14 h-14 bg-[#7AC943] text-white rounded-full shadow-2xl transition-transform active:scale-90 animate-bounce">
             <Phone size={28} />
           </a>
           <Link to="/register" className="ripple flex items-center gap-2 bg-gradient-to-r from-[#4E9F3D] to-[#7AC943] text-white px-6 py-3 rounded-full shadow-2xl font-bold transition-transform active:scale-90 whitespace-nowrap">
