@@ -65,7 +65,7 @@ const Header: React.FC = () => {
           </div>
           <div className={`flex flex-col ${!scrolled ? 'text-white' : 'text-gray-800'}`}>
             <span className="font-bold leading-none text-lg">Bóng bàn</span>
-            <span className="text-sm opacity-90">Hoa Lư</span>
+            <span className="text-sm opacity-100 font-medium">Hoa Lư</span>
           </div>
         </Link>
 
@@ -77,7 +77,7 @@ const Header: React.FC = () => {
                 to={item.path}
                 className={`font-bold text-sm transition-colors flex items-center gap-2 ${location.pathname === item.path
                   ? (scrolled ? 'text-[#4E9F3D]' : 'text-white')
-                  : (scrolled ? 'text-gray-500 hover:text-[#4E9F3D]' : 'text-white/80 hover:text-white')
+                  : (scrolled ? 'text-gray-600 hover:text-[#4E9F3D]' : 'text-white/90 hover:text-white')
                   }`}
               >
                 {item.name}
@@ -140,7 +140,7 @@ const Footer: React.FC = () => (
           </div>
           <div>
             <h3 className="text-xl font-bold text-gray-800">CLB bóng bàn Hoa Lư</h3>
-            <p className="text-gray-400 text-sm">
+            <p className="text-gray-500 text-sm">
               &copy; {new Date().getFullYear()} CLB bóng bàn Hoa Lư. All rights reserved.
             </p>
           </div>
@@ -158,8 +158,8 @@ const Footer: React.FC = () => (
         {/* Contact */}
         <div className="flex flex-col space-y-4">
           <h4 className="font-bold text-gray-800">Liên hệ</h4>
-          <p className="text-gray-500 text-sm">2 Đinh Tiên Hoàng, Đa Kao, Quận 1, Thành phố Hồ Chí Minh (Trung tâm TDTT Hoa Lư)</p>
-          <p className="text-gray-500 text-sm">Hotline: 0913.909.012</p>
+          <p className="text-gray-600 text-sm">2 Đinh Tiên Hoàng, Đa Kao, Quận 1, Thành phố Hồ Chí Minh (Trung tâm TDTT Hoa Lư)</p>
+          <p className="text-gray-600 text-sm">Hotline: 0913.909.012</p>
           <div className="flex gap-4 justify-center md:justify-start pt-2">
             {/* Phone Call Logo - Green and White */}
             <a href="tel:0913909012" aria-label="Gọi điện thoại" title="Gọi điện thoại" className="w-10 h-10 rounded-full bg-[#7AC943] text-white shadow-sm flex items-center justify-center hover:scale-110 transition-all">
@@ -176,7 +176,7 @@ const Footer: React.FC = () => (
           </div>
         </div>
       </div>
-      <div className="text-center md:text-left text-xs text-gray-400 border-t border-gray-200 pt-8 mt-12 w-full">
+      <div className="text-center md:text-left text-xs text-gray-500 border-t border-gray-200 pt-8 mt-12 w-full">
         &copy; 2026 CLB Bóng Bàn Hoa Lư. Tinh thần thể thao vươn tầm.
       </div>
     </div>

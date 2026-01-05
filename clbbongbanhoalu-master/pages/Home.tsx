@@ -30,7 +30,7 @@ const Hero: React.FC = () => {
         </h1>
 
         {/* Trust Signals - Above the fold */}
-        <div className="flex flex-wrap items-center justify-center gap-3 mb-4 text-white/95 text-xs md:text-sm font-medium">
+        <div className="flex flex-wrap items-center justify-center gap-3 mb-4 text-white text-xs md:text-sm font-medium drop-shadow-sm">
           <span className="flex items-center gap-1">
             🏆 <strong>HLV Đội Tuyển Quốc Gia</strong>
           </span>
@@ -44,7 +44,7 @@ const Hero: React.FC = () => {
           </span>
         </div>
 
-        <p className="text-white/90 text-sm md:text-base mb-6 max-w-xl mx-auto leading-relaxed">
+        <p className="text-white text-sm md:text-base mb-6 max-w-xl mx-auto leading-relaxed drop-shadow-sm font-medium">
           Môi trường tập luyện <strong>bóng bàn chuyên nghiệp</strong> hàng đầu tại <strong>trung tâm Quận 1, TP.HCM</strong>.
           Từ người mới bắt đầu đến vận động viên chuyên nghiệp.
         </p>
@@ -56,7 +56,7 @@ const Hero: React.FC = () => {
           >
             ĐĂNG KÝ NGAY - NHẬN TƯ VẤN MIỄN PHÍ <ArrowRight size={20} />
           </Link>
-          <Link to="/shop" className="text-white text-xs font-bold underline underline-offset-4 flex items-center gap-1 opacity-80 hover:opacity-100 transition-opacity">
+          <Link to="/shop" className="text-white text-xs font-bold underline underline-offset-4 flex items-center gap-1 hover:opacity-90 transition-opacity drop-shadow-sm">
             MUA SẮM DỤNG CỤ CHÍNH HÃNG <ShoppingBag size={14} />
           </Link>
         </div>
@@ -259,14 +259,14 @@ const Home: React.FC = () => {
             <h3 className="text-lg font-black text-slate-800 mb-2 uppercase tracking-tight leading-tight">VÉ CHƠI LƯỢT</h3>
             <div className="flex items-baseline gap-1 mb-6">
               <span className="text-3xl font-black text-[#4E9F3D] tracking-tighter">40.000đ</span>
-              <span className="text-slate-400 font-bold text-[10px]">/lượt</span>
+              <span className="text-slate-500 font-bold text-[10px]">/lượt</span>
             </div>
-            <p className="text-slate-400 text-[11px] font-medium mb-8 leading-relaxed px-2">
+            <p className="text-slate-600 text-[11px] font-medium mb-8 leading-relaxed px-2">
               Dành cho khách vãng lai, đến chơi bất cứ khi nào bạn rảnh.
             </p>
             <ul className="space-y-4 mb-10 text-left w-full">
               {['Không cần đăng ký trước', 'Đến là chơi ngay', 'Trải nghiệm sân bãi chuẩn'].map((item, i) => (
-                <li key={i} className="flex items-center gap-3 text-[11px] font-bold text-slate-500">
+                <li key={i} className="flex items-center gap-3 text-[11px] font-bold text-slate-700">
                   <div className="w-4 h-4 rounded-full bg-[#7AC943]/10 flex items-center justify-center">
                     <Check size={10} className="text-[#4E9F3D]" strokeWidth={4} />
                   </div>
@@ -290,14 +290,14 @@ const Home: React.FC = () => {
             <h3 className="text-lg font-black text-slate-800 mb-2 uppercase tracking-tight leading-tight">THẺ HỘI VIÊN</h3>
             <div className="flex items-baseline gap-1 mb-6">
               <span className="text-3xl font-black text-[#4E9F3D] tracking-tighter">700.000đ</span>
-              <span className="text-slate-400 font-bold text-[10px]">/tháng</span>
+              <span className="text-slate-500 font-bold text-[10px]">/tháng</span>
             </div>
-            <p className="text-slate-400 text-[11px] font-medium mb-8 leading-relaxed px-2">
+            <p className="text-slate-600 text-[11px] font-medium mb-8 leading-relaxed px-2">
               Tập luyện không giới hạn. Tiết kiệm tối đa cho hội viên thường xuyên.
             </p>
             <ul className="space-y-4 mb-10 text-left w-full">
               {['Chơi không giới hạn lượt', 'Ưu tiên đặt bàn tập', 'Giao lưu cộng đồng Hội viên', 'Hỗ trợ kỹ thuật cơ bản'].map((item, i) => (
-                <li key={i} className="flex items-center gap-3 text-[11px] font-bold text-slate-500">
+                <li key={i} className="flex items-center gap-3 text-[11px] font-bold text-slate-700">
                   <div className="w-4 h-4 rounded-full bg-[#7AC943]/10 flex items-center justify-center">
                     <Check size={10} className="text-[#4E9F3D]" strokeWidth={4} />
                   </div>
@@ -318,14 +318,14 @@ const Home: React.FC = () => {
             <h3 className="text-lg font-black text-slate-800 mb-2 uppercase tracking-tight leading-tight">THUÊ BÀN RIÊNG</h3>
             <div className="flex items-baseline gap-1 mb-6">
               <span className="text-3xl font-black text-[#4E9F3D] tracking-tighter">70.000đ</span>
-              <span className="text-slate-400 font-bold text-[10px]">/giờ</span>
+              <span className="text-slate-500 font-bold text-[10px]">/giờ</span>
             </div>
-            <p className="text-slate-400 text-[11px] font-medium mb-8 leading-relaxed px-2">
+            <p className="text-slate-600 text-[11px] font-medium mb-8 leading-relaxed px-2">
               Sân chơi riêng tư. Dành cho nhóm bạn muốn tập luyện độc lập.
             </p>
             <ul className="space-y-4 mb-10 text-left w-full">
               {['Không gian tập riêng tư', 'Chuẩn thi đấu quốc tế', 'Tự do thời gian tập', 'Đặt bàn trước tiện lợi'].map((item, i) => (
-                <li key={i} className="flex items-center gap-3 text-[11px] font-bold text-slate-500">
+                <li key={i} className="flex items-center gap-3 text-[11px] font-bold text-slate-700">
                   <div className="w-4 h-4 rounded-full bg-[#7AC943]/10 flex items-center justify-center">
                     <Check size={10} className="text-[#4E9F3D]" strokeWidth={4} />
                   </div>
@@ -402,7 +402,7 @@ const Home: React.FC = () => {
               <span className="text-3xl" aria-hidden="true">{item.icon}</span>
               <div>
                 <h3 className="font-bold text-gray-700">{item.title}</h3>
-                <p className="text-xs text-gray-400">{item.desc}</p>
+                <p className="text-xs text-gray-500 font-medium">{item.desc}</p>
               </div>
             </article>
           ))}
