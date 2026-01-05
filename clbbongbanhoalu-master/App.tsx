@@ -128,17 +128,15 @@ const Header: React.FC = () => {
           ))}
         </ul>
 
-        {/* Mobile Menu Button */}
-        <button
-          id="mobile-menu-btn"
-          onClick={() => setIsOpen(!isOpen)}
-          aria-label={isOpen ? "Đóng menu" : "Mở menu"}
-          className={`md:hidden p-2 rounded-full transition-colors ${scrolled ? 'bg-gray-100 text-[#4E9F3D]' : 'bg-white/20 text-white'}`}
-        >
-          {isOpen ? <X size={24} /> : <Menu size={24} />}
-        </button>
-      </nav>
 
+      </nav>
+      {/* Hidden Mobile Menu Trigger for Bottom Nav */}
+      <button
+        id="mobile-menu-btn"
+        onClick={() => setIsOpen(!isOpen)}
+        className="hidden"
+        aria-hidden="true"
+      />
       {/* Mobile Menu Overlay */}
       <div className={`md:hidden fixed inset-0 bg-black/40 backdrop-blur-sm transition-opacity duration-300 ${isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`} onClick={() => setIsOpen(false)}>
         <div
