@@ -13,10 +13,14 @@ const Admin = lazy(() => import('./pages/Admin'));
 const Shop = lazy(() => import('./pages/Shop'));
 const AdminLogin = lazy(() => import('./pages/admin/AdminLogin'));
 
-// Loading spinner component
+// Skeleton Loader matching index.html to prevent CLS
 const PageLoader = () => (
-  <div className="min-h-[60vh] flex items-center justify-center">
-    <div className="w-12 h-12 border-4 border-[#7AC943] border-t-transparent rounded-full animate-spin"></div>
+  <div className="relative h-[450px] bg-gradient-to-br from-[#7AC943] to-[#4E9F3D] rounded-b-[40px] flex items-center justify-center overflow-hidden">
+    <div className="w-full max-w-[800px] px-5 text-center">
+      <div className="h-10 w-[70%] bg-white/20 rounded-lg mx-auto mb-5 animate-pulse"></div>
+      <div className="h-10 w-[50%] bg-white/20 rounded-lg mx-auto mb-8 animate-pulse"></div>
+      <div className="h-[50px] w-[200px] bg-[#FFD800] rounded-full mx-auto animate-pulse"></div>
+    </div>
   </div>
 );
 
