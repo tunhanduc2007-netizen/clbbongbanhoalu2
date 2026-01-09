@@ -3,7 +3,7 @@ import {
     Wallet, LogOut, TrendingUp, FileSpreadsheet, LayoutDashboard, Coffee, Circle,
     Trash2, Search, LogIn, PlusCircle, ChevronDown, Play, Pause, Square,
     AlertTriangle, CheckCircle, X as CloseIcon, Calendar, Users, Home, Settings,
-    Clock, DollarSign, Minus, Plus, Moon, Sun
+    Clock, DollarSign, Minus, Plus, Moon, Sun, Pencil
 } from 'lucide-react';
 import SEO from '../components/SEO';
 import { Chart, registerables } from 'chart.js';
@@ -1486,7 +1486,7 @@ export default function Admin() {
                                                     </div>
                                                 </div>
                                                 <div className="flex gap-2">
-                                                    <button onClick={() => handleEditCoach(c)} className={`p-2 ${darkMode ? 'text-slate-500 hover:text-emerald-400' : 'text-slate-300 hover:text-emerald-500'}`}><TrendingUp size={16} /></button>
+                                                    <button onClick={() => handleEditCoach(c)} className={`p-2 ${darkMode ? 'text-slate-500 hover:text-emerald-400' : 'text-slate-300 hover:text-emerald-500'}`}><Pencil size={16} /></button>
                                                     <button onClick={() => deleteTableItem('coaches', c.id)} className={`p-2 ${darkMode ? 'text-slate-500 hover:text-red-400' : 'text-slate-300 hover:text-red-500'}`}><Trash2 size={16} /></button>
                                                 </div>
                                             </div>
@@ -1635,8 +1635,8 @@ export default function Admin() {
             </div>
 
             {/* --- MOBILE BOTTOM NAVIGATION --- */}
-            <div className={`fixed bottom-0 left-0 right-0 pb-safe pt-2 px-4 shadow-[0_-4px_20px_-4px_rgba(0,0,0,0.15)] z-40 md:hidden transition-colors ${darkMode ? 'bg-slate-800 border-t border-slate-700' : 'bg-white border-t border-slate-100'}`}>
-                <div className="flex justify-around items-center h-16 max-w-md mx-auto">
+            <div className={`fixed bottom-0 left-0 right-0 pb-safe pt-2 px-4 shadow-[0_-4px_20px_-4px_rgba(0,0,0,0.15)] z-[100] md:hidden transition-colors ${darkMode ? 'bg-slate-800 border-t border-slate-700' : 'bg-white border-t border-slate-100'}`}>
+                <div className="flex justify-around items-center h-16 max-w-md mx-auto gap-2">
                     <button
                         onClick={() => setActiveTab('finance')}
                         className={`flex flex-col items-center justify-center w-16 transition-colors ${activeTab === 'finance' ? 'text-emerald-500' : darkMode ? 'text-slate-500' : 'text-slate-400'}`}
@@ -1644,13 +1644,22 @@ export default function Admin() {
                         <Wallet size={24} strokeWidth={activeTab === 'finance' ? 2.5 : 2} />
                         <span className="text-[10px] font-bold mt-1">Tài chính</span>
                     </button>
+                    
+                    {/* Highlighted 'Tables' Button */}
                     <button
                         onClick={() => setActiveTab('tables')}
-                        className={`flex flex-col items-center justify-center w-16 transition-colors ${activeTab === 'tables' ? 'text-emerald-500' : darkMode ? 'text-slate-500' : 'text-slate-400'}`}
+                        className={`flex flex-col items-center justify-center w-16 h-16 -mt-6 rounded-full border-4 shadow-xl transition-all ${
+                            activeTab === 'tables' 
+                            ? 'bg-gradient-to-br from-emerald-500 to-emerald-600 border-white text-white shadow-emerald-500/30 scale-110' 
+                            : darkMode 
+                                ? 'bg-slate-700 border-slate-800 text-slate-400' 
+                                : 'bg-white border-slate-50 text-slate-400'
+                        }`}
                     >
-                        <LayoutDashboard size={24} strokeWidth={activeTab === 'tables' ? 2.5 : 2} />
-                        <span className="text-[10px] font-bold mt-1">Bàn</span>
+                        <LayoutDashboard size={24} strokeWidth={2.5} />
+                        <span className="text-[10px] font-bold mt-0.5">Bàn</span>
                     </button>
+
                     {isOwner && (
                         <button
                             onClick={() => setActiveTab('schedule')}
@@ -1660,13 +1669,6 @@ export default function Admin() {
                             <span className="text-[10px] font-bold mt-1">Lịch tập</span>
                         </button>
                     )}
-                    <button
-                        onClick={toggleDarkMode}
-                        className={`flex flex-col items-center justify-center w-16 transition-colors ${darkMode ? 'text-amber-400' : 'text-slate-400'}`}
-                    >
-                        {darkMode ? <Sun size={24} strokeWidth={2} /> : <Moon size={24} strokeWidth={2} />}
-                        <span className="text-[10px] font-bold mt-1">{darkMode ? 'Sáng' : 'Tối'}</span>
-                    </button>
                 </div>
             </div>
             {/* --- TRANSACTION HISTORY MODAL (PC + MOBILE RESPONSIVE) --- */}

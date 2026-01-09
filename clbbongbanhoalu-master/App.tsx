@@ -237,7 +237,7 @@ const AppContent: React.FC = () => {
 
       <main className={`${!isAdminPath ? 'flex-grow' : 'min-h-screen'} ${!isAdminPath && !isShopPath ? 'mt-20' : ''}`}>
         <div className={`${!isAdminPath && !isShopPath ? 'container mx-auto max-w-7xl' : 'w-full'}`}>
-          <div key={location.pathname} className="page-enter-active">
+          <div key={location.pathname} className={!isAdminPath ? "page-enter-active" : ""}>
             <Suspense fallback={<PageLoader />}>
               <Routes>
                 <Route path="/" element={<Home />} />
