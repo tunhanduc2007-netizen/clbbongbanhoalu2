@@ -229,25 +229,28 @@ const Footer: React.FC = () => (
 const AppContent: React.FC = () => {
   const location = useLocation();
   const isAdminPath = location.pathname.startsWith('/admin');
+  const isShopPath = location.pathname === '/shop';
 
   return (
     <div className={`min-h-screen flex flex-col bg-white ${!isAdminPath ? 'shadow-2xl overflow-x-hidden' : ''}`}>
-      {!isAdminPath && <Header />}
+      {!isAdminPath && !isShopPath && <Header />}
 
-      <main className={`${!isAdminPath ? 'flex-grow mt-20' : 'min-h-screen'}`}>
-        <div className={`${!isAdminPath ? 'container mx-auto max-w-7xl' : 'w-full'}`}>
-          <Suspense fallback={<PageLoader />}>
-            <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/about" element={<About />} />
-              <Route path="/schedule" element={<Schedule />} />
-              <Route path="/gallery" element={<Gallery />} />
-              <Route path="/register" element={<Register />} />
-              <Route path="/admin" element={<Admin />} />
-              <Route path="/shop" element={<Shop />} />
-              <Route path="/admin/login" element={<AdminLogin />} />
-            </Routes>
-          </Suspense>
+      <main className={`${!isAdminPath ? 'flex-grow' : 'min-h-screen'} ${!isAdminPath && !isShopPath ? 'mt-20' : ''}`}>
+        <div className={`${!isAdminPath && !isShopPath ? 'container mx-auto max-w-7xl' : 'w-full'}`}>
+          <div key={location.pathname} className="page-enter-active">
+            <Suspense fallback={<PageLoader />}>
+              <Routes>
+                <Route path="/" element={<Home />} />
+                <Route path="/about" element={<About />} />
+                <Route path="/schedule" element={<Schedule />} />
+                <Route path="/gallery" element={<Gallery />} />
+                <Route path="/register" element={<Register />} />
+                <Route path="/admin" element={<Admin />} />
+                <Route path="/shop" element={<Shop />} />
+                <Route path="/admin/login" element={<AdminLogin />} />
+              </Routes>
+            </Suspense>
+          </div>
         </div>
       </main>
 

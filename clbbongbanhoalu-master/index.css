@@ -1,5 +1,5 @@
 @import "tailwindcss";
-/* Google Fonts loaded async in HTML - no import here to prevent render blocking */
+/* Google Fonts loaded async in HTML */
 
 body {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
@@ -8,7 +8,6 @@ body {
     -moz-osx-font-smoothing: grayscale;
 }
 
-/* Prevent CLS from font loading */
 @font-face {
     font-family: 'Inter';
     font-display: swap;
@@ -61,17 +60,13 @@ body {
     transition: 0s;
 }
 
-/* Hide scrollbar for Chrome, Safari and Opera */
 .no-scrollbar::-webkit-scrollbar {
     display: none;
 }
 
-/* Hide scrollbar for IE, Edge and Firefox */
 .no-scrollbar {
     -ms-overflow-style: none;
-    /* IE and Edge */
     scrollbar-width: none;
-    /* Firefox */
 }
 
 ::-webkit-scrollbar {
@@ -87,81 +82,52 @@ body {
     border-radius: 10px;
 }
 
-/* Mobile-first Animations */
-@keyframes slide-up {
-    from {
-        transform: translateY(100%);
-        opacity: 0;
-    }
-
-    to {
-        transform: translateY(0);
-        opacity: 1;
-    }
-}
-
-@keyframes slide-in {
-    from {
-        transform: translateX(100%);
-        opacity: 0;
-    }
-
-    to {
-        transform: translateX(0);
-        opacity: 1;
-    }
-}
-
-@keyframes fade-in {
-    from {
-        opacity: 0;
-    }
-
-    to {
-        opacity: 1;
-    }
-}
-
-@keyframes pulse-green {
-
-    0%,
-    100% {
-        box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4);
-    }
-
-    50% {
-        box-shadow: 0 0 0 8px rgba(16, 185, 129, 0);
-    }
-}
-
-.animate-slide-up {
-    animation: slide-up 0.3s ease-out;
-}
-
-.animate-slide-in {
-    animation: slide-in 0.3s ease-out;
-}
-
-.animate-fade-in {
-    animation: fade-in 0.2s ease-out;
-}
-
-.animate-pulse-green {
-    animation: pulse-green 2s infinite;
-}
-
-/* Safe area for mobile devices */
-.pb-safe {
-    padding-bottom: env(safe-area-inset-bottom, 16px);
-}
-
-/* Touch-friendly targets */
-.touch-target {
-    min-height: 44px;
-    min-width: 44px;
-}
-
-/* Emerald theme scrollbar */
 ::-webkit-scrollbar-thumb:hover {
     background: #059669;
 }
+
+/* --- PREMIUM PAGE TRANSITIONS --- */
+@keyframes page-enter {
+    0% {
+        opacity: 0;
+        transform: translateY(8px) scale(0.99);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.page-enter-active {
+    animation: page-enter 0.3s cubic-bezier(0.2, 0.0, 0.2, 1) forwards;
+    will-change: opacity, transform;
+}
+
+/* Reuse existing keyframes for specific elements */
+.animate-slide-up { animation: slide-up 0.3s ease-out; }
+.animate-slide-in { animation: slide-in 0.3s ease-out; }
+.animate-fade-in { animation: fade-in 0.2s ease-out; }
+.animate-pulse-green { animation: pulse-green 2s infinite; }
+
+@keyframes slide-up {
+    from { transform: translateY(100%); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes slide-in {
+    from { transform: translateX(100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes pulse-green {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); }
+    50% { box-shadow: 0 0 0 8px rgba(16, 185, 129, 0); }
+}
+
+.pb-safe { padding-bottom: env(safe-area-inset-bottom, 16px); }
+.touch-target { min-height: 44px; min-width: 44px; }
