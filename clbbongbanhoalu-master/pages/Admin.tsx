@@ -78,6 +78,8 @@ export default function Admin() {
     const [coachLevel, setCoachLevel] = useState('HLV Cơ bản');
     const [coachFee, setCoachFee] = useState('');
     const [coachTableFee, setCoachTableFee] = useState('');
+    const [coachStudents, setCoachStudents] = useState('');
+    const [coachExp, setCoachExp] = useState('');
     const [sessCoachId, setSessCoachId] = useState('');
     const [sessDay, setSessDay] = useState('Monday');
     const [sessStart, setSessStart] = useState('');
@@ -372,26 +374,57 @@ export default function Admin() {
         }
     };
 
+    const [editingCoachId, setEditingCoachId] = useState<number | null>(null);
+
     const handleAddCoach = async (e: React.FormEvent) => {
         e.preventDefault();
         const colors = ['#4E9F3D', '#7AC943', '#1e293b', '#2D5A27', '#FFD800'];
-        const newCoach = {
+        const coachData = {
             name: coachName,
             level: coachLevel,
-            tuition_fee: coachFee || '300.000đ/buổi',
-            table_fee: coachTableFee || '50.000đ/giờ',
+            hourly_rate: parseInt(coachFee) || 300000,
+            trial_rate: parseInt(coachTableFee) || 50000,
+            students_count: parseInt(coachStudents) || 0,
+            experience: parseInt(coachExp) || 0,
             color: colors[coaches.length % colors.length]
         };
 
-        const { error } = await supabase.from('coaches').insert([newCoach]);
-        if (!error) {
-            addToast("Thêm HLV thành công!", "success");
-            setCoachName('');
-            fetchScheduleData();
+        if (editingCoachId) {
+             // Update Mode
+             const { error } = await supabase.from('coaches').update(coachData).eq('id', editingCoachId);
+             if (!error) {
+                 addToast("Cập nhật HLV thành công!", "success");
+                 setEditingCoachId(null);
+             } else {
+                 addToast("Lỗi cập nhật: " + error.message, "error");
+             }
         } else {
-            console.error("Lỗi thêm HLV:", error);
-            addToast("Lỗi: " + error.message + " (Check Console F12)", "error");
+             // Create Mode
+             const { error } = await supabase.from('coaches').insert([coachData]);
+             if (!error) {
+                addToast("Thêm HLV thành công!", "success");
+             } else {
+                addToast("Lỗi thêm: " + error.message, "error");
+             }
         }
+        
+        // Reset Form
+        setCoachName(''); setCoachFee(''); setCoachTableFee('');
+        setCoachStudents(''); setCoachExp('');
+        fetchScheduleData();
+    };
+
+    const handleEditCoach = (coach: any) => {
+        setEditingCoachId(coach.id);
+        setCoachName(coach.name);
+        setCoachLevel(coach.level);
+        setCoachFee(coach.hourly_rate?.toString() || '');
+        setCoachTableFee(coach.trial_rate?.toString() || '');
+        setCoachStudents(coach.students_count?.toString() || '');
+        setCoachExp(coach.experience?.toString() || '');
+        // Scroll to form (simple implementation)
+        const formElement = document.getElementById('coach-form');
+        if (formElement) formElement.scrollIntoView({ behavior: 'smooth' });
     };
 
     const handleAddSession = async (e: React.FormEvent) => {
@@ -601,6 +634,23 @@ export default function Admin() {
         setToasts(prev => [...prev, { id, msg, type }]);
         setTimeout(() => setToasts(prev => prev.filter(t => t.id !== id)), 3000);
     };
+
+    // Helper: Format Duration HH:mm:ss for Live Timer
+    const formatDurationHMS = (startTime: string, now: Date) => {
+        if (!startTime) return "00:00:00";
+        const start = new Date(startTime).getTime();
+        const current = now.getTime();
+        const diff = Math.max(0, current - start) / 1000;
+
+        const h = Math.floor(diff / 3600);
+        const m = Math.floor((diff % 3600) / 60);
+        const s = Math.floor(diff % 60);
+
+        return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+    };
+
+    // Override existing formatDuration in utils (since helpers is external, we can just define a local variant for UI usage)
+    // Actually, let's just use formatDurationHMS in the UI directly.
 
     const getDateRange = (range: string) => {
         const now = new Date();
@@ -860,7 +910,7 @@ export default function Admin() {
                                                         <span className="opacity-60">• {t.player_name || 'Khách'}</span>
                                                     </div>
                                                     <div className="text-lg md:text-xl font-black text-white mt-1 font-mono tracking-wider">
-                                                        {formatDuration(t.start_time, currentTime)}
+                                                        {formatDurationHMS(t.start_time, currentTime)}
                                                     </div>
                                                     <div className="text-[10px] text-emerald-200 font-bold mt-0.5">
                                                         {calculateTableFee(t).toLocaleString()}đ
@@ -1034,7 +1084,7 @@ export default function Admin() {
                                                                 <Clock size={12} /> Thời gian
                                                             </div>
                                                             <div className="text-3xl md:text-4xl font-black font-mono tracking-wider text-white">
-                                                                {formatDuration(selectedTable.start_time, currentTime)}
+                                                                {formatDurationHMS(selectedTable.start_time, currentTime)}
                                                             </div>
                                                             <div className="text-[10px] text-emerald-200 mt-1 flex items-center gap-1">
                                                                 {selectedTable.table_number >= 10 ? (
@@ -1367,9 +1417,9 @@ export default function Admin() {
                         {/* Schedule Management UI */}
                         <div className="lg:col-span-4 space-y-8">
                             {/* Coach Form */}
-                            <div className={`p-10 rounded-[2.5rem] shadow-xl border ${darkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-100'}`}>
+                            <div id="coach-form" className={`p-10 rounded-[2.5rem] shadow-xl border ${darkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-100'}`}>
                                 <h3 className={`font-black text-xl mb-10 flex items-center gap-3 ${darkMode ? 'text-slate-100' : 'text-slate-800'}`}>
-                                    <Users size={24} className="text-emerald-500" /> Quản Lý Huấn Luyện Viên
+                                    <Users size={24} className="text-emerald-500" /> {editingCoachId ? 'Cập Nhật Huấn Luyện Viên' : 'Quản Lý Huấn Luyện Viên'}
                                 </h3>
                                 <form className="space-y-6" onSubmit={handleAddCoach}>
                                     <div>
@@ -1386,15 +1436,41 @@ export default function Admin() {
                                     </div>
                                     <div>
                                         <label className={`text-[10px] font-black uppercase tracking-widest ml-1 ${darkMode ? 'text-slate-400' : 'text-slate-400'}`}>Học phí (VND/Buổi)</label>
-                                        <input type="text" className={`w-full p-4 border-none rounded-2xl mt-2 font-bold outline-none ${darkMode ? 'bg-slate-700 text-slate-100' : 'bg-slate-50 text-slate-700'}`} placeholder="300.000đ" value={coachFee} onChange={e => setCoachFee(e.target.value)} />
+                                        <input type="number" step="50000" className={`w-full p-4 border-none rounded-2xl mt-2 font-bold outline-none ${darkMode ? 'bg-slate-700 text-slate-100' : 'bg-slate-50 text-slate-700'}`} placeholder="300000" value={coachFee} onChange={e => setCoachFee(e.target.value)} />
                                     </div>
                                     <div>
                                         <label className={`text-[10px] font-black uppercase tracking-widest ml-1 ${darkMode ? 'text-slate-400' : 'text-slate-400'}`}>Tiền thuê bàn (VND/Giờ)</label>
-                                        <input type="text" className={`w-full p-4 border-none rounded-2xl mt-2 font-bold outline-none ${darkMode ? 'bg-slate-700 text-slate-100' : 'bg-slate-50 text-slate-700'}`} placeholder="50.000đ" value={coachTableFee} onChange={e => setCoachTableFee(e.target.value)} />
+                                        <input type="number" step="50000" className={`w-full p-4 border-none rounded-2xl mt-2 font-bold outline-none ${darkMode ? 'bg-slate-700 text-slate-100' : 'bg-slate-50 text-slate-700'}`} placeholder="50000" value={coachTableFee} onChange={e => setCoachTableFee(e.target.value)} />
                                     </div>
-                                    <button type="submit" className={`w-full p-5 rounded-3xl font-black flex items-center justify-center gap-3 shadow-xl transition-all ${darkMode ? 'bg-emerald-600 text-white hover:bg-emerald-500' : 'bg-slate-800 text-white hover:bg-slate-700'}`}>
-                                        THÊM HLV MỚI <PlusCircle size={20} />
-                                    </button>
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <div>
+                                            <label className={`text-[10px] font-black uppercase tracking-widest ml-1 ${darkMode ? 'text-slate-400' : 'text-slate-400'}`}>Học sinh</label>
+                                            <input type="number" className={`w-full p-4 border-none rounded-2xl mt-2 font-bold outline-none ${darkMode ? 'bg-slate-700 text-slate-100' : 'bg-slate-50 text-slate-700'}`} placeholder="0" value={coachStudents} onChange={e => setCoachStudents(e.target.value)} />
+                                        </div>
+                                        <div>
+                                            <label className={`text-[10px] font-black uppercase tracking-widest ml-1 ${darkMode ? 'text-slate-400' : 'text-slate-400'}`}>Số năm KN</label>
+                                            <input type="number" className={`w-full p-4 border-none rounded-2xl mt-2 font-bold outline-none ${darkMode ? 'bg-slate-700 text-slate-100' : 'bg-slate-50 text-slate-700'}`} placeholder="0" value={coachExp} onChange={e => setCoachExp(e.target.value)} />
+                                        </div>
+                                    </div>
+                                    
+                                    <div className="flex gap-3">
+                                        <button type="submit" className={`flex-1 p-5 rounded-3xl font-black flex items-center justify-center gap-3 shadow-xl transition-all ${darkMode ? 'bg-emerald-600 text-white hover:bg-emerald-500' : 'bg-slate-800 text-white hover:bg-slate-700'}`}>
+                                            {editingCoachId ? 'CẬP NHẬT' : 'THÊM HLV MỚI'} <PlusCircle size={20} className={editingCoachId ? 'hidden' : ''} />
+                                        </button>
+                                        {editingCoachId && (
+                                            <button 
+                                                type="button" 
+                                                onClick={() => {
+                                                    setEditingCoachId(null);
+                                                    setCoachName(''); setCoachFee(''); setCoachTableFee('');
+                                                    setCoachStudents(''); setCoachExp('');
+                                                }}
+                                                className={`px-6 rounded-3xl font-bold flex items-center justify-center ${darkMode ? 'bg-slate-700 text-slate-300 hover:bg-slate-600' : 'bg-slate-200 text-slate-600 hover:bg-slate-300'}`}
+                                            >
+                                                Hủy
+                                            </button>
+                                        )}
+                                    </div>
                                 </form>
 
                                 <div className={`mt-10 border-t pt-8 ${darkMode ? 'border-slate-700' : 'border-slate-50'}`}>
@@ -1409,7 +1485,10 @@ export default function Admin() {
                                                         <div className={`text-[10px] font-bold uppercase ${darkMode ? 'text-slate-400' : 'text-slate-400'}`}>{c.level}</div>
                                                     </div>
                                                 </div>
-                                                <button onClick={() => deleteTableItem('coaches', c.id)} className={`p-2 ${darkMode ? 'text-slate-500 hover:text-red-400' : 'text-slate-300 hover:text-red-500'}`}><Trash2 size={16} /></button>
+                                                <div className="flex gap-2">
+                                                    <button onClick={() => handleEditCoach(c)} className={`p-2 ${darkMode ? 'text-slate-500 hover:text-emerald-400' : 'text-slate-300 hover:text-emerald-500'}`}><TrendingUp size={16} /></button>
+                                                    <button onClick={() => deleteTableItem('coaches', c.id)} className={`p-2 ${darkMode ? 'text-slate-500 hover:text-red-400' : 'text-slate-300 hover:text-red-500'}`}><Trash2 size={16} /></button>
+                                                </div>
                                             </div>
                                         ))}
                                     </div>

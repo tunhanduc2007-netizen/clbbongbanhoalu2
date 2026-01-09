@@ -31,12 +31,21 @@ const Schedule: React.FC = () => {
     setLoading(true);
     try {
       const [sRes, cRes] = await Promise.all([
-        supabase.from('training_sessions').select('*, coaches(*)').order('start_time'),
+        supabase.from('training_sessions').select('*').order('start_time'),
         supabase.from('coaches').select('*')
       ]);
 
-      if (sRes.data) setSessions(sRes.data);
-      if (cRes.data) setCoaches(cRes.data);
+      const loadedCoaches = cRes.data || [];
+      const loadedSessions = sRes.data || [];
+
+      // Manually join coaches to sessions since foreign key join might fail
+      const enrichedSessions = loadedSessions.map(session => ({
+        ...session,
+        coaches: loadedCoaches.find(c => c.id === session.coach_id) || null
+      }));
+
+      setSessions(enrichedSessions);
+      setCoaches(loadedCoaches);
     } catch (err) {
       console.error(err);
     } finally {
@@ -50,6 +59,27 @@ const Schedule: React.FC = () => {
   );
 
   const getSessionCount = (dayKey: string) => sessions.filter(s => s.day === dayKey).length;
+
+  // New helper to fetch dynamic schedule for a coach from the sessions list
+  const getCoachSchedule = (coachId: number) => {
+    const coachSessions = sessions.filter(s => s.coach_id === coachId);
+    if (coachSessions.length === 0) return null;
+
+    // Group by day to avoid duplicates if multiple slots in one day
+    const scheduleByDay: { [key: string]: string[] } = {};
+    
+    coachSessions.forEach(session => {
+       // Convert English Day to Vietnamese Short Label
+       const dayLabel = daysOfWeek.find(d => d.key === session.day)?.label || session.day;
+       if (!scheduleByDay[dayLabel]) scheduleByDay[dayLabel] = [];
+       // Format time from "18:00:00" to "18:00"
+       const start = session.start_time.slice(0, 5);
+       const end = session.end_time.slice(0, 5);
+       scheduleByDay[dayLabel].push(`${start}-${end}`);
+    });
+
+    return scheduleByDay;
+  };
 
   return (
     <main className="bg-[#f8fafc] min-h-screen pb-20">
@@ -241,11 +271,7 @@ const Schedule: React.FC = () => {
 
                       {/* Stats Row */}
                       <div className="flex items-center justify-center gap-6 mb-5">
-                        <div className="flex flex-col items-center">
-                          <span className="text-lg font-black text-slate-800 flex items-center gap-1">⭐ {coach.rating || '5.0'}</span>
-                          <span className="text-[10px] text-slate-400 font-medium">Đánh giá</span>
-                        </div>
-                        <div className="w-px h-8 bg-slate-200"></div>
+
                         <div className="flex flex-col items-center">
                           <span className="text-lg font-black text-slate-800">{coach.students_count || '0'}</span>
                           <span className="text-[10px] text-slate-400 font-medium">Học sinh</span>
@@ -264,25 +290,23 @@ const Schedule: React.FC = () => {
                           <span className="text-lg font-black text-[#4E9F3D]">{coach.hourly_rate ? coach.hourly_rate.toLocaleString() : '250,000'}đ<span className="text-xs text-slate-400 font-medium">/giờ</span></span>
                         </div>
                         <div className="flex justify-between items-center">
-                          <span className="text-xs font-bold text-slate-500">Thử bài:</span>
+                          <span className="text-sm text-slate-600">Thuê bàn/giờ:</span>
                           <span className="text-sm font-black text-slate-600">{coach.trial_rate ? coach.trial_rate.toLocaleString() : '50,000'}đ<span className="text-xs text-slate-400 font-medium">/giờ</span></span>
                         </div>
                       </div>
 
-                      {/* Schedule */}
-                      {coach.schedule && (
+                      {/* Dynamic Schedule from Admin Panel */}
+                      {getCoachSchedule(coach.id) && (
                         <div className="text-xs font-bold text-slate-600 mb-4 space-y-1 text-left bg-slate-50 rounded-xl p-3">
-                          {Object.entries(coach.schedule).map(([day, times]: any) => (
+                          {Object.entries(getCoachSchedule(coach.id) || {}).map(([day, times]) => (
                             <div key={day} className="flex gap-2">
                               <span className="font-black text-[#4E9F3D] min-w-[24px]">{day}:</span>
-                              <span className="text-slate-500">{times}</span>
+                              <span className="text-slate-500">{(times as string[]).join(', ')}</span>
                             </div>
                           ))}
-                          {coach.additional_schedule && (
-                            <div className="text-blue-500 font-black">+{coach.additional_schedule}</div>
-                          )}
                         </div>
                       )}
+
 
                       {/* Action Buttons */}
                       <div className="flex gap-3 pt-4">
@@ -377,13 +401,7 @@ const Schedule: React.FC = () => {
             <div className="p-6 space-y-6">
               {/* Stats */}
               <div className="flex justify-around py-4 bg-slate-50 rounded-2xl">
-                <div className="text-center">
-                  <div className="flex items-center justify-center gap-1 text-xl font-black text-slate-800">
-                    <Star size={18} className="text-yellow-400 fill-yellow-400" />
-                    {selectedCoach.rating || '5.0'}
-                  </div>
-                  <p className="text-xs text-slate-400 font-medium">Đánh giá</p>
-                </div>
+
                 <div className="text-center">
                   <div className="text-xl font-black text-slate-800">{selectedCoach.students_count || '0'}</div>
                   <p className="text-xs text-slate-400 font-medium">Học sinh</p>
@@ -415,7 +433,7 @@ const Schedule: React.FC = () => {
                     </span>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-sm text-slate-600">Thử bài/giờ:</span>
+                    <span className="text-sm text-slate-600">Thuê bàn/giờ:</span>
                     <span className="text-lg font-black text-slate-600">
                       {selectedCoach.trial_rate ? selectedCoach.trial_rate.toLocaleString() : '50,000'}đ
                     </span>
@@ -423,15 +441,18 @@ const Schedule: React.FC = () => {
                 </div>
               </div>
 
-              {/* Schedule */}
-              {selectedCoach.schedule && (
+
+
+
+              {/* Dynamic Schedule in Modal */}
+              {getCoachSchedule(selectedCoach.id) && (
                 <div>
-                  <h4 className="font-black text-slate-800 mb-3">📅 Lịch dạy</h4>
+                  <h4 className="font-black text-slate-800 mb-3">📅 Lịch dạy (Cập nhật từ Admin)</h4>
                   <div className="bg-slate-50 rounded-xl p-4 space-y-2">
-                    {Object.entries(selectedCoach.schedule).map(([day, times]: any) => (
+                    {Object.entries(getCoachSchedule(selectedCoach.id) || {}).map(([day, times]) => (
                       <div key={day} className="flex gap-3 text-sm">
                         <span className="font-black text-[#4E9F3D] min-w-[30px]">{day}:</span>
-                        <span className="text-slate-600">{times}</span>
+                        <span className="text-slate-600">{(times as string[]).join(', ')}</span>
                       </div>
                     ))}
                   </div>
