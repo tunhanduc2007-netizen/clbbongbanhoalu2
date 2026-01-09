@@ -4,7 +4,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { PRODUCTS } from '../constants';
 import SEO from '../components/SEO';
 
-// --- DATA CONSTANTS ---
+// --- HẰNG SỐ DỮ LIỆU ---
 const SHOP_CATEGORIES = [
   { id: 'mat-vot', name: 'Mặt vợt', icon: Circle, color: '#E53935' },
   { id: 'cot-vot', name: 'Cốt vợt', icon: Layers, color: '#1E88E5' },
@@ -17,11 +17,12 @@ const SHOP_CATEGORIES = [
 
 const BRANDS = ['Butterfly', 'DHS', 'Stiga', 'Yasaka', 'Nittaku', 'Tibhar', 'Donic', 'Xiom'];
 
-// --- SUB-COMPONENT: ShopHeader ---
-// Moved outside to prevent full page re-renders on scroll
+// --- THÀNH PHẦN CON: ShopHeader ---
+// Được di chuyển ra ngoài để ngăn việc kết xuất lại toàn bộ trang khi cuộn
 const ShopHeader: React.FC = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isVisible, setIsVisible] = useState(true);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const location = useLocation();
   const lastScrollY = useRef(0);
 
@@ -30,19 +31,15 @@ const ShopHeader: React.FC = () => {
        const currentScrollY = window.scrollY;
        const splitOffset = 20;
 
-       // 1. Logic Shape Change (Gradient vs Pill)
        if (currentScrollY > splitOffset) {
          setIsScrolled(true);
        } else {
          setIsScrolled(false);
        }
 
-       // 2. Logic Smart Hide/Show
        if (currentScrollY > 100 && currentScrollY > lastScrollY.current) {
-         // Scrolling DOWN -> Hide
          setIsVisible(false);
        } else {
-         // Scrolling UP -> Show
          setIsVisible(true);
        }
 
@@ -73,8 +70,8 @@ const ShopHeader: React.FC = () => {
            ? 'rounded-full shadow-lg px-6 py-3' 
            : 'rounded-b-3xl px-6 py-4'
       }`}>
-        {/* Logo Area */}
-        <Link to="/" className="flex items-center gap-3 group">
+        {/* Khu vực Logo */}
+        <Link to="/" className="flex items-center gap-3 group" onClick={() => setIsMobileMenuOpen(false)}>
           <div className="w-14 h-14 rounded-full shadow-md overflow-hidden shrink-0">
             <picture>
               <source srcSet="/logo.webp" type="image/webp" />
@@ -87,7 +84,7 @@ const ShopHeader: React.FC = () => {
           </div>
         </Link>
 
-        {/* Main Navigation (Desktop) */}
+        {/* Điều hướng chính (Máy tính) */}
         <div className="hidden md:flex items-center gap-8">
           <ul className="flex items-center gap-8">
             {navItems.map((item) => (
@@ -112,13 +109,58 @@ const ShopHeader: React.FC = () => {
           </a>
         </div>
       </nav>
+
+      {/* Nút kích hoạt Menu Di động Ẩn (được kết nối với Điều hướng Dưới cùng) */}
+      <button
+        id="mobile-menu-btn"
+        onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+        className="hidden"
+        aria-hidden="true"
+      />
+
+      {/* Lớp phủ Menu Di động */}
+      <div 
+        className={`md:hidden fixed inset-0 bg-black/40 backdrop-blur-sm transition-opacity duration-300 z-[-1] ${
+          isMobileMenuOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
+        }`} 
+        onClick={() => setIsMobileMenuOpen(false)}
+      >
+        <div
+          className={`absolute top-24 right-4 left-4 glass rounded-3xl p-6 transition-transform duration-300 ${
+            isMobileMenuOpen ? 'translate-y-0 scale-100' : '-translate-y-10 scale-95'
+          }`}
+          onClick={e => e.stopPropagation()}
+        >
+          <ul className="space-y-2">
+            {navItems.map((item) => (
+              <li key={item.path}>
+                <Link
+                  to={item.path}
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className={`flex items-center justify-between p-4 rounded-2xl transition-all font-bold ${
+                    location.pathname === item.path
+                    ? 'bg-gradient-to-r from-[#7AC943] to-[#FFD800] text-white shadow-md'
+                    : 'bg-gray-50 text-gray-700 hover:bg-gray-100'
+                  }`}
+                >
+                  <span className="flex items-center gap-3">
+                    {/* Icons could be added here if imported, but text is fine */}
+                    {item.name}
+                  </span>
+                  <ChevronRight size={18} className="opacity-50" />
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
     </header>
   );
 };
 
 const Shop: React.FC = () => {
-  // --- STATE ---
-  // No longer tracking scroll here!
+  // --- TRẠNG THÁI ---
+  // Không còn theo dõi cuộn ở đây nữa!
   const [activeCategory, setActiveCategory] = useState('Tất cả');
   const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
   const [sortBy, setSortBy] = useState('Tên: A-Z');
@@ -126,7 +168,7 @@ const Shop: React.FC = () => {
 
   const sortOptions = ['Tên: A-Z', 'Tên: Z-A', 'Giá: Thấp-Cao', 'Giá: Cao-Thấp', 'Mới nhất'];
 
-  // --- LOGIC: FILTERING ---
+  // --- LOGIC: LỌC ---
   const toggleBrand = (brand: string) => {
     setSelectedBrands(prev => 
       prev.includes(brand) ? prev.filter(b => b !== brand) : [...prev, brand]
@@ -142,7 +184,7 @@ const Shop: React.FC = () => {
     ? PRODUCTS
     : PRODUCTS.filter(p => p.category === activeCategory);
 
-  // --- SCHEMA ---
+  // --- KHUNG DỮ LIỆU ---
   const shopSchema = {
     "@context": "https://schema.org",
     "@type": "Store",
@@ -169,7 +211,7 @@ const Shop: React.FC = () => {
         schema={shopSchema}
       />
 
-      {/* --- HEADER (ISOLATED COMPONENT) --- */}
+      {/* --- HEADER (THÀNH PHẦN RIÊNG BIỆT) --- */}
       <ShopHeader />
 
       {/* --- HERO SECTION (Cleaner, Less Glare) --- */}

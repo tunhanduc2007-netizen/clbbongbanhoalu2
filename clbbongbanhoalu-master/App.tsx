@@ -3,7 +3,7 @@ import React, { useState, useEffect, Suspense, lazy } from 'react';
 import { BrowserRouter, Routes, Route, Link, useLocation } from 'react-router-dom';
 import { Menu, X, ChevronRight, Table, Trophy, Users, Calendar, Image as ImageIcon, MessageSquare, ShoppingBag, Phone, Facebook, MessageCircle } from 'lucide-react';
 
-// Lazy load pages for code splitting - reduces initial bundle size
+// Tải trang lười (Lazy load) để chia nhỏ mã - giảm kích thước gói ban đầu
 const Home = lazy(() => import('./pages/Home'));
 const About = lazy(() => import('./pages/About'));
 const Schedule = lazy(() => import('./pages/Schedule'));
@@ -13,7 +13,7 @@ const Admin = lazy(() => import('./pages/Admin'));
 const Shop = lazy(() => import('./pages/Shop'));
 const AdminLogin = lazy(() => import('./pages/admin/AdminLogin'));
 
-// Skeleton Loader matching index.html to prevent CLS
+// Trình tải khung xương (Skeleton Loader) khớp với index.html để ngăn CLS
 const PageLoader = () => (
   <div className="relative h-[450px] bg-gradient-to-br from-[#7AC943] to-[#4E9F3D] rounded-b-[40px] flex items-center justify-center overflow-hidden">
     <div className="w-full max-w-[800px] px-5 text-center">
@@ -24,7 +24,7 @@ const PageLoader = () => (
   </div>
 );
 
-// Mobile Bottom Navigation for better accessibility (especially for older users)
+// Điều hướng dưới cùng trên di động để tăng khả năng truy cập (đặc biệt cho người lớn tuổi)
 const MobileBottomNav: React.FC<{ onMenuClick: () => void }> = ({ onMenuClick }) => {
   const location = useLocation();
   const isActive = (path: string) => location.pathname === path;
@@ -42,7 +42,7 @@ const MobileBottomNav: React.FC<{ onMenuClick: () => void }> = ({ onMenuClick })
           <span className="text-[10px] font-bold">Lịch tập</span>
         </Link>
 
-        {/* Center Call Button - Floating nicely */}
+        {/* Nút Gọi Giữa - Nổi đẹp mắt */}
         <div className="relative flex flex-col items-center justify-end pb-1.5 h-full">
           <a
             href="tel:0913909012"
@@ -68,7 +68,7 @@ const MobileBottomNav: React.FC<{ onMenuClick: () => void }> = ({ onMenuClick })
   );
 };
 
-// Layout Components
+// Thành phần Bố cục
 const Header: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -113,7 +113,7 @@ const Header: React.FC = () => {
           </div>
         </Link>
 
-        {/* Desktop Menu */}
+        {/* Menu Máy tính */}
         <ul className="hidden md:flex items-center gap-8">
           {navItems.map((item) => (
             <li key={item.path}>
@@ -132,14 +132,14 @@ const Header: React.FC = () => {
 
 
       </nav>
-      {/* Hidden Mobile Menu Trigger for Bottom Nav */}
+      {/* Nút kích hoạt Menu Di động Ẩn cho Điều hướng Dưới cùng */}
       <button
         id="mobile-menu-btn"
         onClick={() => setIsOpen(!isOpen)}
         className="hidden"
         aria-hidden="true"
       />
-      {/* Mobile Menu Overlay */}
+      {/* Lớp phủ Menu Di động */}
       <div className={`md:hidden fixed inset-0 bg-black/40 backdrop-blur-sm transition-opacity duration-300 ${isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`} onClick={() => setIsOpen(false)}>
         <div
           className={`absolute top-20 right-4 left-4 glass rounded-3xl p-6 transition-transform duration-300 ${isOpen ? 'translate-y-0 scale-100' : '-translate-y-10 scale-95'}`}
@@ -173,7 +173,7 @@ const Footer: React.FC = () => (
   <footer className="bg-gray-50 pt-16 pb-24 border-t border-gray-100">
     <div className="container mx-auto px-6 max-w-7xl">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-12 text-center md:text-left">
-        {/* Brand */}
+        {/* Thương hiệu */}
         <div className="flex flex-col items-center md:items-start space-y-6">
           <div className="w-24 h-24 rounded-full flex items-center justify-center shadow-xl p-2 overflow-hidden">
             <picture>
@@ -189,7 +189,7 @@ const Footer: React.FC = () => (
           </div>
         </div>
 
-        {/* Navigation */}
+        {/* Điều hướng */}
         <nav className="flex flex-col space-y-4">
           <h4 className="font-bold text-gray-800">Liên kết nhanh</h4>
           <Link to="/about" className="text-gray-500 hover:text-[#7AC943] transition-colors">Giới thiệu về CLB</Link>
@@ -198,21 +198,21 @@ const Footer: React.FC = () => (
           <Link to="/register" className="text-gray-500 hover:text-[#7AC943] transition-colors">Đăng ký hội viên</Link>
         </nav>
 
-        {/* Contact */}
+        {/* Liên hệ */}
         <div className="flex flex-col space-y-4">
           <h4 className="font-bold text-gray-800">Liên hệ</h4>
           <p className="text-gray-600 text-sm">2 Đinh Tiên Hoàng, Đa Kao, Quận 1, Thành phố Hồ Chí Minh (Trung tâm TDTT Hoa Lư)</p>
           <p className="text-gray-600 text-sm">Hotline: 0913.909.012</p>
           <div className="flex gap-4 justify-center md:justify-start pt-2">
-            {/* Phone Call Logo - Green and White */}
+            {/* Logo Gọi điện thoại - Xanh lá và Trắng */}
             <a href="tel:0913909012" aria-label="Gọi điện thoại" title="Gọi điện thoại" className="w-10 h-10 rounded-full bg-[#7AC943] text-white shadow-sm flex items-center justify-center hover:scale-110 transition-all">
               <Phone size={20} fill="currentColor" />
             </a>
-            {/* Zalo Logo - Green */}
+            {/* Logo Zalo - Xanh lá */}
             <a href="https://zalo.me/0913909012" aria-label="Chat Zalo" target="_blank" rel="noopener noreferrer" title="Chat Zalo" className="w-10 h-10 rounded-full bg-[#4E9F3D] text-white shadow-sm flex items-center justify-center hover:scale-110 transition-all">
               <MessageCircle size={22} fill="currentColor" />
             </a>
-            {/* FB Logo - Official Blue */}
+            {/* Logo FB - Xanh dương chính thức */}
             <a href="https://facebook.com" aria-label="Facebook Fanpage" target="_blank" rel="noopener noreferrer" title="Facebook" className="w-10 h-10 rounded-full bg-[#1877F2] text-white shadow-sm flex items-center justify-center hover:scale-110 transition-all">
               <Facebook size={20} fill="currentColor" />
             </a>
