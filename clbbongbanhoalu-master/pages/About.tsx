@@ -26,7 +26,7 @@ const About: React.FC = () => {
       />
       <header className="mb-10 text-center">
         <h1 className="text-3xl font-black text-gray-900 mb-2">Về CLB Hoa Lư</h1>
-        <div className="w-20 h-1.5 bg-[#7AC943] mx-auto rounded-full"></div>
+        <div className="w-20 h-1.5 bg-[#bdffff] mx-auto rounded-full"></div>
         <p className="text-gray-500 mt-4 max-w-lg mx-auto text-sm">
           Điểm đến mới dành cho những người yêu thích bóng bàn - nơi bạn có thể tập luyện, giao lưu và phát triển kỹ năng.
         </p>
@@ -37,12 +37,12 @@ const About: React.FC = () => {
         <h2 className="sr-only">Khởi đầu</h2>
 
         <article className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
-          <div className="flex items-center justify-center w-10 h-10 rounded-full border border-white bg-[#7AC943] text-white shadow shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2">
+          <div className="flex items-center justify-center w-10 h-10 rounded-full border border-white bg-[#0891b2] text-white shadow shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2">
             <span className="font-bold">26</span>
           </div>
           <div className="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] glass p-6 rounded-3xl shadow-sm border border-gray-100 transition-all hover:scale-[1.02]">
             <div className="flex items-center justify-between mb-2">
-              <time className="font-bold text-[#4E9F3D]">2026 - Khởi đầu hành trình</time>
+              <time className="font-bold text-[#0891b2]">2026 - Khởi đầu hành trình</time>
             </div>
             <h3 className="text-gray-800 font-bold mb-1">Chính thức thành lập</h3>
             <p className="text-gray-500 text-sm">CLB Bóng bàn Hoa Lư được thành lập với sứ mệnh mang đến môi trường tập luyện chuyên nghiệp, hiện đại cho những người yêu thích bóng bàn tại khu vực.</p>
@@ -56,23 +56,23 @@ const About: React.FC = () => {
           Mục tiêu phát triển 🎯
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <article className="bg-gradient-to-br from-[#7AC943]/5 to-transparent p-6 rounded-3xl border border-[#7AC943]/10 shadow-sm">
-            <div className="text-xs font-bold text-[#4E9F3D] uppercase tracking-wider mb-1">2026</div>
+          <article className="bg-gradient-to-br from-[#bdffff]/5 to-transparent p-6 rounded-3xl border border-[#bdffff]/20 shadow-sm">
+            <div className="text-xs font-bold text-[#0891b2] uppercase tracking-wider mb-1">2026</div>
             <h3 className="text-lg font-bold text-gray-800 mb-2">Xây dựng nền tảng</h3>
             <p className="text-sm text-gray-600 leading-relaxed">Hoàn thiện cơ sở vật chất, thu hút hội viên và xây dựng đội ngũ huấn luyện viên chất lượng.</p>
           </article>
-          <article className="bg-gradient-to-br from-[#7AC943]/5 to-transparent p-6 rounded-3xl border border-[#7AC943]/10 shadow-sm">
-            <div className="text-xs font-bold text-[#4E9F3D] uppercase tracking-wider mb-1">2027</div>
+          <article className="bg-gradient-to-br from-[#bdffff]/5 to-transparent p-6 rounded-3xl border border-[#bdffff]/20 shadow-sm">
+            <div className="text-xs font-bold text-[#0891b2] uppercase tracking-wider mb-1">2027</div>
             <h3 className="text-lg font-bold text-gray-800 mb-2">Mở rộng cộng đồng</h3>
             <p className="text-sm text-gray-600 leading-relaxed">Tổ chức các giải đấu giao lưu, phát triển chương trình đào tạo trẻ em và mở rộng mạng lưới hội viên.</p>
           </article>
-          <article className="bg-gradient-to-br from-[#7AC943]/5 to-transparent p-6 rounded-3xl border border-[#7AC943]/10 shadow-sm">
-            <div className="text-xs font-bold text-[#4E9F3D] uppercase tracking-wider mb-1">2028</div>
+          <article className="bg-gradient-to-br from-[#bdffff]/5 to-transparent p-6 rounded-3xl border border-[#bdffff]/20 shadow-sm">
+            <div className="text-xs font-bold text-[#0891b2] uppercase tracking-wider mb-1">2028</div>
             <h3 className="text-lg font-bold text-gray-800 mb-2">Tham gia thi đấu</h3>
             <p className="text-sm text-gray-600 leading-relaxed">Đưa các vận động viên tham gia các giải đấu cấp thành phố và khu vực.</p>
           </article>
-          <article className="bg-gradient-to-br from-[#7AC943]/5 to-transparent p-6 rounded-3xl border border-[#7AC943]/10 shadow-sm">
-            <div className="text-xs font-bold text-[#4E9F3D] uppercase tracking-wider mb-1">2030</div>
+          <article className="bg-gradient-to-br from-[#bdffff]/5 to-transparent p-6 rounded-3xl border border-[#bdffff]/20 shadow-sm">
+            <div className="text-xs font-bold text-[#0891b2] uppercase tracking-wider mb-1">2030</div>
             <h3 className="text-lg font-bold text-gray-800 mb-2">Vươn tầm chuyên nghiệp</h3>
             <p className="text-sm text-gray-600 leading-relaxed">Trở thành một trong những CLB bóng bàn uy tín hàng đầu khu vực với đội ngũ VĐV đạt thành tích cao.</p>
           </article>

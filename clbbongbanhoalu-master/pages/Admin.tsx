@@ -8,6 +8,7 @@ import {
 import SEO from '../components/SEO';
 import { Chart, registerables } from 'chart.js';
 import * as XLSX from 'xlsx';
+import logo from '../src/assets/logo.png';
 import { Card, Button, BottomSheet, StatsCard, BottomNav } from '../components/ui';
 import { formatCurrency, formatTime, calculatePrice, PRICE_PER_PERSON, ADMIN_CONFIG, formatDuration } from '../utils/helpers';
 
@@ -674,13 +675,13 @@ export default function Admin() {
 
     if (!isLoggedIn) {
         return (
-            <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-emerald-50 flex items-center justify-center p-4">
-                <div className="bg-white p-8 md:p-10 rounded-3xl shadow-2xl shadow-emerald-500/10 w-full max-w-md text-center border border-emerald-100">
-                    <div className="w-20 h-20 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-2xl mx-auto flex items-center justify-center shadow-xl shadow-emerald-500/30 mb-6">
+            <div className="min-h-screen bg-gradient-to-br from-cyan-50 via-white to-cyan-50 flex items-center justify-center p-4">
+                <div className="bg-white p-8 md:p-10 rounded-3xl shadow-2xl shadow-cyan-500/10 w-full max-w-md text-center border border-cyan-100">
+                    <div className="w-20 h-20 bg-gradient-to-br from-cyan-500 to-cyan-600 rounded-2xl mx-auto flex items-center justify-center shadow-xl shadow-cyan-500/30 mb-6">
                         <LayoutDashboard size={36} className="text-white" />
                     </div>
                     <h2 className="text-2xl md:text-3xl font-black text-slate-800 tracking-tight">CLB Bóng Bàn</h2>
-                    <p className="text-emerald-600 font-bold text-sm mt-1">Hoa Lư - Admin Panel</p>
+                    <p className="text-cyan-600 font-bold text-sm mt-1">Hoa Lư - Admin Panel</p>
                     <form className="mt-8 space-y-4" onSubmit={async (e) => {
                         e.preventDefault();
                         setIsSubmitting(true);
@@ -709,13 +710,13 @@ export default function Admin() {
                     }}>
                         <div>
                             <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block text-left mb-2 ml-1">Tài khoản</label>
-                            <input name="user" type="text" placeholder="Nhập tên đăng nhập" className="w-full p-4 bg-slate-50 rounded-2xl outline-none border-2 border-transparent focus:border-emerald-500/30 focus:bg-white transition-all font-medium" required />
+                            <input name="user" type="text" placeholder="Nhập tên đăng nhập" className="w-full p-4 bg-slate-50 rounded-2xl outline-none border-2 border-transparent focus:border-cyan-500/30 focus:bg-white transition-all font-medium" required />
                         </div>
                         <div>
                             <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block text-left mb-2 ml-1">Mật khẩu</label>
-                            <input name="pass" type="password" placeholder="••••••" className="w-full p-4 bg-slate-50 rounded-2xl outline-none border-2 border-transparent focus:border-emerald-500/30 focus:bg-white transition-all font-medium" required />
+                            <input name="pass" type="password" placeholder="••••••" className="w-full p-4 bg-slate-50 rounded-2xl outline-none border-2 border-transparent focus:border-cyan-500/30 focus:bg-white transition-all font-medium" required />
                         </div>
-                        <button type="submit" disabled={isSubmitting} className="w-full bg-emerald-600 hover:bg-emerald-700 text-white p-4 rounded-2xl font-bold flex items-center justify-center gap-2 mt-6 shadow-xl shadow-emerald-500/30 disabled:opacity-50 transition-all active:scale-[0.98]">
+                        <button type="submit" disabled={isSubmitting} className="w-full bg-cyan-600 hover:bg-cyan-700 text-white p-4 rounded-2xl font-bold flex items-center justify-center gap-2 mt-6 shadow-xl shadow-cyan-500/30 disabled:opacity-50 transition-all active:scale-[0.98]">
                             {isSubmitting ? (
                                 <span className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
                             ) : (
@@ -733,15 +734,15 @@ export default function Admin() {
             <SEO title="Tổng Quan Tài Chính" description="Admin Dashboard" />
 
             {/* Header - Mobile Optimized */}
-            <header className={`py-4 px-4 md:px-8 sticky top-0 z-[100] shadow-xl transition-colors ${darkMode ? 'bg-slate-800 shadow-slate-900/50' : 'bg-gradient-to-r from-emerald-600 to-emerald-700 shadow-emerald-600/20'}`}>
+            <header className={`py-4 px-4 md:px-8 sticky top-0 z-[100] shadow-xl transition-colors ${darkMode ? 'bg-slate-800 shadow-slate-900/50' : 'bg-gradient-to-r from-cyan-600 to-cyan-700 shadow-cyan-600/20'}`}>
                 <div className="max-w-[1600px] mx-auto flex justify-between items-center">
                     <div className="flex items-center gap-3">
                         <div className="w-10 h-10 rounded-full overflow-hidden">
-                            <img src="/logo.png" alt="Logo CLB Hoa Lư" className="w-full h-full object-cover scale-110" />
+                            <img src={logo} alt="Logo CLB Hoa Lư" className="w-full h-full object-cover scale-110" />
                         </div>
                         <div>
                             <span className="font-black text-lg tracking-tight block leading-tight text-white">Hoa Lư</span>
-                            <span className={`text-[10px] font-bold uppercase tracking-wider ${darkMode ? 'text-emerald-400' : 'text-emerald-100'}`}>Admin Panel</span>
+                            <span className={`text-[10px] font-bold uppercase tracking-wider ${darkMode ? 'text-cyan-400' : 'text-cyan-100'}`}>Admin Panel</span>
                         </div>
                     </div>
                     <div className="flex items-center gap-2 md:gap-3">
@@ -755,8 +756,8 @@ export default function Admin() {
                         </button>
                         <div className="hidden md:block text-right">
                             <div className="text-sm font-bold text-white">{user?.full_name || 'Admin'}</div>
-                            <div className={`text-[10px] font-bold uppercase tracking-wider flex items-center gap-1 justify-end ${darkMode ? 'text-emerald-400' : 'text-emerald-200'}`}>
-                                <span className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse"></span> Online
+                            <div className={`text-[10px] font-bold uppercase tracking-wider flex items-center gap-1 justify-end ${darkMode ? 'text-cyan-400' : 'text-cyan-200'}`}>
+                                <span className="w-1.5 h-1.5 bg-cyan-400 rounded-full animate-pulse"></span> Online
                             </div>
                         </div>
                         <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center font-black text-sm border-2 border-white/30 backdrop-blur-sm">
@@ -782,20 +783,20 @@ export default function Admin() {
                         <div className="flex gap-3 mt-4 overflow-x-auto pb-2 no-scrollbar">
                             <button
                                 onClick={() => setActiveTab('finance')}
-                                className={`px-5 py-3 rounded-2xl font-bold text-sm flex items-center gap-2 transition-all whitespace-nowrap ${activeTab === 'finance' ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-500/30' : darkMode ? 'bg-slate-800 text-slate-300 hover:bg-slate-700 border border-slate-700' : 'bg-white text-slate-500 hover:bg-slate-50 border border-slate-100'}`}
+                                className={`px-5 py-3 rounded-2xl font-bold text-sm flex items-center gap-2 transition-all whitespace-nowrap ${activeTab === 'finance' ? 'bg-cyan-600 text-white shadow-lg shadow-cyan-500/30' : darkMode ? 'bg-slate-800 text-slate-300 hover:bg-slate-700 border border-slate-700' : 'bg-white text-slate-500 hover:bg-slate-50 border border-slate-100'}`}
                             >
                                 <Wallet size={18} /> Tài Chính
                             </button>
                             <button
                                 onClick={() => setActiveTab('tables')}
-                                className={`px-5 py-3 rounded-2xl font-bold text-sm flex items-center gap-2 transition-all whitespace-nowrap ${activeTab === 'tables' ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-500/30' : darkMode ? 'bg-slate-800 text-slate-300 hover:bg-slate-700 border border-slate-700' : 'bg-white text-slate-500 hover:bg-slate-50 border border-slate-100'}`}
+                                className={`px-5 py-3 rounded-2xl font-bold text-sm flex items-center gap-2 transition-all whitespace-nowrap ${activeTab === 'tables' ? 'bg-cyan-600 text-white shadow-lg shadow-cyan-500/30' : darkMode ? 'bg-slate-800 text-slate-300 hover:bg-slate-700 border border-slate-700' : 'bg-white text-slate-500 hover:bg-slate-50 border border-slate-100'}`}
                             >
                                 <LayoutDashboard size={18} /> Quản Lý Bàn
                             </button>
                             {isOwner && (
                                 <button
                                     onClick={() => setActiveTab('schedule')}
-                                    className={`px-5 py-3 rounded-2xl font-bold text-sm flex items-center gap-2 transition-all whitespace-nowrap ${activeTab === 'schedule' ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-500/30' : darkMode ? 'bg-slate-800 text-slate-300 hover:bg-slate-700 border border-slate-700' : 'bg-white text-slate-500 hover:bg-slate-50 border border-slate-100'}`}
+                                    className={`px-5 py-3 rounded-2xl font-bold text-sm flex items-center gap-2 transition-all whitespace-nowrap ${activeTab === 'schedule' ? 'bg-cyan-600 text-white shadow-lg shadow-cyan-500/30' : darkMode ? 'bg-slate-800 text-slate-300 hover:bg-slate-700 border border-slate-700' : 'bg-white text-slate-500 hover:bg-slate-50 border border-slate-100'}`}
                                 >
                                     <Calendar size={18} /> Lịch Tập
                                 </button>
@@ -809,7 +810,7 @@ export default function Admin() {
                                 <select
                                     value={timeRange}
                                     onChange={(e) => setTimeRange(e.target.value)}
-                                    className={`appearance-none shadow-sm rounded-2xl px-5 py-3 pr-12 font-bold text-sm outline-none cursor-pointer focus:ring-2 focus:ring-emerald-500/20 transition-all ${darkMode ? 'bg-slate-800 border border-slate-700 text-slate-200' : 'bg-white border border-slate-100 text-slate-600'}`}
+                                    className={`appearance-none shadow-sm rounded-2xl px-5 py-3 pr-12 font-bold text-sm outline-none cursor-pointer focus:ring-2 focus:ring-cyan-500/20 transition-all ${darkMode ? 'bg-slate-800 border border-slate-700 text-slate-200' : 'bg-white border border-slate-100 text-slate-600'}`}
                                 >
                                     <option value="today">Hôm nay</option>
                                     <option value="week">Tuần này</option>
@@ -820,7 +821,7 @@ export default function Admin() {
                             </div>
                             {isOwner && (
                                 <button onClick={exportExcel} className={`flex items-center gap-2 px-5 py-3 rounded-2xl shadow-sm text-sm font-bold transition-all ${darkMode ? 'bg-slate-800 border border-slate-700 text-slate-200 hover:bg-slate-700' : 'bg-white border border-slate-100 text-slate-600 hover:bg-slate-50'}`}>
-                                    <FileSpreadsheet size={18} className="text-emerald-500" /> Xuất Excel
+                                    <FileSpreadsheet size={18} className="text-cyan-500" /> Xuất Excel
                                 </button>
                             )}
                         </div>
@@ -833,7 +834,7 @@ export default function Admin() {
                         <h1 className={`text-xl font-black mb-4 ${darkMode ? 'text-slate-100' : 'text-slate-800'}`}>Quản Lý Bàn</h1>
                         <div className="flex gap-3 overflow-x-auto no-scrollbar pb-2">
                             <div className={`flex-shrink-0 rounded-2xl p-4 border min-w-[120px] ${darkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-100'}`}>
-                                <div className="flex items-center gap-2 text-emerald-500 mb-1">
+                                <div className="flex items-center gap-2 text-cyan-500 mb-1">
                                     <LayoutDashboard size={16} />
                                     <span className={`text-xs font-bold ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>Đang chơi</span>
                                 </div>
@@ -879,14 +880,14 @@ export default function Admin() {
                                             }
                                         }}
                                         className={`relative min-h-[140px] md:min-h-[160px] rounded-2xl p-4 md:p-5 cursor-pointer transition-all border-2 
-                                            ${selectedTable?.id === t.id ? 'ring-4 ring-offset-2 ring-emerald-500 scale-[1.02] z-10' : 'hover:scale-[1.02] active:scale-[0.98]'} 
+                                            ${selectedTable?.id === t.id ? 'ring-4 ring-offset-2 ring-cyan-500 scale-[1.02] z-10' : 'hover:scale-[1.02] active:scale-[0.98]'} 
                                             ${t.status === 'occupied'
-                                                ? 'bg-gradient-to-br from-emerald-500 to-emerald-600 text-white border-emerald-500 shadow-lg shadow-emerald-500/30'
+                                                ? 'bg-gradient-to-br from-cyan-500 to-cyan-600 text-white border-cyan-500 shadow-lg shadow-cyan-500/30'
                                                 : t.status === 'paused'
                                                     ? darkMode ? 'bg-amber-900/30 border-amber-700' : 'bg-amber-50 border-amber-300'
                                                     : t.status === 'reserved'
                                                         ? darkMode ? 'bg-orange-900/30 border-orange-700' : 'bg-white border-orange-200'
-                                                        : darkMode ? 'bg-slate-800 border-slate-700 hover:border-emerald-600' : 'bg-white border-slate-100 hover:border-emerald-200'} 
+                                                        : darkMode ? 'bg-slate-800 border-slate-700 hover:border-cyan-600' : 'bg-white border-slate-100 hover:border-cyan-200'} 
                                             ${t.isTemp ? 'opacity-70 border-dashed' : ''} ${t.isTemp && darkMode ? 'border-slate-600' : t.isTemp ? 'border-slate-300' : ''}`}
                                     >
                                         <div className="flex justify-between items-start">
@@ -894,14 +895,14 @@ export default function Admin() {
                                                 {t.table_number < 10 ? `0${t.table_number}` : t.table_number}
                                             </span>
                                             <div className={`w-2.5 h-2.5 rounded-full 
-                                                ${t.status === 'occupied' ? 'bg-white animate-pulse' : t.status === 'paused' ? 'bg-amber-400' : t.isTemp ? 'bg-slate-500' : 'bg-emerald-400'}`}
+                                                ${t.status === 'occupied' ? 'bg-white animate-pulse' : t.status === 'paused' ? 'bg-amber-400' : t.isTemp ? 'bg-slate-500' : 'bg-cyan-400'}`}
                                             />
                                         </div>
 
                                         <div className="mt-4 md:mt-6">
                                             {t.status === 'occupied' ? (
                                                 <>
-                                                    <div className="text-[10px] md:text-xs text-emerald-100 truncate flex items-center gap-1">
+                                                    <div className="text-[10px] md:text-xs text-cyan-100 truncate flex items-center gap-1">
                                                         {t.table_number >= 10 ? (
                                                             <><Clock size={10} /> 70k/giờ</>
                                                         ) : (
@@ -912,7 +913,7 @@ export default function Admin() {
                                                     <div className="text-lg md:text-xl font-black text-white mt-1 font-mono tracking-wider">
                                                         {formatDurationHMS(t.start_time, currentTime)}
                                                     </div>
-                                                    <div className="text-[10px] text-emerald-200 font-bold mt-0.5">
+                                                    <div className="text-[10px] text-cyan-200 font-bold mt-0.5">
                                                         {calculateTableFee(t).toLocaleString()}đ
                                                     </div>
                                                 </>
@@ -958,7 +959,7 @@ export default function Admin() {
                                                 <button onClick={() => setSelectedTable(null)} className={`lg:hidden w-10 h-10 rounded-full flex items-center justify-center touch-target ${darkMode ? 'bg-slate-700 text-slate-300' : 'bg-slate-100 text-slate-500'}`}>
                                                     <CloseIcon size={20} />
                                                 </button>
-                                                <div className={`w-11 h-11 rounded-2xl flex items-center justify-center text-white shadow-lg ${selectedTable.status === 'occupied' ? 'bg-emerald-600 shadow-emerald-500/30' : darkMode ? 'bg-slate-700 text-slate-400' : 'bg-slate-200 text-slate-400'}`}>
+                                                <div className={`w-11 h-11 rounded-2xl flex items-center justify-center text-white shadow-lg ${selectedTable.status === 'occupied' ? 'bg-cyan-600 shadow-cyan-500/30' : darkMode ? 'bg-slate-700 text-slate-400' : 'bg-slate-200 text-slate-400'}`}>
                                                     <LayoutDashboard size={22} />
                                                 </div>
                                             </div>
@@ -971,7 +972,7 @@ export default function Admin() {
                                                     <label className={`text-[10px] font-bold uppercase tracking-widest ml-1 ${darkMode ? 'text-slate-400' : 'text-slate-400'}`}>Tên khách hàng</label>
                                                     <input
                                                         type="text"
-                                                        className={`w-full p-3 border-none rounded-xl mt-2 font-bold outline-none shadow-sm focus:ring-2 ring-emerald-500/20 transition-all ${darkMode ? 'bg-slate-700 text-slate-100 placeholder-slate-400' : 'bg-white text-slate-800'}`}
+                                                        className={`w-full p-3 border-none rounded-xl mt-2 font-bold outline-none shadow-sm focus:ring-2 ring-cyan-500/20 transition-all ${darkMode ? 'bg-slate-700 text-slate-100 placeholder-slate-400' : 'bg-white text-slate-800'}`}
                                                         placeholder="Nhập tên khách..."
                                                         value={playerNameInput}
                                                         onChange={(e) => setPlayerNameInput(e.target.value)}
@@ -988,8 +989,8 @@ export default function Admin() {
                                                             <button
                                                                 onClick={() => setPlayerCountInput(2)}
                                                                 className={`h-14 rounded-xl border-2 flex flex-col items-center justify-center transition-all ${playerCountInput === 2
-                                                                    ? (darkMode ? 'border-emerald-500 bg-emerald-500/20 text-emerald-400' : 'border-emerald-500 bg-emerald-50 text-emerald-700')
-                                                                    : (darkMode ? 'border-slate-600 bg-slate-700 text-slate-400 hover:border-emerald-500/50' : 'border-slate-200 bg-white text-slate-500 hover:border-emerald-200')
+                                                                    ? (darkMode ? 'border-cyan-500 bg-cyan-500/20 text-cyan-400' : 'border-cyan-500 bg-cyan-50 text-cyan-700')
+                                                                    : (darkMode ? 'border-slate-600 bg-slate-700 text-slate-400 hover:border-cyan-500/50' : 'border-slate-200 bg-white text-slate-500 hover:border-cyan-200')
                                                                     }`}
                                                             >
                                                                 <Users size={16} className="mb-0.5" />
@@ -999,8 +1000,8 @@ export default function Admin() {
                                                             <button
                                                                 onClick={() => setPlayerCountInput(3)}
                                                                 className={`h-14 rounded-xl border-2 flex flex-col items-center justify-center transition-all ${playerCountInput === 3
-                                                                    ? (darkMode ? 'border-emerald-500 bg-emerald-500/20 text-emerald-400' : 'border-emerald-500 bg-emerald-50 text-emerald-700')
-                                                                    : (darkMode ? 'border-slate-600 bg-slate-700 text-slate-400 hover:border-emerald-500/50' : 'border-slate-200 bg-white text-slate-500 hover:border-emerald-200')
+                                                                    ? (darkMode ? 'border-cyan-500 bg-cyan-500/20 text-cyan-400' : 'border-cyan-500 bg-cyan-50 text-cyan-700')
+                                                                    : (darkMode ? 'border-slate-600 bg-slate-700 text-slate-400 hover:border-cyan-500/50' : 'border-slate-200 bg-white text-slate-500 hover:border-cyan-200')
                                                                     }`}
                                                             >
                                                                 <Users size={16} className="mb-0.5" />
@@ -1010,8 +1011,8 @@ export default function Admin() {
                                                             <button
                                                                 onClick={() => setPlayerCountInput(4)}
                                                                 className={`h-14 rounded-xl border-2 flex flex-col items-center justify-center transition-all ${playerCountInput === 4
-                                                                    ? (darkMode ? 'border-emerald-500 bg-emerald-500/20 text-emerald-400' : 'border-emerald-500 bg-emerald-50 text-emerald-700')
-                                                                    : (darkMode ? 'border-slate-600 bg-slate-700 text-slate-400 hover:border-emerald-500/50' : 'border-slate-200 bg-white text-slate-500 hover:border-emerald-200')
+                                                                    ? (darkMode ? 'border-cyan-500 bg-cyan-500/20 text-cyan-400' : 'border-cyan-500 bg-cyan-50 text-cyan-700')
+                                                                    : (darkMode ? 'border-slate-600 bg-slate-700 text-slate-400 hover:border-cyan-500/50' : 'border-slate-200 bg-white text-slate-500 hover:border-cyan-200')
                                                                     }`}
                                                             >
                                                                 <Users size={16} className="mb-0.5" />
@@ -1032,7 +1033,7 @@ export default function Admin() {
                                                                 <span className={`w-8 text-center font-black text-lg ${darkMode ? 'text-slate-200' : 'text-slate-800'}`}>{playerCountInput}</span>
                                                                 <button
                                                                     onClick={() => setPlayerCountInput(playerCountInput + 1)}
-                                                                    className={`w-9 h-9 flex items-center justify-center rounded-lg transition-colors touch-target ${darkMode ? 'bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30' : 'bg-emerald-100 text-emerald-700 hover:bg-emerald-200'}`}
+                                                                    className={`w-9 h-9 flex items-center justify-center rounded-lg transition-colors touch-target ${darkMode ? 'bg-cyan-500/20 text-cyan-400 hover:bg-cyan-500/30' : 'bg-cyan-100 text-cyan-700 hover:bg-cyan-200'}`}
                                                                 >
                                                                     <Plus size={16} />
                                                                 </button>
@@ -1052,12 +1053,12 @@ export default function Admin() {
 
                                                 {/* Price Preview - Chỉ cho bàn 1-9 */}
                                                 {selectedTable.table_number < 10 && (
-                                                    <div className={`flex justify-between items-center p-4 rounded-2xl border ${darkMode ? 'bg-emerald-500/10 border-emerald-500/20' : 'bg-emerald-50 border-emerald-100'}`}>
+                                                    <div className={`flex justify-between items-center p-4 rounded-2xl border ${darkMode ? 'bg-cyan-500/10 border-cyan-500/20' : 'bg-cyan-50 border-cyan-100'}`}>
                                                         <div>
-                                                            <span className="text-xs font-bold text-emerald-600 uppercase tracking-wider block">Tạm tính</span>
-                                                            <span className="text-[10px] text-emerald-500">{playerCountInput} × 40,000đ</span>
+                                                            <span className="text-xs font-bold text-cyan-600 uppercase tracking-wider block">Tạm tính</span>
+                                                            <span className="text-[10px] text-cyan-500">{playerCountInput} × 40,000đ</span>
                                                         </div>
-                                                        <span className="text-2xl font-black text-emerald-700">{(playerCountInput * 40000).toLocaleString()}đ</span>
+                                                        <span className="text-2xl font-black text-cyan-700">{(playerCountInput * 40000).toLocaleString()}đ</span>
                                                     </div>
                                                 )}
 
@@ -1069,7 +1070,7 @@ export default function Admin() {
                                                         });
                                                         setPlayerCountInput(2); // Reset về mặc định
                                                     }}
-                                                    className="w-full py-5 bg-emerald-600 text-white rounded-2xl font-bold shadow-xl shadow-emerald-500/30 hover:bg-emerald-700 transition-all active:scale-[0.98] text-lg flex items-center justify-center gap-3"
+                                                    className="w-full py-5 bg-cyan-600 text-white rounded-2xl font-bold shadow-xl shadow-cyan-500/30 hover:bg-cyan-700 transition-all active:scale-[0.98] text-lg flex items-center justify-center gap-3"
                                                 >
                                                     <Play size={22} fill="currentColor" /> Bắt đầu chơi
                                                 </button>
@@ -1077,16 +1078,16 @@ export default function Admin() {
                                         ) : (
                                             <div className="flex flex-col h-full animate-fade-in">
                                                 {/* Timer Display */}
-                                                <div className="bg-gradient-to-br from-emerald-600 to-emerald-700 rounded-2xl p-5 text-white shadow-xl shadow-emerald-500/30 mb-5 relative overflow-hidden">
+                                                <div className="bg-gradient-to-br from-cyan-600 to-cyan-700 rounded-2xl p-5 text-white shadow-xl shadow-cyan-500/30 mb-5 relative overflow-hidden">
                                                     <div className="relative z-10 flex justify-between items-end">
                                                         <div>
-                                                            <div className="text-[10px] font-bold text-emerald-200 uppercase tracking-widest mb-1 flex items-center gap-1.5">
+                                                            <div className="text-[10px] font-bold text-cyan-200 uppercase tracking-widest mb-1 flex items-center gap-1.5">
                                                                 <Clock size={12} /> Thời gian
                                                             </div>
                                                             <div className="text-3xl md:text-4xl font-black font-mono tracking-wider text-white">
                                                                 {formatDurationHMS(selectedTable.start_time, currentTime)}
                                                             </div>
-                                                            <div className="text-[10px] text-emerald-200 mt-1 flex items-center gap-1">
+                                                            <div className="text-[10px] text-cyan-200 mt-1 flex items-center gap-1">
                                                                 {selectedTable.table_number >= 10 ? (
                                                                     <><Clock size={10} /> Tính theo giờ</>
                                                                 ) : (
@@ -1095,9 +1096,9 @@ export default function Admin() {
                                                             </div>
                                                         </div>
                                                         <div className="text-right">
-                                                            <div className="text-[10px] font-bold text-emerald-200 uppercase tracking-widest mb-1">Tạm tính</div>
+                                                            <div className="text-[10px] font-bold text-cyan-200 uppercase tracking-widest mb-1">Tạm tính</div>
                                                             <div className="text-xl font-bold text-white">{calculateTableFee(selectedTable).toLocaleString()}đ</div>
-                                                            <div className="text-[10px] text-emerald-200">
+                                                            <div className="text-[10px] text-cyan-200">
                                                                 {selectedTable.table_number >= 10
                                                                     ? '70,000đ/giờ'
                                                                     : `${selectedTable.player_count || 2} × 40,000đ`
@@ -1145,7 +1146,7 @@ export default function Admin() {
                                                                         <span className="text-sm font-black w-4 text-center">{qty}</span>
                                                                         <button
                                                                             onClick={() => handleTableAction('update_service', { item: item.name, price: item.price, qty: 1 })}
-                                                                            className="w-8 h-8 flex items-center justify-center rounded-md bg-emerald-600 text-white hover:bg-emerald-700 shadow-sm touch-target"
+                                                                            className="w-8 h-8 flex items-center justify-center rounded-md bg-cyan-600 text-white hover:bg-cyan-700 shadow-sm touch-target"
                                                                         >
                                                                             <Plus size={14} />
                                                                         </button>
@@ -1157,7 +1158,7 @@ export default function Admin() {
                                                 </div>
 
                                                 {/* Bill Summary Footer */}
-                                                <div className={`mt-auto p-4 rounded-2xl space-y-2 border ${darkMode ? 'bg-emerald-900/20 border-emerald-800' : 'bg-emerald-50 border-emerald-100'}`}>
+                                                <div className={`mt-auto p-4 rounded-2xl space-y-2 border ${darkMode ? 'bg-cyan-900/20 border-cyan-800' : 'bg-cyan-50 border-cyan-100'}`}>
                                                     <div className={`flex justify-between text-sm ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>
                                                         <span>{selectedTable.table_number >= 10 ? `Tiền giờ` : 'Phí lượt chơi'}</span>
                                                         <span className="font-bold">{calculateTableFee(selectedTable).toLocaleString()}đ</span>
@@ -1166,15 +1167,15 @@ export default function Admin() {
                                                         <span>Dịch vụ ({selectedTable.services?.reduce((acc: any, cur: any) => acc + cur.qty, 0) || 0})</span>
                                                         <span className="font-bold">{(calculateTotal(selectedTable) - calculateTableFee(selectedTable)).toLocaleString()}đ</span>
                                                     </div>
-                                                    <div className="pt-3 border-t border-emerald-200 flex justify-between items-center">
-                                                        <span className="font-bold text-emerald-700 text-xs uppercase tracking-wider">Tổng</span>
-                                                        <span className="text-2xl font-black text-emerald-700">{calculateTotal(selectedTable).toLocaleString()}đ</span>
+                                                    <div className="pt-3 border-t border-cyan-200 flex justify-between items-center">
+                                                        <span className="font-bold text-cyan-700 text-xs uppercase tracking-wider">Tổng</span>
+                                                        <span className="text-2xl font-black text-cyan-700">{calculateTotal(selectedTable).toLocaleString()}đ</span>
                                                     </div>
                                                 </div>
 
                                                 <button
                                                     onClick={() => handleTableAction('stop')}
-                                                    className="w-full mt-4 py-4 bg-emerald-600 text-white rounded-2xl font-bold text-base shadow-xl shadow-emerald-500/30 hover:bg-emerald-700 transition-all active:scale-[0.98] flex items-center justify-center gap-2"
+                                                    className="w-full mt-4 py-4 bg-cyan-600 text-white rounded-2xl font-bold text-base shadow-xl shadow-cyan-500/30 hover:bg-cyan-700 transition-all active:scale-[0.98] flex items-center justify-center gap-2"
                                                 >
                                                     <Square size={18} fill="currentColor" /> Thanh Toán
                                                 </button>
@@ -1201,12 +1202,12 @@ export default function Admin() {
                             <div className={`p-10 rounded-[2.5rem] shadow-sm border relative overflow-hidden group hover:shadow-xl transition-all ${darkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-100'}`}>
                                 <span className={`font-black uppercase text-[10px] tracking-[0.2em] ${darkMode ? 'text-slate-400' : 'text-slate-400'}`}>Tổng Thu Nhập Thực Tế</span>
                                 <div className="mt-4 flex items-baseline gap-2">
-                                    <h2 className={`text-5xl font-black tracking-tighter ${darkMode ? 'text-emerald-400' : 'text-slate-800'}`}>{stats.income.toLocaleString()}đ</h2>
+                                    <h2 className={`text-5xl font-black tracking-tighter ${darkMode ? 'text-cyan-400' : 'text-slate-800'}`}>{stats.income.toLocaleString()}đ</h2>
                                 </div>
-                                <div className="flex items-center gap-1.5 text-emerald-500 text-sm mt-6 font-black">
+                                <div className="flex items-center gap-1.5 text-cyan-500 text-sm mt-6 font-black">
                                     <TrendingUp size={18} /> <span>Dữ liệu ổn định</span>
                                 </div>
-                                <Wallet className="absolute -right-8 -bottom-8 w-44 h-44 text-emerald-500 opacity-[0.05] group-hover:scale-110 transition-transform duration-700" />
+                                <Wallet className="absolute -right-8 -bottom-8 w-44 h-44 text-cyan-500 opacity-[0.05] group-hover:scale-110 transition-transform duration-700" />
                             </div>
 
                             {isOwner && (
@@ -1217,14 +1218,14 @@ export default function Admin() {
                                     <div className="grid grid-cols-2 gap-6">
                                         <div
                                             onClick={() => setShowHistoryModal(true)}
-                                            className={`p-6 rounded-2xl cursor-pointer hover:scale-105 transition-transform border border-transparent hover:border-emerald-500/30 shadow-sm hover:shadow-emerald-500/10 ${darkMode ? 'bg-slate-700/50' : 'bg-slate-50'}`}
+                                            className={`p-6 rounded-2xl cursor-pointer hover:scale-105 transition-transform border border-transparent hover:border-cyan-500/30 shadow-sm hover:shadow-cyan-500/10 ${darkMode ? 'bg-slate-700/50' : 'bg-slate-50'}`}
                                         >
                                             <div className="flex justify-between items-start">
-                                                <div className={`text-3xl font-black ${darkMode ? 'text-emerald-400' : 'text-emerald-600'}`}>{records.length}</div>
-                                                <div className={`p-2 rounded-full ${darkMode ? 'bg-emerald-500/10 text-emerald-400' : 'bg-emerald-100 text-emerald-600'}`}><FileSpreadsheet size={16} /></div>
+                                                <div className={`text-3xl font-black ${darkMode ? 'text-cyan-400' : 'text-cyan-600'}`}>{records.length}</div>
+                                                <div className={`p-2 rounded-full ${darkMode ? 'bg-cyan-500/10 text-cyan-400' : 'bg-cyan-100 text-cyan-600'}`}><FileSpreadsheet size={16} /></div>
                                             </div>
                                             <div className={`text-xs font-bold mt-2 ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>Giao dịch trong kỳ</div>
-                                            <div className="text-[10px] text-emerald-500 font-bold mt-1">Bấm để xem chi tiết →</div>
+                                            <div className="text-[10px] text-cyan-500 font-bold mt-1">Bấm để xem chi tiết →</div>
                                         </div>
                                         <div className={`p-6 rounded-2xl ${darkMode ? 'bg-slate-700/50' : 'bg-slate-50'}`}>
                                             <div className={`text-3xl font-black ${darkMode ? 'text-amber-400' : 'text-amber-600'}`}>{tables.filter((t: any) => t.status === 'occupied').length}</div>
@@ -1249,13 +1250,13 @@ export default function Admin() {
                             <div className="lg:col-span-4">
                                 <div className={`p-10 rounded-[2.5rem] shadow-xl border sticky top-28 ${darkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-100'}`}>
                                     <h3 className={`font-black text-xl mb-10 flex items-center gap-3 ${darkMode ? 'text-slate-100' : 'text-slate-800'}`}>
-                                        <div className="w-1.5 h-6 bg-emerald-500 rounded-full"></div> Ghi Chép Giao Dịch
+                                        <div className="w-1.5 h-6 bg-cyan-500 rounded-full"></div> Ghi Chép Giao Dịch
                                     </h3>
                                     <form className="space-y-6" onSubmit={handleAddTransaction}>
                                         <div>
                                             <label className={`text-[10px] font-black uppercase tracking-widest ml-1 ${darkMode ? 'text-slate-400' : 'text-slate-400'}`}>Hạng Mục</label>
                                             <select
-                                                className={`w-full p-4 border-none rounded-2xl mt-2 font-bold outline-none focus:ring-2 ring-emerald-500/10 transition-all appearance-none ${darkMode ? 'bg-slate-700 text-slate-200' : 'bg-slate-50 text-slate-700'}`}
+                                                className={`w-full p-4 border-none rounded-2xl mt-2 font-bold outline-none focus:ring-2 ring-cyan-500/10 transition-all appearance-none ${darkMode ? 'bg-slate-700 text-slate-200' : 'bg-slate-50 text-slate-700'}`}
                                                 value={catId}
                                                 onChange={(e) => {
                                                     const selectedId = e.target.value;
@@ -1282,7 +1283,7 @@ export default function Admin() {
                                             <label className={`text-[10px] font-black uppercase tracking-widest ml-1 ${darkMode ? 'text-slate-400' : 'text-slate-400'}`}>Số tiền (VNĐ)</label>
                                             <input
                                                 type="text"
-                                                className={`w-full p-4 border-none rounded-2xl mt-2 font-black text-xl md:text-2xl outline-none focus:ring-2 ring-emerald-500/10 transition-all ${darkMode ? 'bg-slate-700 text-emerald-400 placeholder:text-slate-500' : 'bg-slate-50 text-slate-800 placeholder:text-slate-200'}`}
+                                                className={`w-full p-4 border-none rounded-2xl mt-2 font-black text-xl md:text-2xl outline-none focus:ring-2 ring-cyan-500/10 transition-all ${darkMode ? 'bg-slate-700 text-cyan-400 placeholder:text-slate-500' : 'bg-slate-50 text-slate-800 placeholder:text-slate-200'}`}
                                                 value={amount}
                                                 onChange={(e) => {
                                                     const raw = e.target.value.replace(/[^0-9]/g, '');
@@ -1299,7 +1300,7 @@ export default function Admin() {
                                                     className="absolute inset-0 w-full h-full opacity-0 z-10 cursor-pointer"
                                                     value={date} onChange={(e) => setDate(e.target.value)} required
                                                 />
-                                                <div className={`w-full p-4 rounded-2xl font-bold flex justify-between items-center group-focus-within:ring-2 ring-emerald-500/10 transition-all ${darkMode ? 'bg-slate-700 text-slate-300' : 'bg-slate-50 text-slate-600'}`}>
+                                                <div className={`w-full p-4 rounded-2xl font-bold flex justify-between items-center group-focus-within:ring-2 ring-cyan-500/10 transition-all ${darkMode ? 'bg-slate-700 text-slate-300' : 'bg-slate-50 text-slate-600'}`}>
                                                     <span>{date ? date.split('-').reverse().join('/') : 'dd/mm/yyyy'}</span>
                                                     <Calendar size={20} className={darkMode ? 'text-slate-400' : 'text-slate-400'} />
                                                 </div>
@@ -1338,11 +1339,11 @@ export default function Admin() {
                                 <div className={`rounded-[2.5rem] shadow-sm border overflow-hidden min-h-[700px] flex flex-col ${darkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-100'}`}>
                                     <div className={`p-8 border-b flex justify-between items-center ${darkMode ? 'border-slate-700' : 'border-slate-50'}`}>
                                         <div className="relative w-full max-w-sm group">
-                                            <Search className={`absolute left-4 top-1/2 -translate-y-1/2 group-focus-within:text-emerald-500 transition-colors ${darkMode ? 'text-slate-500' : 'text-slate-300'}`} size={18} />
+                                            <Search className={`absolute left-4 top-1/2 -translate-y-1/2 group-focus-within:text-cyan-500 transition-colors ${darkMode ? 'text-slate-500' : 'text-slate-300'}`} size={18} />
                                             <input
                                                 type="text"
                                                 placeholder="Tìm tên khách, nội dung..."
-                                                className={`w-full pl-12 pr-6 py-4 border-none rounded-2xl text-sm font-bold focus:ring-2 ring-emerald-500/10 outline-none transition-all ${darkMode ? 'bg-slate-700 text-slate-200 placeholder:text-slate-500' : 'bg-slate-50 text-slate-800'}`}
+                                                className={`w-full pl-12 pr-6 py-4 border-none rounded-2xl text-sm font-bold focus:ring-2 ring-cyan-500/10 outline-none transition-all ${darkMode ? 'bg-slate-700 text-slate-200 placeholder:text-slate-500' : 'bg-slate-50 text-slate-800'}`}
                                                 value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)}
                                             />
                                         </div>
@@ -1372,7 +1373,7 @@ export default function Admin() {
                                                         </td>
                                                         <td className="px-4 md:px-10 py-7">
                                                             <span className={`font-black block text-base ${darkMode ? 'text-slate-200' : 'text-slate-700'}`}>{r.category_name}</span>
-                                                            <span className="bg-emerald-500/20 text-emerald-500 px-2.5 py-1 rounded-md text-[9px] font-black uppercase tracking-wider mt-1 inline-block">Đã duyệt</span>
+                                                            <span className="bg-cyan-500/20 text-cyan-500 px-2.5 py-1 rounded-md text-[9px] font-black uppercase tracking-wider mt-1 inline-block">Đã duyệt</span>
                                                         </td>
                                                         <td className={`px-4 md:px-10 py-7 text-sm font-medium italic line-clamp-1 ${darkMode ? 'text-slate-400' : 'text-slate-400'}`}>{r.equipment_name || '-'}</td>
                                                         <td className="px-4 md:px-10 py-7">
@@ -1419,7 +1420,7 @@ export default function Admin() {
                             {/* Coach Form */}
                             <div id="coach-form" className={`p-10 rounded-[2.5rem] shadow-xl border ${darkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-100'}`}>
                                 <h3 className={`font-black text-xl mb-10 flex items-center gap-3 ${darkMode ? 'text-slate-100' : 'text-slate-800'}`}>
-                                    <Users size={24} className="text-emerald-500" /> {editingCoachId ? 'Cập Nhật Huấn Luyện Viên' : 'Quản Lý Huấn Luyện Viên'}
+                                    <Users size={24} className="text-cyan-500" /> {editingCoachId ? 'Cập Nhật Huấn Luyện Viên' : 'Quản Lý Huấn Luyện Viên'}
                                 </h3>
                                 <form className="space-y-6" onSubmit={handleAddCoach}>
                                     <div>
@@ -1454,7 +1455,7 @@ export default function Admin() {
                                     </div>
                                     
                                     <div className="flex gap-3">
-                                        <button type="submit" className={`flex-1 p-5 rounded-3xl font-black flex items-center justify-center gap-3 shadow-xl transition-all ${darkMode ? 'bg-emerald-600 text-white hover:bg-emerald-500' : 'bg-slate-800 text-white hover:bg-slate-700'}`}>
+                                        <button type="submit" className={`flex-1 p-5 rounded-3xl font-black flex items-center justify-center gap-3 shadow-xl transition-all ${darkMode ? 'bg-cyan-600 text-white hover:bg-cyan-500' : 'bg-slate-800 text-white hover:bg-slate-700'}`}>
                                             {editingCoachId ? 'CẬP NHẬT' : 'THÊM HLV MỚI'} <PlusCircle size={20} className={editingCoachId ? 'hidden' : ''} />
                                         </button>
                                         {editingCoachId && (
@@ -1486,7 +1487,7 @@ export default function Admin() {
                                                     </div>
                                                 </div>
                                                 <div className="flex gap-2">
-                                                    <button onClick={() => handleEditCoach(c)} className={`p-2 ${darkMode ? 'text-slate-500 hover:text-emerald-400' : 'text-slate-300 hover:text-emerald-500'}`}><Pencil size={16} /></button>
+                                                    <button onClick={() => handleEditCoach(c)} className={`p-2 ${darkMode ? 'text-slate-500 hover:text-cyan-400' : 'text-slate-300 hover:text-cyan-500'}`}><Pencil size={16} /></button>
                                                     <button onClick={() => deleteTableItem('coaches', c.id)} className={`p-2 ${darkMode ? 'text-slate-500 hover:text-red-400' : 'text-slate-300 hover:text-red-500'}`}><Trash2 size={16} /></button>
                                                 </div>
                                             </div>
@@ -1544,7 +1545,7 @@ export default function Admin() {
                                                 <input type="time" className={`w-full p-4 border-none rounded-2xl mt-2 font-bold outline-none ${darkMode ? 'bg-slate-700 text-slate-100' : 'bg-slate-50 text-slate-700'}`} value={sessEnd} onChange={e => setSessEnd(e.target.value)} required />
                                             </div>
                                         </div>
-                                        <button type="submit" className={`w-full h-[68px] rounded-3xl font-black flex items-center justify-center gap-3 shadow-xl transition-all mt-4 ${darkMode ? 'bg-emerald-600 text-white hover:bg-emerald-500' : 'bg-slate-800 text-white hover:bg-slate-700'}`}>
+                                        <button type="submit" className={`w-full h-[68px] rounded-3xl font-black flex items-center justify-center gap-3 shadow-xl transition-all mt-4 ${darkMode ? 'bg-cyan-600 text-white hover:bg-cyan-500' : 'bg-slate-800 text-white hover:bg-slate-700'}`}>
                                             LƯU THỜI KHÓA BIỂU
                                         </button>
                                     </div>
@@ -1555,7 +1556,7 @@ export default function Admin() {
                             <div className={`rounded-[2.5rem] shadow-sm border overflow-hidden ${darkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-100'}`}>
                                 <div className={`p-8 border-b ${darkMode ? 'border-slate-700 bg-slate-700/50' : 'border-slate-50 bg-slate-50/50'}`}>
                                     <h3 className={`font-black uppercase text-xs tracking-widest flex items-center gap-2 ${darkMode ? 'text-slate-100' : 'text-slate-800'}`}>
-                                        <FileSpreadsheet size={16} className="text-emerald-500" /> Bảng phân phối lịch tuần
+                                        <FileSpreadsheet size={16} className="text-cyan-500" /> Bảng phân phối lịch tuần
                                     </h3>
                                 </div>
                                 <div className="overflow-x-auto">
@@ -1625,8 +1626,8 @@ export default function Admin() {
             {/* --- TOASTS --- */}
             <div className="fixed bottom-24 md:bottom-10 right-4 md:right-10 z-[300] flex flex-col gap-3 max-w-[calc(100vw-2rem)]">
                 {toasts.map(t => (
-                    <div key={t.id} className={`bg-white px-5 py-4 rounded-2xl shadow-2xl border-l-4 ${t.type === 'error' ? 'border-rose-500' : t.type === 'warning' ? 'border-amber-500' : 'border-emerald-500'} flex items-center gap-3 animate-slide-in`}>
-                        <div className={`${t.type === 'error' ? 'text-rose-500 bg-rose-50' : t.type === 'warning' ? 'text-amber-500 bg-amber-50' : 'text-emerald-500 bg-emerald-50'} p-2 rounded-full flex-shrink-0`}>
+                    <div key={t.id} className={`bg-white px-5 py-4 rounded-2xl shadow-2xl border-l-4 ${t.type === 'error' ? 'border-rose-500' : t.type === 'warning' ? 'border-amber-500' : 'border-cyan-500'} flex items-center gap-3 animate-slide-in`}>
+                        <div className={`${t.type === 'error' ? 'text-rose-500 bg-rose-50' : t.type === 'warning' ? 'text-amber-500 bg-amber-50' : 'text-cyan-500 bg-cyan-50'} p-2 rounded-full flex-shrink-0`}>
                             {t.type === 'error' ? <AlertTriangle size={18} /> : t.type === 'warning' ? <AlertTriangle size={18} /> : <CheckCircle size={18} />}
                         </div>
                         <span className="font-bold text-slate-700 text-sm">{t.msg}</span>
@@ -1639,7 +1640,7 @@ export default function Admin() {
                 <div className="flex justify-around items-center h-16 max-w-md mx-auto gap-2">
                     <button
                         onClick={() => setActiveTab('finance')}
-                        className={`flex flex-col items-center justify-center w-16 transition-colors ${activeTab === 'finance' ? 'text-emerald-500' : darkMode ? 'text-slate-500' : 'text-slate-400'}`}
+                        className={`flex flex-col items-center justify-center w-16 transition-colors ${activeTab === 'finance' ? 'text-cyan-500' : darkMode ? 'text-slate-500' : 'text-slate-400'}`}
                     >
                         <Wallet size={24} strokeWidth={activeTab === 'finance' ? 2.5 : 2} />
                         <span className="text-[10px] font-bold mt-1">Tài chính</span>
@@ -1650,7 +1651,7 @@ export default function Admin() {
                         onClick={() => setActiveTab('tables')}
                         className={`flex flex-col items-center justify-center w-16 h-16 -mt-6 rounded-full border-4 shadow-xl transition-all ${
                             activeTab === 'tables' 
-                            ? 'bg-gradient-to-br from-emerald-500 to-emerald-600 border-white text-white shadow-emerald-500/30 scale-110' 
+                            ? 'bg-gradient-to-br from-cyan-500 to-cyan-600 border-white text-white shadow-cyan-500/30 scale-110' 
                             : darkMode 
                                 ? 'bg-slate-700 border-slate-800 text-slate-400' 
                                 : 'bg-white border-slate-50 text-slate-400'
@@ -1663,7 +1664,7 @@ export default function Admin() {
                     {isOwner && (
                         <button
                             onClick={() => setActiveTab('schedule')}
-                            className={`flex flex-col items-center justify-center w-16 transition-colors ${activeTab === 'schedule' ? 'text-emerald-500' : darkMode ? 'text-slate-500' : 'text-slate-400'}`}
+                            className={`flex flex-col items-center justify-center w-16 transition-colors ${activeTab === 'schedule' ? 'text-cyan-500' : darkMode ? 'text-slate-500' : 'text-slate-400'}`}
                         >
                             <Calendar size={24} strokeWidth={activeTab === 'schedule' ? 2.5 : 2} />
                             <span className="text-[10px] font-bold mt-1">Lịch tập</span>
@@ -1680,7 +1681,7 @@ export default function Admin() {
                         <div className={`p-6 md:p-8 border-b flex justify-between items-center ${darkMode ? 'border-slate-800 bg-slate-900' : 'border-slate-100 bg-white'}`}>
                             <div>
                                 <h3 className={`text-xl font-black flex items-center gap-3 ${darkMode ? 'text-slate-100' : 'text-slate-800'}`}>
-                                    <FileSpreadsheet className="text-emerald-500" /> Lịch Sử Giao Dịch
+                                    <FileSpreadsheet className="text-cyan-500" /> Lịch Sử Giao Dịch
                                 </h3>
                                 <p className={`text-xs font-bold mt-1 ${darkMode ? 'text-slate-400' : 'text-slate-400'}`}>
                                     Tổng: {records.length} giao dịch • {records.reduce((acc: number, r: any) => acc + Number(r.amount), 0).toLocaleString()}đ
@@ -1709,7 +1710,7 @@ export default function Admin() {
                                                         <span className={`text-[10px] font-black uppercase tracking-wider px-2 py-1 rounded-md ${darkMode ? 'bg-slate-700 text-slate-300' : 'bg-white text-slate-500'}`}>
                                                             {r.category_name || 'Khác'}
                                                         </span>
-                                                        <h4 className={`text-lg font-black mt-2 ${darkMode ? 'text-emerald-400' : 'text-emerald-600'}`}>
+                                                        <h4 className={`text-lg font-black mt-2 ${darkMode ? 'text-cyan-400' : 'text-cyan-600'}`}>
                                                             +{parseFloat(r.amount).toLocaleString()}
                                                         </h4>
                                                     </div>
@@ -1732,7 +1733,7 @@ export default function Admin() {
                                                         </p>
                                                     </div>
                                                     <div className="flex items-center gap-1.5 shrink-0">
-                                                        <div className="w-4 h-4 rounded-full bg-emerald-500 flex items-center justify-center text-[8px] text-white font-bold">
+                                                        <div className="w-4 h-4 rounded-full bg-cyan-500 flex items-center justify-center text-[8px] text-white font-bold">
                                                             {r.creator_name ? r.creator_name.charAt(0) : 'S'}
                                                         </div>
                                                         <span className={`text-[10px] font-bold ${darkMode ? 'text-slate-500' : 'text-slate-400'}`}>
@@ -1775,7 +1776,7 @@ export default function Admin() {
                                                                 {r.category_name}
                                                             </span>
                                                         </td>
-                                                        <td className={`py-4 text-right font-black ${darkMode ? 'text-emerald-400' : 'text-emerald-600'}`}>
+                                                        <td className={`py-4 text-right font-black ${darkMode ? 'text-cyan-400' : 'text-cyan-600'}`}>
                                                             {parseFloat(r.amount).toLocaleString()}
                                                         </td>
                                                         <td className="py-4 pr-4 text-right">

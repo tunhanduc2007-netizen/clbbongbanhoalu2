@@ -6,7 +6,7 @@ import { PRODUCTS } from '../constants';
 
 const Hero: React.FC = () => {
   return (
-    <section className="relative h-[450px] bg-gradient-to-br from-[#7AC943] to-[#4E9F3D] overflow-hidden rounded-b-[40px] flex items-center justify-center">
+    <section className="relative h-[450px] bg-gradient-to-br from-[#bdffff] to-[#0891b2] overflow-hidden rounded-b-[40px] flex items-center justify-center">
       {/* Decorative Animated Ball - Updated to match logo yellow-green style */}
       <div className="absolute w-12 h-12 bg-[#FFD800] rounded-full shadow-lg z-10 animate-bounce" style={{ left: '10%', top: '20%', animationDuration: '3s' }}>
         <div className="w-full h-full border-t-2 border-white/30 rounded-full"></div>
@@ -52,7 +52,7 @@ const Hero: React.FC = () => {
         <div className="flex flex-col items-center gap-3">
           <Link
             to="/register"
-            className="ripple inline-flex items-center gap-2 bg-[#FFD800] text-[#4E9F3D] px-8 py-3 rounded-full font-bold shadow-xl transition-all hover:bg-white hover:scale-105"
+            className="ripple inline-flex items-center gap-2 bg-[#FFD800] text-[#0891b2] px-8 py-3 rounded-full font-bold shadow-xl transition-all hover:bg-white hover:scale-105"
           >
             ĐĂNG KÝ NGAY - NHẬN TƯ VẤN MIỄN PHÍ <ArrowRight size={20} />
           </Link>
@@ -89,27 +89,27 @@ const Home: React.FC = () => {
         <div className="max-w-6xl mx-auto">
           {/* Main About Section - Expanded */}
           <article className="glass p-8 md:p-12 rounded-[32px] shadow-sm border border-gray-100 overflow-hidden relative mb-12">
-            <div className="absolute -top-10 -right-10 w-32 h-32 bg-[#7AC943]/10 rounded-full blur-2xl"></div>
+            <div className="absolute -top-10 -right-10 w-32 h-32 bg-[#bdffff]/10 rounded-full blur-2xl"></div>
 
             <header className="mb-8">
               <h2 className="text-3xl md:text-4xl font-bold text-gray-800 mb-4 flex items-center gap-3">
-                <Users className="text-[#4E9F3D]" size={36} />
+                <Users className="text-[#0891b2]" size={36} />
                 Về CLB Bóng Bàn Hoa Lư - Điểm Đến Lý Tưởng Cho Người Yêu Bóng Bàn
               </h2>
-              <div className="h-1 w-24 bg-gradient-to-r from-[#7AC943] to-[#FFD800] rounded-full"></div>
+              <div className="h-1 w-24 bg-gradient-to-r from-[#bdffff] to-[#FFD800] rounded-full"></div>
             </header>
 
             <div className="prose prose-lg max-w-none text-gray-600 leading-relaxed space-y-6">
               <p className="text-lg">
                 <strong className="text-gray-800">CLB Bóng bàn Hoa Lư</strong> tọa lạc tại <strong>2 Đinh Tiên Hoàng, Đa Kao, Quận 1, TP.HCM</strong>,
-                là một trong những <em className="text-[#4E9F3D]">câu lạc bộ bóng bàn uy tín hàng đầu khu vực trung tâm thành phố</em>.
+                là một trong những <em className="text-[#0891b2]">câu lạc bộ bóng bàn uy tín hàng đầu khu vực trung tâm thành phố</em>.
                 Với hơn 10 năm kinh nghiệm đào tạo và phát triển phong trào <strong>bóng bàn tại Quận 1</strong>, chúng tôi tự hào là
                 nơi hội tụ của những tay vợt đam mê từ người mới bắt đầu đến vận động viên chuyên nghiệp.
               </p>
 
               {/* Key Features Grid */}
               <div className="grid md:grid-cols-2 gap-6 my-8">
-                <div className="bg-gradient-to-br from-[#7AC943]/5 to-[#FFD800]/5 p-6 rounded-2xl border-l-4 border-[#7AC943]">
+                <div className="bg-gradient-to-br from-[#bdffff]/5 to-[#FFD800]/5 p-6 rounded-2xl border-l-4 border-[#bdffff]">
                   <h3 className="text-xl font-bold text-gray-800 mb-3 flex items-center gap-2">
                     🏆 Đội Ngũ Huấn Luyện Viên Chuyên Nghiệp
                   </h3>
@@ -120,7 +120,7 @@ const Home: React.FC = () => {
                   </p>
                 </div>
 
-                <div className="bg-gradient-to-br from-[#4E9F3D]/5 to-[#7AC943]/5 p-6 rounded-2xl border-l-4 border-[#4E9F3D]">
+                <div className="bg-gradient-to-br from-[#0891b2]/5 to-[#bdffff]/5 p-6 rounded-2xl border-l-4 border-[#0891b2]">
                   <h3 className="text-xl font-bold text-gray-800 mb-3 flex items-center gap-2">
                     🏃 Cơ Sở Vật Chất Đạt Chuẩn Quốc Tế
                   </h3>
@@ -181,7 +181,7 @@ const Home: React.FC = () => {
                   { icon: "⏰", title: "Lịch linh hoạt", desc: "Mở cửa cả tuần kể cả Chủ nhật" },
                   { icon: "🎯", title: "Cam kết chất lượng", desc: "Đào tạo đúng phương pháp quốc tế" }
                 ].map((item, idx) => (
-                  <div key={idx} className="text-center p-4 bg-gray-50 rounded-xl hover:bg-[#7AC943]/5 transition-colors">
+                  <div key={idx} className="text-center p-4 bg-gray-50 rounded-xl hover:bg-[#bdffff]/5 transition-colors">
                     <div className="text-3xl mb-2">{item.icon}</div>
                     <h4 className="font-bold text-gray-800 text-sm mb-1">{item.title}</h4>
                     <p className="text-xs text-gray-500">{item.desc}</p>
@@ -189,8 +189,8 @@ const Home: React.FC = () => {
                 ))}
               </div>
 
-              <div className="bg-gradient-to-r from-[#7AC943]/10 to-[#FFD800]/10 p-6 md:p-8 rounded-2xl mt-8 border-l-4 border-[#7AC943]">
-                <p className="text-lg font-bold text-[#4E9F3D] mb-3">
+              <div className="bg-gradient-to-r from-[#bdffff]/10 to-[#FFD800]/10 p-6 md:p-8 rounded-2xl mt-8 border-l-4 border-[#bdffff]">
+                <p className="text-lg font-bold text-[#0891b2] mb-3">
                   🎯 Bạn đang tìm kiếm nơi học bóng bàn uy tín tại Quận 1, TP.HCM?
                 </p>
                 <p className="text-gray-700 leading-relaxed">
@@ -201,13 +201,13 @@ const Home: React.FC = () => {
                 <div className="mt-4 flex flex-wrap gap-3">
                   <Link
                     to="/register"
-                    className="inline-flex items-center gap-2 bg-[#4E9F3D] text-white px-6 py-2 rounded-full font-bold text-sm hover:bg-[#7AC943] transition-colors"
+                    className="inline-flex items-center gap-2 bg-[#0891b2] text-white px-6 py-2 rounded-full font-bold text-sm hover:bg-[#bdffff] transition-colors"
                   >
                     Đăng ký ngay <ArrowRight size={16} />
                   </Link>
                   <a
                     href="tel:0913909012"
-                    className="inline-flex items-center gap-2 bg-white text-[#4E9F3D] px-6 py-2 rounded-full font-bold text-sm border-2 border-[#4E9F3D] hover:bg-[#4E9F3D] hover:text-white transition-colors"
+                    className="inline-flex items-center gap-2 bg-white text-[#0891b2] px-6 py-2 rounded-full font-bold text-sm border-2 border-[#0891b2] hover:bg-[#0891b2] hover:text-white transition-colors"
                   >
                     Gọi tư vấn: 0913.909.012
                   </a>
@@ -218,15 +218,15 @@ const Home: React.FC = () => {
 
           {/* Quick Links Cards */}
           <nav className="grid grid-cols-2 gap-4" aria-label="Quick links">
-            <Link to="/schedule" className="glass p-6 rounded-3xl flex flex-col items-center justify-center text-center group transition-all hover:bg-[#7AC943]/5 h-full">
-              <div className="w-16 h-16 bg-[#FFD800]/20 text-[#4E9F3D] rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+            <Link to="/schedule" className="glass p-6 rounded-3xl flex flex-col items-center justify-center text-center group transition-all hover:bg-[#bdffff]/5 h-full">
+              <div className="w-16 h-16 bg-[#FFD800]/20 text-[#0891b2] rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
                 <Calendar size={32} />
               </div>
               <h3 className="font-bold text-gray-800 text-lg">Lịch tập luyện</h3>
               <p className="text-sm text-gray-500 mt-2">Giao lưu & huấn luyện</p>
             </Link>
-            <Link to="/shop" className="glass p-6 rounded-3xl flex flex-col items-center justify-center text-center group transition-all hover:bg-[#7AC943]/5 h-full">
-              <div className="w-16 h-16 bg-[#7AC943]/20 text-[#4E9F3D] rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+            <Link to="/shop" className="glass p-6 rounded-3xl flex flex-col items-center justify-center text-center group transition-all hover:bg-[#bdffff]/5 h-full">
+              <div className="w-16 h-16 bg-[#bdffff]/20 text-[#0891b2] rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
                 <ShoppingBag size={32} />
               </div>
               <h3 className="font-bold text-gray-800 text-lg">Cửa hàng</h3>
@@ -240,9 +240,9 @@ const Home: React.FC = () => {
       <section className="px-6 py-8 bg-[#f8fafc] rounded-[40px] my-4" id="pricing">
         <header className="text-center mb-16">
           <div className="flex items-center justify-center gap-3 mb-4">
-            <span className="w-12 h-[2px] bg-[#7AC943]/30"></span>
-            <span className="text-[#4E9F3D] font-black uppercase tracking-[0.2em] text-[10px]">BẢNG GIÁ DỊCH VỤ</span>
-            <span className="w-12 h-[2px] bg-[#7AC943]/30"></span>
+            <span className="w-12 h-[2px] bg-[#bdffff]/30"></span>
+            <span className="text-[#0891b2] font-black uppercase tracking-[0.2em] text-[10px]">BẢNG GIÁ DỊCH VỤ</span>
+            <span className="w-12 h-[2px] bg-[#bdffff]/30"></span>
           </div>
           <h2 className="text-3xl font-black text-gray-800 tracking-tighter uppercase mb-4">GIÁ TẬP LUYỆN</h2>
           <p className="text-gray-400 text-xs font-medium max-w-xs mx-auto mb-10 leading-relaxed">
@@ -252,13 +252,13 @@ const Home: React.FC = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-stretch max-w-5xl mx-auto">
           {/* Card 1: Vé chơi lượt */}
-          <div className="bg-white p-8 rounded-[3rem] shadow-sm border border-gray-100 flex flex-col items-center text-center group hover:shadow-xl hover:shadow-[#7AC943]/10 transition-all duration-500">
-            <div className="w-16 h-16 bg-[#7AC943] rounded-full flex items-center justify-center text-white mb-8 shadow-lg shadow-[#7AC943]/20 group-hover:scale-110 transition-transform">
+          <div className="bg-white p-8 rounded-[3rem] shadow-sm border border-gray-100 flex flex-col items-center text-center group hover:shadow-xl hover:shadow-[#bdffff]/10 transition-all duration-500">
+            <div className="w-16 h-16 bg-[#bdffff] rounded-full flex items-center justify-center text-white mb-8 shadow-lg shadow-[#bdffff]/20 group-hover:scale-110 transition-transform">
               <Ticket size={28} fill="currentColor" fillOpacity={0.2} strokeWidth={2.5} />
             </div>
             <h3 className="text-lg font-black text-slate-800 mb-2 uppercase tracking-tight leading-tight">VÉ CHƠI LƯỢT</h3>
             <div className="flex items-baseline gap-1 mb-6">
-              <span className="text-3xl font-black text-[#4E9F3D] tracking-tighter">40.000đ</span>
+              <span className="text-3xl font-black text-[#0891b2] tracking-tighter">40.000đ</span>
               <span className="text-slate-500 font-bold text-[10px]">/lượt</span>
             </div>
             <p className="text-slate-600 text-[11px] font-medium mb-8 leading-relaxed px-2">
@@ -267,29 +267,29 @@ const Home: React.FC = () => {
             <ul className="space-y-4 mb-10 text-left w-full">
               {['Không cần đăng ký trước', 'Đến là chơi ngay', 'Trải nghiệm sân bãi chuẩn'].map((item, i) => (
                 <li key={i} className="flex items-center gap-3 text-[11px] font-bold text-slate-700">
-                  <div className="w-4 h-4 rounded-full bg-[#7AC943]/10 flex items-center justify-center">
-                    <Check size={10} className="text-[#4E9F3D]" strokeWidth={4} />
+                  <div className="w-4 h-4 rounded-full bg-[#bdffff]/10 flex items-center justify-center">
+                    <Check size={10} className="text-[#0891b2]" strokeWidth={4} />
                   </div>
                   {item}
                 </li>
               ))}
             </ul>
-            <div className="mt-auto w-full py-4 border-2 border-[#7AC943] text-[#4E9F3D] rounded-full font-black text-[10px] uppercase tracking-[0.2em] transition-all text-center">
+            <div className="mt-auto w-full py-4 border-2 border-[#bdffff] text-[#0891b2] rounded-full font-black text-[10px] uppercase tracking-[0.2em] transition-all text-center">
               ĐẾN LÀ CHƠI!!!
             </div>
           </div>
 
           {/* Card 2: Thẻ hội viên - Featured */}
-          <div className="bg-white p-8 rounded-[3rem] shadow-2xl shadow-[#7AC943]/20 border-2 border-[#7AC943] flex flex-col items-center text-center relative transform md:-translate-y-6 lg:scale-105 z-10">
-            <div className="absolute -top-4 bg-[#FFD800] text-[#4E9F3D] px-6 py-2 rounded-full text-[10px] font-black uppercase tracking-[0.2em] shadow-lg">
+          <div className="bg-white p-8 rounded-[3rem] shadow-2xl shadow-[#bdffff]/20 border-2 border-[#bdffff] flex flex-col items-center text-center relative transform md:-translate-y-6 lg:scale-105 z-10">
+            <div className="absolute -top-4 bg-[#FFD800] text-[#0891b2] px-6 py-2 rounded-full text-[10px] font-black uppercase tracking-[0.2em] shadow-lg">
               TIẾT KIỆM
             </div>
-            <div className="w-16 h-16 bg-[#4E9F3D] rounded-full flex items-center justify-center text-white mb-8 shadow-xl shadow-[#4E9F3D]/30 group-hover:scale-110 transition-transform">
+            <div className="w-16 h-16 bg-[#0891b2] rounded-full flex items-center justify-center text-white mb-8 shadow-xl shadow-[#0891b2]/30 group-hover:scale-110 transition-transform">
               <User size={28} fill="currentColor" fillOpacity={0.2} strokeWidth={2.5} />
             </div>
             <h3 className="text-lg font-black text-slate-800 mb-2 uppercase tracking-tight leading-tight">THẺ HỘI VIÊN</h3>
             <div className="flex items-baseline gap-1 mb-6">
-              <span className="text-3xl font-black text-[#4E9F3D] tracking-tighter">700.000đ</span>
+              <span className="text-3xl font-black text-[#0891b2] tracking-tighter">700.000đ</span>
               <span className="text-slate-500 font-bold text-[10px]">/tháng</span>
             </div>
             <p className="text-slate-600 text-[11px] font-medium mb-8 leading-relaxed px-2">
@@ -298,26 +298,26 @@ const Home: React.FC = () => {
             <ul className="space-y-4 mb-10 text-left w-full">
               {['Chơi không giới hạn lượt', 'Ưu tiên đặt bàn tập', 'Giao lưu cộng đồng Hội viên', 'Hỗ trợ kỹ thuật cơ bản'].map((item, i) => (
                 <li key={i} className="flex items-center gap-3 text-[11px] font-bold text-slate-700">
-                  <div className="w-4 h-4 rounded-full bg-[#7AC943]/10 flex items-center justify-center">
-                    <Check size={10} className="text-[#4E9F3D]" strokeWidth={4} />
+                  <div className="w-4 h-4 rounded-full bg-[#bdffff]/10 flex items-center justify-center">
+                    <Check size={10} className="text-[#0891b2]" strokeWidth={4} />
                   </div>
                   {item}
                 </li>
               ))}
             </ul>
-            <Link to="/register" className="mt-auto w-full py-4 bg-gradient-to-r from-[#7AC943] to-[#4E9F3D] text-white rounded-full font-black text-[10px] uppercase tracking-[0.2em] shadow-lg shadow-[#7AC943]/30 hover:brightness-110 transition-all text-center">
+            <Link to="/register" className="mt-auto w-full py-4 bg-gradient-to-r from-[#bdffff] to-[#0891b2] text-white rounded-full font-black text-[10px] uppercase tracking-[0.2em] shadow-lg shadow-[#bdffff]/30 hover:brightness-110 transition-all text-center">
               ĐĂNG KÝ NGAY
             </Link>
           </div>
 
           {/* Card 3: Thuê bàn riêng */}
-          <div className="bg-white p-8 rounded-[3rem] shadow-sm border border-gray-100 flex flex-col items-center text-center group hover:shadow-xl hover:shadow-[#7AC943]/10 transition-all duration-500">
-            <div className="w-16 h-16 bg-[#FFD800] rounded-full flex items-center justify-center text-[#4E9F3D] mb-8 shadow-lg shadow-[#FFD800]/20 group-hover:scale-110 transition-transform">
+          <div className="bg-white p-8 rounded-[3rem] shadow-sm border border-gray-100 flex flex-col items-center text-center group hover:shadow-xl hover:shadow-[#bdffff]/10 transition-all duration-500">
+            <div className="w-16 h-16 bg-[#FFD800] rounded-full flex items-center justify-center text-[#0891b2] mb-8 shadow-lg shadow-[#FFD800]/20 group-hover:scale-110 transition-transform">
               <Calendar size={28} fill="currentColor" fillOpacity={0.2} strokeWidth={2.5} />
             </div>
             <h3 className="text-lg font-black text-slate-800 mb-2 uppercase tracking-tight leading-tight">THUÊ BÀN RIÊNG</h3>
             <div className="flex items-baseline gap-1 mb-6">
-              <span className="text-3xl font-black text-[#4E9F3D] tracking-tighter">70.000đ</span>
+              <span className="text-3xl font-black text-[#0891b2] tracking-tighter">70.000đ</span>
               <span className="text-slate-500 font-bold text-[10px]">/giờ</span>
             </div>
             <p className="text-slate-600 text-[11px] font-medium mb-8 leading-relaxed px-2">
@@ -326,14 +326,14 @@ const Home: React.FC = () => {
             <ul className="space-y-4 mb-10 text-left w-full">
               {['Không gian tập riêng tư', 'Chuẩn thi đấu quốc tế', 'Tự do thời gian tập', 'Đặt bàn trước tiện lợi'].map((item, i) => (
                 <li key={i} className="flex items-center gap-3 text-[11px] font-bold text-slate-700">
-                  <div className="w-4 h-4 rounded-full bg-[#7AC943]/10 flex items-center justify-center">
-                    <Check size={10} className="text-[#4E9F3D]" strokeWidth={4} />
+                  <div className="w-4 h-4 rounded-full bg-[#bdffff]/10 flex items-center justify-center">
+                    <Check size={10} className="text-[#0891b2]" strokeWidth={4} />
                   </div>
                   {item}
                 </li>
               ))}
             </ul>
-            <Link to="/register" className="mt-auto w-full py-4 border-2 border-[#7AC943] text-[#4E9F3D] rounded-full font-black text-[10px] uppercase tracking-[0.2em] transition-all text-center">
+            <Link to="/register" className="mt-auto w-full py-4 border-2 border-[#bdffff] text-[#0891b2] rounded-full font-black text-[10px] uppercase tracking-[0.2em] transition-all text-center">
               CHỌN NGAY
             </Link>
           </div>
@@ -344,7 +344,7 @@ const Home: React.FC = () => {
       <section className="px-6 py-12">
         <header className="flex justify-between items-center mb-6">
           <h2 className="text-xl font-bold text-gray-800">Dụng cụ bóng bàn nổi bật</h2>
-          <Link to="/shop" className="text-[#4E9F3D] text-xs font-bold flex items-center gap-1">
+          <Link to="/shop" className="text-[#0891b2] text-xs font-bold flex items-center gap-1">
             XEM TẤT CẢ <ArrowRight size={14} />
           </Link>
         </header>
@@ -362,7 +362,7 @@ const Home: React.FC = () => {
                 />
               </div>
               <h3 className="text-[11px] font-bold text-gray-800 line-clamp-1">{product.name}</h3>
-              <p className="text-[#4E9F3D] font-black text-[10px] mt-1">{product.price}</p>
+              <p className="text-[#0891b2] font-black text-[10px] mt-1">{product.price}</p>
             </Link>
           ))}
         </div>

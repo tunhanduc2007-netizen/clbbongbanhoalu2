@@ -4,8 +4,8 @@
 <head>
   <meta charset="UTF-8" />
   <!-- Biểu tượng Favicon & Ứng dụng -->
-  <link rel="icon" type="image/webp" href="/logo.webp" />
-  <link rel="apple-touch-icon" href="/logo.png?v=3" />
+  <link rel="icon" type="image/png" href="/favicon.png" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
   <link rel="manifest" href="/manifest.json" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
@@ -20,14 +20,14 @@
   <meta property="og:title" content="CLB Bóng Bàn Hoa Lư Quận 1" />
   <meta property="og:description"
     content="Đào tạo bóng bàn chuyên nghiệp từ cơ bản đến nâng cao. Sân bãi chuẩn quốc tế." />
-  <meta property="og:image" content="https://clbbongbanhoalu.netlify.app/logo.webp" />
+  <meta property="og:image" content="https://clbbongbanhoalu.netlify.app/logo.png" />
   <meta property="og:url" content="https://clbbongbanhoalu.netlify.app/" />
 
   <!-- Thẻ Twitter -->
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="CLB Bóng Bàn Hoa Lư Quận 1" />
   <meta name="twitter:description" content="Đào tạo bóng bàn chuyên nghiệp tại trung tâm Quận 1." />
-  <meta name="twitter:image" content="https://clbbongbanhoalu.netlify.app/logo.webp" />
+  <meta name="twitter:image" content="https://clbbongbanhoalu.netlify.app/logo.png" />
 
   <!-- Kết nối trước & Tìm nạp DNS -->
   <link rel="dns-prefetch" href="https://fonts.googleapis.com">
@@ -37,7 +37,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
   <!-- Tải trước Tài nguyên Quan trọng -->
-  <link rel="preload" as="image" href="/logo.webp" type="image/webp" fetchpriority="high">
+  <link rel="preload" as="image" href="/logo.png" type="image/png" fetchpriority="high">
 
   <!-- Google Fonts với display=swap để hiển thị văn bản nhanh hơn -->
   <link
@@ -50,10 +50,10 @@
     "@context": "https://schema.org",
     "@type": "SportsClub",
     "name": "CLB Bóng Bàn Hoa Lư",
-    "image": "https://clbbongbanhoalu.netlify.app/logo.webp",
+    "image": "https://clbbongbanhoalu.netlify.app/logo.png",
     "description": "Câu lạc bộ bóng bàn chuyên nghiệp tại Quận 1, TP.HCM. Đào tạo từ cơ bản đến nâng cao với HLV đội tuyển quốc gia, thảm Enlio chuẩn quốc tế.",
     "url": "https://clbbongbanhoalu.netlify.app",
-    "logo": "https://clbbongbanhoalu.netlify.app/logo.webp",
+    "logo": "https://clbbongbanhoalu.netlify.app/logo.png",
     "telephone": "+84913909012",
     "priceRange": "40000 - 700000 VND",
     "address": {
@@ -78,6 +78,14 @@
   }
   </script>
 
+  <!-- Google Analytics (Thay YOUR_ID bằng ID thực tế) -->
+  <!-- <script async src="https://www.googletagmanager.com/gtag/js?id=YOUR_ID"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'YOUR_ID');
+  </script> -->
 
 </head>
 
@@ -103,7 +111,7 @@
     }
 
     .sk-header-bg {
-      background: linear-gradient(to right, #7AC943, #FFD800);
+      background: linear-gradient(to right, #bdffff, #FFD800);
       border-bottom-left-radius: 1.5rem;
       border-bottom-right-radius: 1.5rem;
       box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
@@ -119,7 +127,7 @@
     .sk-hero {
       position: relative;
       height: 450px;
-      background: linear-gradient(135deg, #7AC943, #4E9F3D);
+      background: linear-gradient(135deg, #bdffff, #7AC943);
       border-bottom-left-radius: 40px;
       border-bottom-right-radius: 40px;
       display: flex;

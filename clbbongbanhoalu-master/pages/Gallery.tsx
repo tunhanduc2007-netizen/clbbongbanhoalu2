@@ -43,15 +43,15 @@ const Gallery: React.FC = () => {
         schema={gallerySchema}
       />
       <header className="mb-10 text-center">
-        <div className="flex items-center justify-center gap-2 text-[#4E9F3D] mb-3">
+        <div className="flex items-center justify-center gap-2 text-[#0891b2] mb-3">
           <ImageIcon size={20} />
           <span className="text-xs font-black uppercase tracking-widest">Thư Viện</span>
         </div>
         <h1 className="text-4xl font-black text-gray-900 mb-3 tracking-tight">Khoảnh Khắc Hoa Lư</h1>
         <p className="text-gray-500 text-sm font-medium">Ghi lại những dấu ấn đáng nhớ trong hành trình đam mê bóng bàn</p>
-        <div className="mt-4 inline-flex items-center gap-2 bg-green-50 px-4 py-2 rounded-full">
-          <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-          <span className="text-xs font-bold text-green-700">{GALLERY.length} ảnh trong bộ sưu tập</span>
+        <div className="mt-4 inline-flex items-center gap-2 bg-[#bdffff]/20 px-4 py-2 rounded-full">
+          <div className="w-2 h-2 bg-[#0891b2] rounded-full animate-pulse"></div>
+          <span className="text-xs font-bold text-[#0891b2]">{GALLERY.length} ảnh trong bộ sưu tập</span>
         </div>
       </header>
 
@@ -157,10 +157,10 @@ const Gallery: React.FC = () => {
         </div>
       )}
 
-      <footer className="mt-16 text-center p-12 bg-gradient-to-r from-green-50 to-yellow-50 rounded-[40px] border border-green-100">
+      <footer className="mt-16 text-center p-12 bg-gradient-to-r from-[#bdffff]/10 to-[#FFD800]/10 rounded-[40px] border border-[#bdffff]/20">
         <h2 className="text-2xl font-black text-gray-800 mb-3">Bạn có khoảnh khắc đẹp tại CLB?</h2>
         <p className="text-sm text-gray-600 mb-8 font-medium">Chia sẻ những hình ảnh tập luyện và thi đấu của bạn với cộng đồng Hoa Lư.</p>
-        <button className="px-8 py-4 bg-white border-2 border-[#7AC943] text-[#4E9F3D] rounded-full font-black uppercase text-sm hover:bg-[#7AC943] hover:text-white transition-all shadow-lg hover:shadow-xl">
+        <button className="px-8 py-4 bg-white border-2 border-[#bdffff] text-[#0891b2] rounded-full font-black uppercase text-sm hover:bg-[#bdffff] hover:text-[#0891b2] transition-all shadow-lg hover:shadow-xl">
           📸 Gửi Ảnh Của Bạn Cho Chúng Tôi
         </button>
       </footer>

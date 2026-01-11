@@ -3,6 +3,7 @@ import { ShoppingBag, Search, Circle, Layers, Shirt, Briefcase, Footprints, Slid
 import { Link, useLocation } from 'react-router-dom';
 import { PRODUCTS } from '../constants';
 import SEO from '../components/SEO';
+import logo from '../src/assets/logo.png';
 
 // --- HẰNG SỐ DỮ LIỆU ---
 const SHOP_CATEGORIES = [
@@ -74,12 +75,12 @@ const ShopHeader: React.FC = () => {
         <Link to="/" className="flex items-center gap-3 group" onClick={() => setIsMobileMenuOpen(false)}>
           <div className="w-14 h-14 rounded-full shadow-md overflow-hidden shrink-0">
             <picture>
-              <source srcSet="/logo.webp" type="image/webp" />
-              <img src="/logo.png" alt="Logo" className="w-full h-full object-cover" />
+              <source srcSet={logo} type="image/png" />
+              <img src={logo} alt="Logo" className="w-full h-full object-cover" />
             </picture>
           </div>
           <div className="flex flex-col justify-center select-none">
-             <span className="font-black leading-none text-xl uppercase tracking-tight text-[#81c341]">HOA LƯ</span>
+             <span className="font-black leading-none text-xl uppercase tracking-tight text-[#0891b2]">HOA LƯ</span>
              <span className="font-bold leading-none text-sm uppercase tracking-widest opacity-90 text-[#0e1b3c]">STORE</span>
           </div>
         </Link>
@@ -93,8 +94,8 @@ const ShopHeader: React.FC = () => {
                    to={item.path}
                    className={`text-sm font-bold transition-colors ${
                       location.pathname === item.path
-                        ? 'text-[#7AC943]'
-                        : 'text-gray-600 hover:text-[#7AC943]'
+                        ? 'text-[#0891b2]'
+                        : 'text-gray-600 hover:text-[#0891b2]'
                    }`}
                  >
                    {item.name}
@@ -103,7 +104,7 @@ const ShopHeader: React.FC = () => {
             ))}
           </ul>
           <div className="w-px h-6 mx-2 bg-gray-300"></div>
-          <a href="tel:0913909012" className="flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold transition-all shadow-lg hover:scale-105 bg-gray-900 text-white hover:bg-[#7AC943]">
+          <a href="tel:0913909012" className="flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold transition-all shadow-lg hover:scale-105 bg-gray-900 text-white hover:bg-[#bdffff]">
             <ShoppingBag size={14} />
             <span>0913.909.012</span>
           </a>
@@ -139,7 +140,7 @@ const ShopHeader: React.FC = () => {
                   onClick={() => setIsMobileMenuOpen(false)}
                   className={`flex items-center justify-between p-4 rounded-2xl transition-all font-bold ${
                     location.pathname === item.path
-                    ? 'bg-gradient-to-r from-[#7AC943] to-[#FFD800] text-white shadow-md'
+                    ? 'bg-gradient-to-r from-[#bdffff] to-[#FFD800] text-white shadow-md'
                     : 'bg-gray-50 text-gray-700 hover:bg-gray-100'
                   }`}
                 >
@@ -203,7 +204,7 @@ const Shop: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#FAFAFA] font-sans text-gray-900 pb-20">
+    <div className="min-h-screen bg-slate-50 font-sans text-gray-900 pb-20">
       <SEO
         title="Hoa Lu Store - Dụng Cụ Bóng Bàn Chính Hãng"
         description="Mua sắm cốt vợt, mặt vợt, giày và phụ kiện bóng bàn chính hãng từ các thương hiệu hàng đầu."
@@ -215,8 +216,8 @@ const Shop: React.FC = () => {
       <ShopHeader />
 
       {/* --- HERO SECTION (Cleaner, Less Glare) --- */}
-      <section className="pt-32 pb-12 px-4 relative overflow-hidden bg-gradient-to-br from-gray-100 to-white">
-        <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-[#7AC943]/5 to-transparent pointer-events-none"></div>
+      <section className="pt-32 pb-12 px-4 relative overflow-hidden bg-gradient-to-br from-[#bdffff]/20 via-white to-white">
+        <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-[#bdffff]/10 to-transparent pointer-events-none"></div>
         <div className="container mx-auto max-w-6xl relative z-10">
           
           {/* Breadcrumb - Clean */}
@@ -230,7 +231,7 @@ const Shop: React.FC = () => {
             <div className="max-w-xl">
               <h1 className="text-4xl md:text-5xl font-black text-gray-900 mb-4 tracking-tight leading-tight">
                 Bộ sưu tập <br/>
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#7AC943] to-[#4E9F3D]">Chuyên Nghiệp</span>
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#bdffff] to-[#0891b2]">Chuyên Nghiệp</span>
               </h1>
               <p className="text-gray-500 text-lg font-light leading-relaxed">
                 Các sản phẩm được tuyển chọn kỹ lưỡng bởi HLV đội tuyển quốc gia. Chuẩn thi đấu ITTF.
@@ -242,9 +243,9 @@ const Shop: React.FC = () => {
               <input 
                 type="text" 
                 placeholder="Tìm kiếm sản phẩm..." 
-                className="w-full pl-12 pr-4 py-3 bg-white border-2 border-transparent focus:border-[#7AC943] shadow-sm group-hover:shadow-md rounded-full outline-none transition-all"
+                className="w-full pl-12 pr-4 py-3 bg-white border-2 border-transparent focus:border-[#bdffff] shadow-sm group-hover:shadow-md rounded-full outline-none transition-all"
               />
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-[#7AC943]" size={20} />
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-[#0891b2]" size={20} />
             </div>
           </div>
         </div>
@@ -268,7 +269,7 @@ const Shop: React.FC = () => {
                     className={`flex items-center gap-2 px-4 py-2.5 rounded-full border transition-all duration-300 whitespace-nowrap ${
                       active 
                       ? 'bg-gray-900 text-white border-gray-900 shadow-lg scale-105' 
-                      : 'bg-white text-gray-600 border-gray-200 hover:border-[#7AC943] hover:text-[#7AC943]'
+                      : 'bg-white text-gray-600 border-gray-200 hover:border-[#bdffff] hover:text-[#0891b2]'
                     }`}
                   >
                     <Icon size={16} strokeWidth={2.5} />
@@ -283,7 +284,7 @@ const Shop: React.FC = () => {
           <div className="flex items-center gap-3 shrink-0">
              <button 
                 onClick={() => setShowFilters(!showFilters)}
-                className={`flex items-center gap-2 px-4 py-2.5 rounded-full border text-sm font-bold transition-all ${showFilters ? 'bg-[#7AC943] text-white border-[#7AC943]' : 'bg-white text-gray-700 border-gray-200 hover:bg-gray-50'}`}
+                className={`flex items-center gap-2 px-4 py-2.5 rounded-full border text-sm font-bold transition-all ${showFilters ? 'bg-[#bdffff] text-white border-[#bdffff]' : 'bg-white text-gray-700 border-gray-200 hover:bg-gray-50'}`}
              >
                <SlidersHorizontal size={16} />
                <span>Bộ lọc</span>
@@ -293,7 +294,7 @@ const Shop: React.FC = () => {
                 <select 
                   value={sortBy}
                   onChange={(e) => setSortBy(e.target.value)}
-                  className="appearance-none bg-transparent font-bold text-sm hover:text-[#7AC943] cursor-pointer outline-none pr-6"
+                  className="appearance-none bg-transparent font-bold text-sm hover:text-[#0891b2] cursor-pointer outline-none pr-6"
                 >
                   {sortOptions.map(o => <option key={o} value={o}>{o}</option>)}
                 </select>
@@ -304,7 +305,7 @@ const Shop: React.FC = () => {
 
         {/* --- EXPANDABLE FILTERS --- */}
         <div className={`overflow-hidden transition-all duration-300 ease-out ${showFilters ? 'max-h-96 opacity-100 mb-8' : 'max-h-0 opacity-0'}`}>
-          <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
+          <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-xl shadow-slate-200/50">
              <div className="flex flex-wrap gap-2">
                {BRANDS.map(brand => (
                  <button
@@ -312,7 +313,7 @@ const Shop: React.FC = () => {
                    onClick={() => toggleBrand(brand)}
                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                      selectedBrands.includes(brand)
-                       ? 'bg-[#7AC943] text-white shadow-md'
+                       ? 'bg-[#bdffff] text-white shadow-md'
                        : 'bg-gray-50 text-gray-600 hover:bg-gray-100'
                    }`}
                  >
@@ -333,7 +334,7 @@ const Shop: React.FC = () => {
           {filteredProducts.map((product) => (
             <div key={product.id} className="group flex flex-col">
               {/* Image Container */}
-              <div className="relative aspect-[4/5] bg-white rounded-2xl overflow-hidden mb-4 border border-gray-100 shadow-sm group-hover:shadow-xl transition-all duration-500">
+              <div className="relative aspect-[4/5] bg-white rounded-2xl overflow-hidden mb-4 border border-gray-100 shadow-md group-hover:shadow-2xl group-hover:shadow-cyan-500/10 transition-all duration-500">
                  {/* Image */}
                  <img 
                    src={product.image} 
@@ -344,7 +345,7 @@ const Shop: React.FC = () => {
 
                  {/* Quick Action Overlay (Desktop) */}
                  <div className="absolute inset-x-0 bottom-0 p-4 translate-y-full group-hover:translate-y-0 transition-transform duration-300 bg-gradient-to-t from-black/50 to-transparent flex justify-center">
-                    <button className="bg-white text-black px-6 py-2.5 rounded-full text-xs font-bold hover:bg-[#7AC943] hover:text-white transition-colors shadow-lg flex items-center gap-2">
+                    <button className="bg-white text-black px-6 py-2.5 rounded-full text-xs font-bold hover:bg-[#bdffff] hover:text-white transition-colors shadow-lg flex items-center gap-2">
                        <ShoppingBag size={14} /> Mua ngay
                     </button>
                  </div>
@@ -355,9 +356,9 @@ const Shop: React.FC = () => {
                 <div className="flex items-center gap-2 text-[10px] font-bold text-gray-400 uppercase tracking-wider">
                   <span>{product.category}</span>
                   <span className="w-1 h-1 rounded-full bg-gray-300"></span>
-                  <span className="text-[#7AC943]">Chính hãng</span>
+                  <span className="text-[#0891b2]">Chính hãng</span>
                 </div>
-                <h3 className="font-bold text-gray-900 group-hover:text-[#7AC943] transition-colors leading-tight line-clamp-2 min-h-[40px]">
+                <h3 className="font-bold text-gray-900 group-hover:text-[#0891b2] transition-colors leading-tight line-clamp-2 min-h-[40px]">
                   {product.name}
                 </h3>
                 <div className="pt-2 flex items-center justify-between">
@@ -374,7 +375,7 @@ const Shop: React.FC = () => {
                <ShoppingBag size={32} />
              </div>
              <p className="text-gray-500 font-medium">Không tìm thấy sản phẩm phù hợp.</p>
-             <button onClick={clearAllFilters} className="mt-4 text-[#7AC943] font-bold hover:underline">Xóa bộ lọc</button>
+             <button onClick={clearAllFilters} className="mt-4 text-[#0891b2] font-bold hover:underline">Xóa bộ lọc</button>
           </div>
         )}
 
@@ -384,7 +385,7 @@ const Shop: React.FC = () => {
       <section className="container mx-auto max-w-6xl px-4 mt-24">
         <div className="bg-gray-900 rounded-[32px] p-8 md:p-12 relative overflow-hidden flex flex-col md:flex-row items-center justify-between gap-8">
            <div className="absolute top-0 right-0 p-12 opacity-10 pointer-events-none">
-              <img src="/logo.webp" className="w-64 h-64 grayscale invert" />
+              <img src={logo} className="w-64 h-64 grayscale invert" />
            </div>
            
            <div className="relative z-10 text-center md:text-left">
@@ -393,7 +394,7 @@ const Shop: React.FC = () => {
            </div>
            
            <div className="relative z-10 flex flex-col sm:flex-row gap-3 w-full md:w-auto">
-             <Link to="/register" className="inline-flex items-center justify-center gap-2 bg-[#7AC943] text-white px-8 py-4 rounded-xl font-bold hover:bg-[#68b037] transition-all transform hover:scale-105 shadow-xl shadow-green-900/20">
+             <Link to="/register" className="inline-flex items-center justify-center gap-2 bg-[#bdffff] text-[#0891b2] px-8 py-4 rounded-xl font-bold hover:bg-white hover:text-[#0891b2] transition-all transform hover:scale-105 shadow-xl shadow-[#bdffff]/30">
                Đăng Ký Ngay <ChevronRight size={18} />
              </Link>
              <a href="tel:0913909012" className="inline-flex items-center justify-center gap-2 bg-white/10 backdrop-blur text-white px-6 py-4 rounded-xl font-bold hover:bg-white/20 transition-all">

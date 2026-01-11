@@ -10,13 +10,13 @@ const Input: React.FC<{ label: string, type: string, id: string }> = ({ label, t
         type={type}
         id={id}
         name={id}
-        className="block py-4 px-4 w-full text-sm text-gray-900 bg-gray-50 rounded-2xl border-0 border-b-2 border-gray-200 appearance-none focus:outline-none focus:ring-0 focus:border-[#7AC943] peer transition-all"
+        className="block py-4 px-4 w-full text-sm text-gray-900 bg-gray-50 rounded-2xl border-0 border-b-2 border-gray-200 appearance-none focus:outline-none focus:ring-0 focus:border-[#bdffff] peer transition-all"
         placeholder=" "
         required
       />
       <label
         htmlFor={id}
-        className="peer-focus:font-medium absolute text-sm text-gray-500 duration-300 transform -translate-y-6 scale-75 top-4 z-10 origin-[0] left-4 peer-focus:left-4 peer-focus:text-[#4E9F3D] peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
+        className="peer-focus:font-medium absolute text-sm text-gray-500 duration-300 transform -translate-y-6 scale-75 top-4 z-10 origin-[0] left-4 peer-focus:left-4 peer-focus:text-[#0891b2] peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
       >
         {label}
       </label>
@@ -52,8 +52,8 @@ const Register: React.FC = () => {
   if (submitted) {
     return (
       <main className="px-6 py-20 flex flex-col items-center text-center animate-in fade-in zoom-in duration-500">
-        <div className="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center mb-8">
-          <CheckCircle2 size={60} className="text-[#4E9F3D]" />
+        <div className="w-24 h-24 bg-[#bdffff]/20 rounded-full flex items-center justify-center mb-8">
+          <CheckCircle2 size={60} className="text-[#0891b2]" />
         </div>
         <h2 className="text-3xl font-black text-gray-900 mb-4">Ghi danh thành công!</h2>
         <p className="text-gray-500 max-w-xs mx-auto mb-10">
@@ -61,7 +61,7 @@ const Register: React.FC = () => {
         </p>
         <button
           onClick={() => setSubmitted(false)}
-          className="ripple px-10 py-4 bg-[#7AC943] text-white rounded-full font-bold shadow-lg"
+          className="ripple px-10 py-4 bg-[#bdffff] text-[#0891b2] rounded-full font-bold shadow-lg"
         >
           QUAY LẠI TRANG ĐĂNG KÝ
         </button>
@@ -96,8 +96,8 @@ const Register: React.FC = () => {
               { id: 'advanced', label: 'Nâng cao trình độ' },
               { id: 'pro', label: 'Thi đấu chuyên nghiệp' }
             ].map((goal) => (
-              <label key={goal.id} htmlFor={goal.id} className="flex items-center gap-2 p-3 bg-gray-50 rounded-xl border-2 border-transparent has-[:checked]:border-[#7AC943] has-[:checked]:bg-[#7AC943]/5 cursor-pointer transition-all">
-                <input type="checkbox" id={goal.id} name="goal" className="w-4 h-4 text-[#7AC943] rounded" />
+              <label key={goal.id} htmlFor={goal.id} className="flex items-center gap-2 p-3 bg-gray-50 rounded-xl border-2 border-transparent has-[:checked]:border-[#bdffff] has-[:checked]:bg-[#bdffff]/5 cursor-pointer transition-all">
+                <input type="checkbox" id={goal.id} name="goal" className="w-4 h-4 text-[#0891b2] rounded" />
                 <span className="text-[11px] font-bold text-gray-700 leading-tight">{goal.label}</span>
               </label>
             ))}
@@ -106,7 +106,7 @@ const Register: React.FC = () => {
 
         <button
           type="submit"
-          className="ripple w-full py-4 bg-gradient-to-r from-[#4E9F3D] to-[#7AC943] text-white rounded-[24px] font-bold shadow-xl flex items-center justify-center gap-3 transition-transform active:scale-95"
+          className="ripple w-full py-4 bg-gradient-to-r from-[#bdffff] to-[#0891b2] text-white rounded-[24px] font-bold shadow-xl flex items-center justify-center gap-3 transition-transform active:scale-95"
         >
           GỬI YÊU CẦU GHI DANH <Send size={20} />
         </button>
