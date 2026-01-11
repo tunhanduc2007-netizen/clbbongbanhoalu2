@@ -93,14 +93,14 @@ const Schedule: React.FC = () => {
         <div className="max-w-[1200px] mx-auto px-6">
           <header className="flex flex-col md:flex-row justify-between items-center mb-10 gap-6">
             <div className="flex flex-col items-center md:items-start">
-              <div className="flex items-center gap-2 text-[#4E9F3D] mb-2">
+              <div className="flex items-center gap-2 text-[#0891b2] mb-2">
                 <Calendar size={18} fill="currentColor" fillOpacity={0.2} />
                 <span className="text-xs font-black uppercase tracking-widest">LỊCH TẬP</span>
               </div>
               <h2 className="text-3xl font-black text-slate-800 tracking-tight">LỊCH DẠY CỦA HLV</h2>
             </div>
-            <button className="bg-[#4E9F3D] text-white px-5 py-2.5 rounded-full text-[10px] font-black uppercase tracking-widest flex items-center gap-2 shadow-lg shadow-green-200">
-              HÔM NAY <div className="w-1.5 h-1.5 bg-white rounded-full animate-pulse"></div>
+            <button className="bg-[#bdffff] text-[#0891b2] px-5 py-2.5 rounded-full text-[10px] font-black uppercase tracking-widest flex items-center gap-2 shadow-lg shadow-cyan-200">
+              HÔM NAY <div className="w-1.5 h-1.5 bg-[#0891b2] rounded-full animate-pulse"></div>
             </button>
           </header>
 
@@ -112,16 +112,16 @@ const Schedule: React.FC = () => {
                   key={day.key}
                   onClick={() => setSelectedDay(day.key)}
                   className={`flex flex-col items-center min-w-[70px] py-3 rounded-2xl transition-all relative ${selectedDay === day.key
-                    ? 'bg-[#4E9F3D] text-white shadow-xl shadow-green-100 scale-105 z-10'
+                    ? 'bg-[#bdffff] text-[#0891b2] shadow-xl shadow-cyan-100 scale-105 z-10'
                     : 'text-slate-400 hover:bg-slate-100'
                     }`}
                 >
                   <span className="text-sm font-black mb-1">{day.label}</span>
-                  <span className={`text-[9px] font-bold ${selectedDay === day.key ? 'text-green-100' : 'text-slate-300'}`}>
+                  <span className={`text-[9px] font-bold ${selectedDay === day.key ? 'text-[#0e1b3c]' : 'text-slate-300'}`}>
                     {getSessionCount(day.key)} lớp
                   </span>
                   {selectedDay === day.key && (
-                    <div className="absolute -top-1.5 -right-1.5 w-4 h-4 bg-white border-2 border-[#4E9F3D] rounded-full flex items-center justify-center text-[#4E9F3D]">
+                    <div className="absolute -top-1.5 -right-1.5 w-4 h-4 bg-white border-2 border-[#bdffff] rounded-full flex items-center justify-center text-[#0891b2]">
                       <Check size={8} strokeWidth={4} />
                     </div>
                   )}
@@ -133,13 +133,13 @@ const Schedule: React.FC = () => {
           {/* HLV Filter */}
           <div className="flex flex-wrap justify-center items-center gap-3 mb-16">
             <span className="text-xs font-black text-slate-400 mr-2 flex items-center gap-1">
-              <MapPin size={14} className="text-[#7AC943]" /> Lọc theo HLV:
+              <MapPin size={14} className="text-[#0891b2]" /> Lọc theo HLV:
             </span>
             <button
               onClick={() => setCoachFilter('all')}
               className={`px-5 py-2 rounded-full text-[10px] font-black uppercase tracking-widest transition-all ${coachFilter === 'all'
-                ? 'bg-[#4E9F3D] text-white shadow-lg shadow-green-200'
-                : 'bg-white text-slate-400 border border-slate-200 hover:border-[#7AC943] hover:text-[#4E9F3D]'
+                ? 'bg-[#bdffff] text-[#0891b2] shadow-lg shadow-cyan-200'
+                : 'bg-white text-slate-400 border border-slate-200 hover:border-[#bdffff] hover:text-[#0891b2]'
                 }`}
             >
               Tất cả
@@ -149,8 +149,8 @@ const Schedule: React.FC = () => {
                 key={coach.id}
                 onClick={() => setCoachFilter(coach.id.toString())}
                 className={`px-5 py-2 rounded-full text-[10px] font-black uppercase tracking-widest transition-all ${coachFilter === coach.id.toString()
-                  ? 'bg-[#4E9F3D] text-white shadow-lg shadow-green-200'
-                  : 'bg-white text-slate-400 border border-slate-200 hover:border-[#7AC943] hover:text-[#4E9F3D]'
+                  ? 'bg-[#bdffff] text-[#0891b2] shadow-lg shadow-cyan-200'
+                  : 'bg-white text-slate-400 border border-slate-200 hover:border-[#bdffff] hover:text-[#0891b2]'
                   }`}
               >
                 {coach.name.split(' ').pop()}
@@ -163,7 +163,7 @@ const Schedule: React.FC = () => {
             <div className="bg-[#f0f4f8] p-4 rounded-[3rem] border-4 border-white shadow-2xl overflow-hidden relative">
               {/* Dashboard Header */}
               <div className="flex justify-between items-center py-6 px-4">
-                <button className="w-10 h-10 bg-white rounded-full flex items-center justify-center text-slate-400 hover:text-[#4E9F3D] shadow-md transition-all">
+                <button className="w-10 h-10 bg-white rounded-full flex items-center justify-center text-slate-400 hover:text-[#0891b2] shadow-md transition-all">
                   <ArrowLeft size={20} />
                 </button>
                 <div className="text-center">
@@ -172,10 +172,10 @@ const Schedule: React.FC = () => {
                   </h3>
                   <div className="flex items-center justify-center gap-2">
                     <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{filteredSessions.length} lớp học</span>
-                    <span className="px-2 py-0.5 bg-[#4E9F3D] text-white text-[8px] font-black uppercase rounded-md">Hôm nay</span>
+                    <span className="px-2 py-0.5 bg-[#bdffff] text-[#0891b2] text-[8px] font-black uppercase rounded-md">Hôm nay</span>
                   </div>
                 </div>
-                <button className="w-10 h-10 bg-white rounded-full flex items-center justify-center text-slate-400 hover:text-[#4E9F3D] shadow-md transition-all">
+                <button className="w-10 h-10 bg-white rounded-full flex items-center justify-center text-slate-400 hover:text-[#0891b2] shadow-md transition-all">
                   <ArrowRight size={20} />
                 </button>
               </div>
@@ -183,13 +183,13 @@ const Schedule: React.FC = () => {
               {/* Session List */}
               <div className="space-y-4 p-4 mt-2">
                 {loading ? (
-                  <div className="flex justify-center py-20"><Loader2 className="animate-spin text-[#4E9F3D]" /></div>
+                  <div className="flex justify-center py-20"><Loader2 className="animate-spin text-[#0891b2]" /></div>
                 ) : filteredSessions.length > 0 ? (
                   filteredSessions.map(sess => (
                     <div key={sess.id} className="bg-white/70 backdrop-blur-md p-6 rounded-[2rem] flex justify-between items-center hover:bg-white transition-all group">
                       <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-6">
                         <div className="flex items-center gap-2">
-                          <Clock size={16} className="text-[#4E9F3D]" />
+                          <Clock size={16} className="text-[#0891b2]" />
                           <span className="text-lg font-black text-slate-800">{sess.start_time.slice(0, 5)} - {sess.end_time.slice(0, 5)}</span>
                         </div>
                         <div className="hidden md:block h-4 w-px bg-slate-200"></div>
@@ -204,8 +204,8 @@ const Schedule: React.FC = () => {
                         </div>
                       </div>
                       <div className="flex items-center gap-2">
-                        <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                        <span className="text-[10px] font-bold text-green-600 uppercase tracking-widest">Có lớp</span>
+                        <div className="w-2 h-2 bg-cyan-500 rounded-full animate-pulse"></div>
+                        <span className="text-[10px] font-bold text-cyan-600 uppercase tracking-widest">Có lớp</span>
                       </div>
                     </div>
                   ))
@@ -228,7 +228,7 @@ const Schedule: React.FC = () => {
             {/* Coaches Team Section */}
             <div className="mt-16">
               <div className="flex flex-col items-center md:items-start mb-10">
-                <div className="flex items-center gap-2 text-[#4E9F3D] mb-2">
+                <div className="flex items-center gap-2 text-[#0891b2] mb-2">
                   <Users size={18} fill="currentColor" fillOpacity={0.2} />
                   <span className="text-xs font-black uppercase tracking-widest">Đội ngũ</span>
                 </div>
@@ -240,7 +240,7 @@ const Schedule: React.FC = () => {
                 {coaches.map(coach => (
                   <div key={coach.id} className="bg-white rounded-3xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 group border border-slate-100">
                     {/* Coach Header - Improved Gradient */}
-                    <div className="bg-gradient-to-br from-[#4E9F3D] via-[#7AC943] to-[#a8e063] h-28 relative overflow-hidden">
+                    <div className="bg-gradient-to-br from-[#0891b2] via-[#bdffff] to-[#e0fafa] h-28 relative overflow-hidden">
                       {/* Decorative circles */}
                       <div className="absolute -top-6 -right-6 w-24 h-24 bg-white/10 rounded-full"></div>
                       <div className="absolute -bottom-4 -left-4 w-16 h-16 bg-white/10 rounded-full"></div>
@@ -251,8 +251,8 @@ const Schedule: React.FC = () => {
                           {coach.avatar ? (
                             <img src={coach.avatar} alt={coach.name} className="w-full h-full object-cover" />
                           ) : (
-                            <div className="w-full h-full bg-gradient-to-br from-[#7AC943]/20 to-[#FFD800]/20 flex items-center justify-center">
-                              <User size={44} className="text-[#4E9F3D]" strokeWidth={1.5} />
+                            <div className="w-full h-full bg-gradient-to-br from-[#bdffff]/20 to-[#FFD800]/20 flex items-center justify-center">
+                              <User size={44} className="text-[#0891b2]" strokeWidth={1.5} />
                             </div>
                           )}
                         </div>
@@ -267,7 +267,7 @@ const Schedule: React.FC = () => {
                     {/* Coach Info */}
                     <div className="pt-16 px-6 pb-6 text-center">
                       <h3 className="text-xl font-black text-slate-800 mb-1">{coach.name}</h3>
-                      <p className="text-xs text-[#4E9F3D] font-bold mb-5 uppercase tracking-wider">Huấn luyện viên</p>
+                      <p className="text-xs text-[#0891b2] font-bold mb-5 uppercase tracking-wider">Huấn luyện viên</p>
 
                       {/* Stats Row */}
                       <div className="flex items-center justify-center gap-6 mb-5">
@@ -284,10 +284,10 @@ const Schedule: React.FC = () => {
                       </div>
 
                       {/* Pricing - Better Design */}
-                      <div className="bg-gradient-to-r from-[#4E9F3D]/5 to-[#7AC943]/10 rounded-2xl p-4 mb-4 space-y-3">
+                      <div className="bg-gradient-to-r from-[#bdffff]/10 to-[#0891b2]/10 rounded-2xl p-4 mb-4 space-y-3">
                         <div className="flex justify-between items-center">
                           <span className="text-xs font-bold text-slate-500">Học phí:</span>
-                          <span className="text-lg font-black text-[#4E9F3D]">{coach.hourly_rate ? coach.hourly_rate.toLocaleString() : '250,000'}đ<span className="text-xs text-slate-400 font-medium">/giờ</span></span>
+                          <span className="text-lg font-black text-[#0891b2]">{coach.hourly_rate ? coach.hourly_rate.toLocaleString() : '250,000'}đ<span className="text-xs text-slate-400 font-medium">/giờ</span></span>
                         </div>
                         <div className="flex justify-between items-center">
                           <span className="text-sm text-slate-600">Thuê bàn/giờ:</span>
@@ -300,7 +300,7 @@ const Schedule: React.FC = () => {
                         <div className="text-xs font-bold text-slate-600 mb-4 space-y-1 text-left bg-slate-50 rounded-xl p-3">
                           {Object.entries(getCoachSchedule(coach.id) || {}).map(([day, times]) => (
                             <div key={day} className="flex gap-2">
-                              <span className="font-black text-[#4E9F3D] min-w-[24px]">{day}:</span>
+                              <span className="font-black text-[#0891b2] min-w-[24px]">{day}:</span>
                               <span className="text-slate-500">{(times as string[]).join(', ')}</span>
                             </div>
                           ))}
@@ -318,7 +318,7 @@ const Schedule: React.FC = () => {
                         </button>
                         <a
                           href="tel:0913909012"
-                          className="flex-1 bg-gradient-to-r from-[#4E9F3D] to-[#7AC943] text-white rounded-full py-3 text-xs font-black uppercase hover:shadow-lg hover:shadow-green-200 transition-all text-center"
+                          className="flex-1 bg-gradient-to-r from-[#bdffff] to-[#0891b2] text-white rounded-full py-3 text-xs font-black uppercase hover:shadow-lg hover:shadow-cyan-200 transition-all text-center"
                         >
                           Liên hệ
                         </a>
@@ -341,7 +341,7 @@ const Schedule: React.FC = () => {
             {/* Footer Info */}
             <div className="mt-12 space-y-4">
               <div className="bg-white p-6 rounded-3xl border border-slate-100 flex items-center gap-5 shadow-sm">
-                <div className="w-10 h-10 bg-green-50 text-[#4E9F3D] rounded-2xl flex items-center justify-center">
+                <div className="w-10 h-10 bg-cyan-50 text-[#0891b2] rounded-2xl flex items-center justify-center">
                   <Info size={18} />
                 </div>
                 <div>
@@ -350,7 +350,7 @@ const Schedule: React.FC = () => {
                 </div>
               </div>
               <div className="bg-white p-6 rounded-3xl border border-slate-100 flex items-center gap-5 shadow-sm">
-                <div className="w-10 h-10 bg-green-50 text-green-600 rounded-2xl flex items-center justify-center">
+                <div className="w-10 h-10 bg-cyan-50 text-cyan-600 rounded-2xl flex items-center justify-center">
                   <Phone size={18} />
                 </div>
                 <div>
@@ -374,7 +374,7 @@ const Schedule: React.FC = () => {
             onClick={(e) => e.stopPropagation()}
           >
             {/* Modal Header */}
-            <div className="bg-gradient-to-br from-[#4E9F3D] via-[#7AC943] to-[#a8e063] p-8 rounded-t-3xl relative">
+            <div className="bg-gradient-to-br from-[#0891b2] via-[#bdffff] to-[#e0fafa] p-8 rounded-t-3xl relative">
               <button
                 onClick={() => setSelectedCoach(null)}
                 className="absolute top-4 right-4 bg-white/20 hover:bg-white/30 p-2 rounded-full text-white transition-all"
@@ -387,7 +387,7 @@ const Schedule: React.FC = () => {
                   {selectedCoach.avatar ? (
                     <img src={selectedCoach.avatar} alt={selectedCoach.name} className="w-full h-full object-cover" />
                   ) : (
-                    <User size={40} className="text-[#4E9F3D]" />
+                    <User size={40} className="text-[#0891b2]" />
                   )}
                 </div>
                 <div>
@@ -416,19 +416,19 @@ const Schedule: React.FC = () => {
               {selectedCoach.bio && (
                 <div>
                   <h4 className="font-black text-slate-800 mb-2 flex items-center gap-2">
-                    <Award size={16} className="text-[#4E9F3D]" /> Giới thiệu
+                    <Award size={16} className="text-[#0891b2]" /> Giới thiệu
                   </h4>
                   <p className="text-slate-600 text-sm leading-relaxed">{selectedCoach.bio}</p>
                 </div>
               )}
 
               {/* Pricing */}
-              <div className="bg-gradient-to-r from-[#4E9F3D]/5 to-[#7AC943]/10 rounded-2xl p-5">
+              <div className="bg-gradient-to-r from-[#bdffff]/10 to-[#0891b2]/10 rounded-2xl p-5">
                 <h4 className="font-black text-slate-800 mb-3">💰 Học phí</h4>
                 <div className="space-y-2">
                   <div className="flex justify-between items-center">
                     <span className="text-sm text-slate-600">Học phí/giờ:</span>
-                    <span className="text-lg font-black text-[#4E9F3D]">
+                    <span className="text-lg font-black text-[#0891b2]">
                       {selectedCoach.hourly_rate ? selectedCoach.hourly_rate.toLocaleString() : '250,000'}đ
                     </span>
                   </div>
@@ -451,7 +451,7 @@ const Schedule: React.FC = () => {
                   <div className="bg-slate-50 rounded-xl p-4 space-y-2">
                     {Object.entries(getCoachSchedule(selectedCoach.id) || {}).map(([day, times]) => (
                       <div key={day} className="flex gap-3 text-sm">
-                        <span className="font-black text-[#4E9F3D] min-w-[30px]">{day}:</span>
+                        <span className="font-black text-[#0891b2] min-w-[30px]">{day}:</span>
                         <span className="text-slate-600">{(times as string[]).join(', ')}</span>
                       </div>
                     ))}
@@ -463,7 +463,7 @@ const Schedule: React.FC = () => {
               <div className="flex gap-3 pt-4">
                 <a
                   href="tel:0913909012"
-                  className="flex-1 bg-gradient-to-r from-[#4E9F3D] to-[#7AC943] text-white rounded-full py-4 text-sm font-black uppercase text-center hover:shadow-lg hover:shadow-green-200 transition-all flex items-center justify-center gap-2"
+                  className="flex-1 bg-gradient-to-r from-[#bdffff] to-[#0891b2] text-white rounded-full py-4 text-sm font-black uppercase text-center hover:shadow-lg hover:shadow-cyan-200 transition-all flex items-center justify-center gap-2"
                 >
                   <Phone size={18} /> Gọi ngay
                 </a>
